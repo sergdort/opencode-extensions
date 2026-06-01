@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [".opencode/GITHUB_LIBRARIAN_INSTRUCTIONS.md"],
+  "agent": {
+    "build": {
+      "permission": {
+        "task": {
+          "github-librarian": "allow"
+        }
+      }
+    }
+  }
+}
