@@ -154,11 +154,13 @@ If you use deny-by-default task permissions, put the broad rule first and the Li
 
 OpenCode evaluates the last matching permission rule, so order matters.
 
-## Bash Permissions
+## Permissions
 
-The default agent file denies edits and allows only the read/search tools plus a small set of shell command patterns used for GitHub scouting, such as `gh`, `jq`, `mkdir`, `mktemp`, `base64`, `tr`, and `nl`.
+The default agent file denies edits, allows the read/search tools, and allows all bash commands so it can use `gh`, `git`, `jq`, temp workspace setup, and other repository-inspection utilities without repeated prompts.
 
-If you want stricter behavior, edit `github-librarian.md` after copying it and change `permission.bash` to `ask`.
+It also allows external-directory access only for the isolated temp workspace paths `/tmp/github-librarian-*` and `/private/tmp/github-librarian-*`, including nested files under those directories. This lets Librarian create its cache folders without prompting while keeping the permission scoped to its own workspace.
+
+If you want stricter behavior, edit `github-librarian.md` after copying it and change `permission.bash` to `ask` or to a pattern object with only the commands you trust.
 
 ## Usage
 

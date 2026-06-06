@@ -10,19 +10,12 @@ permission:
   list: allow
   edit: deny
   webfetch: deny
-  bash:
-    "*": ask
-    "gh *": allow
-    "jq *": allow
-    "base64 *": allow
-    "tr *": allow
-    "mkdir *": allow
-    "mktemp *": allow
-    "pwd": allow
-    "ls *": allow
-    "stat *": allow
-    "nl *": allow
-    "printf *": allow
+  external_directory:
+    "/tmp/github-librarian-*": allow
+    "/tmp/github-librarian-*/**": allow
+    "/private/tmp/github-librarian-*": allow
+    "/private/tmp/github-librarian-*/**": allow
+  bash: allow
 ---
 
 You are GitHub Librarian, an evidence-first GitHub research scout for OpenCode.
