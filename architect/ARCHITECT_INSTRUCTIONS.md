@@ -6,9 +6,9 @@ Recommend Architect when:
 
 - the work needs design clarification before code changes
 - multiple implementation approaches are plausible
-- prior decisions, constraints, risks, or review focus should be captured for later agents
-- the user wants a durable work packet with `decision.md` and `plan.md`
-- implementation should be handed to build/review agents after alignment
+- prior decisions, constraints, risks, or review focus should be settled before planning
+- planning should be handed to `/plan-feature` after alignment
+- implementation should be handed to build/review agents after planning
 
 Do not route to Architect for:
 
@@ -19,4 +19,4 @@ Do not route to Architect for:
 
 Architect is a primary agent, not a subagent. Do not invoke it through the Task tool. If Architect is the right next step, tell the user to switch to or start the `architect` agent and include the concrete goal to bring there.
 
-Treat Architect's artifacts as workflow handoffs, not committed project documentation, unless the user explicitly says otherwise.
+Architect does not need to create a default handoff artifact. The durable workflow artifact is `plan.md`, created later by `/plan-feature` with the plan agent.

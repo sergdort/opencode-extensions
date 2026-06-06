@@ -12,7 +12,7 @@ This repo packages lightweight OpenCode extensions as copyable Markdown prompts,
 ## Current Packages
 
 - `commands/`: reusable slash command prompts.
-- `architect/`: primary agent for architecture alignment, work packets, and implementation/review handoff.
+- `architect/`: primary agent for architecture alignment before planning, implementation, and review.
 - `oracle/`: read-only second-opinion subagent preset.
 - `librarian/`: GitHub research subagent preset and command.
 

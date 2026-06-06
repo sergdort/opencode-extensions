@@ -1,27 +1,27 @@
 ---
-description: Review implemented work against an Architect decision and plan
+description: Review implemented work against plan.md
 agent: review
 ---
-Review the current implementation against the Architect work packet identified by these command arguments:
+Review the current implementation against the plan identified by these command arguments:
 
 `$ARGUMENTS`
 
-## Resolve The Work Packet
+## Resolve The Plan
 
-- Treat the argument as a handoff directory path, for example `handoffs/payments-refactor`.
-- If the argument is a bare slug and `handoffs/<slug>` exists, use that directory.
-- If no argument is provided, ask the user for the handoff directory before reviewing.
-- Read `decision.md` and `plan.md` from the handoff directory before judging the implementation.
-- If either file is missing, stop and ask the user to provide the correct work packet.
+- If the argument names a Markdown file, use that file as the plan path.
+- If the argument names a directory, use `<directory>/plan.md`.
+- If no argument is provided, use `plan.md` in the current repository or working directory.
+- Read the resolved `plan.md` before judging the implementation.
+- If `plan.md` is missing, warn that `/plan-feature` must create the implementation plan first and stop.
 
 ## Review Scope
 
 - Review the current diff and relevant touched files.
-- Compare the implementation to `decision.md` and `plan.md`.
-- Flag deviations from the agreed architecture.
+- Compare the implementation to `plan.md`.
+- Flag deviations from the goal, constraints, execution sketch, call flow, work steps, behavioral contract, and verification plan.
 - Flag implementation defects, regressions, missing tests, and missing verification.
 - Distinguish code problems from plan problems.
-- If the diff includes unrelated changes, call them out separately instead of treating them as part of the work packet.
+- If the diff includes unrelated changes, call them out separately instead of treating them as part of the planned work.
 - Stay read-only. Do not edit files, stage changes, commit, or push.
 
 ## Findings Format
@@ -32,7 +32,7 @@ For each finding, include:
 
 - Severity
 - File and line reference when available
-- The violated decision, plan step, or expected behavior
+- The violated plan step, expected behavior, or verification requirement
 - Why it matters
 - A concrete fix or follow-up
 

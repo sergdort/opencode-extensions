@@ -126,7 +126,7 @@ Example project config:
 
 If your `build` agent already has `permission` or `task` settings, merge these keys manually. Do not replace your existing config wholesale.
 
-If you want Architect to delegate high-risk decisions or plans to Oracle, also allow `architect` to invoke `oracle` through the Task tool.
+If you want Architect to delegate high-risk decisions to Oracle, also allow `architect` to invoke `oracle` through the Task tool.
 
 If your config already has `instructions`, append `.opencode/ORACLE_INSTRUCTIONS.md` instead of replacing the array.
 

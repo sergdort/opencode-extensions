@@ -1,32 +1,25 @@
 ---
-description: Implement an Architect work packet from decision.md and plan.md
+description: Implement work from a Plannotator-reviewed plan.md
 agent: build
 ---
-Implement the Architect work packet identified by these command arguments:
+Implement the work described by the plan identified by these command arguments:
 
 `$ARGUMENTS`
 
-## Resolve The Work Packet
+## Resolve The Plan
 
-- Treat the argument as a handoff directory path, for example `handoffs/payments-refactor`.
-- If the argument is a bare slug and `handoffs/<slug>` exists, use that directory.
-- If no argument is provided, ask the user for the handoff directory before doing any work.
-- Read `decision.md` and `plan.md` from the handoff directory before editing files.
-- If either file is missing, stop and ask the user to provide the correct work packet.
-
-## Plannotator Soft Gate
-
-- Inspect the status line in `plan.md` before editing files.
-- If the plan is clearly approved or reviewed, proceed.
-- If the plan is draft, pending review, missing a status line, or otherwise unclear, warn the user that the plan does not appear approved.
-- Do not edit product files after that warning unless the user confirms they want to proceed anyway.
-- If the command arguments already include an explicit instruction to proceed despite a draft plan, report the caveat and continue.
+- If the argument names a Markdown file, use that file as the plan path.
+- If the argument names a directory, use `<directory>/plan.md`.
+- If no argument is provided, use `plan.md` in the current repository or working directory.
+- Read the resolved `plan.md` before editing files.
+- If `plan.md` is missing, warn that `/plan-feature` must create the implementation plan first and stop.
 
 ## Implementation Rules
 
-- Treat `decision.md` and `plan.md` as the source of truth.
-- Implement only the approved scope from `plan.md`.
-- Preserve architectural decisions from `decision.md` unless the user explicitly renegotiates them.
+- Treat `plan.md` as the source of truth.
+- Implement only the scope from `plan.md`.
+- Preserve the constraints, ownership boundaries, execution sketch, call flow, and behavioral contract in `plan.md` unless the user explicitly renegotiates them.
+- Prefer implementing scenario by scenario when `plan.md` includes Gherkin scenarios.
 - If repository reality conflicts with the plan, stop and explain the conflict before changing direction.
 - If the user approves a necessary deviation, update `plan.md` to record it.
 - Do not expand scope just because nearby improvements are visible.
@@ -46,4 +39,4 @@ Report:
 - Any deviations from the plan
 - Verification commands and results
 - Remaining risks or follow-ups
-- The next command: `/review-work <handoff-dir>`
+- The next command: `/review-work` or `/review-work <plan-path>` if a non-default plan path was used
