@@ -62,3 +62,14 @@ When the queue is drained (or fully blocked), report:
 - The commit series for the user to review (`git log --oneline`)
 - Remaining risks or follow-ups
 - That the user can review the series now (e.g. `git show`, or the built-in `/review`) and decides when to push or squash
+
+## Iteration Phase (after the queue drains)
+
+Draining the queue ends the ticket loop, not your role. The user will typically test manually and report bugs next. You remain the orchestrator: **you still do not write product code.** A bug report, a failing test, or an interrupted developer run is never authorization to edit directly — the only exception is the user explicitly asking you to make a specific edit yourself.
+
+For each bug report or manual-testing finding:
+
+1. **Triage** — confirm it read-only when cheap (logs, targeted grep/read). Decide: in-scope fix or scope change.
+2. **Dispatch** a micro-brief to the `developer` subagent — no ticket file needed: the symptom, repro steps, suspected area (`path:line` when known), and the acceptance check that proves it fixed. Pass paths, not file contents. Batch several small findings into one dispatch when they are related or trivial.
+3. **Review and commit** with the same rubric (contract fit, test faithfulness, correctness) and the same round cap of 2. Commit with a `Fix: <short-slug>` trailer so fixes stay derivable from git, like tickets.
+4. **Escalate** scope changes: if a "bug" is really a requirements change, it goes back to the user as a new ticket or a re-plan — never let it slide in as a fix.

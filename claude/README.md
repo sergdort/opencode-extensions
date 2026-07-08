@@ -38,7 +38,8 @@ Subagents (`claude/agents/`):
 
 - `developer.md` (Sonnet): implements exactly one ticket, writes and verifies its own tests, returns a structured report. Does not commit.
 - `repo-scout.md` (Haiku): fast read-only codebase discovery, spawned by the developer when a ticket's seeds run dry.
-- `oracle.md` (Opus): read-only second opinion on high-risk architecture, security, refactors, and plans.
+- `oracle.md` (Fable): read-only second opinion on high-risk architecture, security, refactors, and plans.
+- `contrarian.md` (Fable): adversarial stress-test of one specific decision — steelmans the strongest opposing case and reports confirmed vs. speculative objections. Gated to uncertain, hard-to-undo, or broad-blast-radius calls.
 - `github-librarian.md` (Sonnet): GitHub research scout that uses `gh` to find and cite exact upstream code locations.
 
 Slash commands (`claude/commands/`):
@@ -53,6 +54,7 @@ Slash commands (`claude/commands/`):
 ## How The Loop Works
 
 - **Architect = orchestrator + reviewer.** It dispatches each ticket to the `developer` subagent, reviews the working-tree diff (contract fit, test faithfulness, correctness), and commits on approval. It never writes product code within the flow.
+- **The role survives the queue.** Draining the tickets ends the loop, not the orchestration: bugs found during manual testing become micro-briefs dispatched to `developer` (committed with a `Fix:` trailer), not direct edits by the main session.
 - **State is derived, not stored.** Ticket files are immutable specs. A ticket is *done* when a commit with a `Ticket: <id>` trailer exists; *ready* when its deps are done. A fresh session resumes from git plus the dependency graph. The only mutation is a `blocked` marker on an escalated ticket.
 - **Per-ticket local commits** are the completion ledger and your review surface — never pushed. Review the commit series at the end (`git show`, `/review`) and squash before pushing if you like.
 - **2-round cap.** If a ticket fails review twice it escalates to you at the requirements level — usually a sign the ticket or contract is wrong, not the developer.
@@ -91,9 +93,12 @@ Each subagent pins both a model and a reasoning `effort` (which overrides the se
 
 - `developer`: `sonnet` / `high` — correctness of delegated code matters; `high` is Sonnet's ceiling below `max`.
 - `repo-scout`: `haiku` / `low` — stays cheap even when the session runs hot.
-- `oracle`: `opus` / `xhigh` — stays deep even when the session runs low.
+- `oracle`: `fable` / `xhigh` — the deepest model, in a bounded burst: fresh context in, short report out.
+- `contrarian`: `fable` / `xhigh` — same shape as oracle; adversarial reasoning is where the top model earns its cost.
 - `github-librarian`: `sonnet` / `medium` — locate-and-cite tool work, not analysis.
 - Commands inherit the session model and `/effort` — the grilling, decomposition, and inline review are your reasoning under your control.
+
+The allocation principle: the main session is a long-lived context replayed every turn, so run it on Opus (`/model opus`) — `/architect` will suggest this if it notices the session is on Fable. Fable lives only in `oracle`/`contrarian` bursts, where its cost is bounded by construction. If Opus-in-main still proves too expensive, the next lever is a `code-reviewer` subagent so the orchestrator stops reading full diffs — deliberately not adopted yet.
 
 Edit the `model:` / `effort:` frontmatter to taste. Note `xhigh` is not available on Sonnet, and available levels depend on the model.
 

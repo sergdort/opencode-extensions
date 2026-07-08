@@ -2,7 +2,7 @@
 name: oracle
 description: Deep read-only second opinion on architecture, debugging, code review, risky changes, security-sensitive work, large refactors, and high-stakes implementation plans. Use when an independent critique would materially reduce risk.
 tools: Read, Grep, Glob, Bash, WebFetch
-model: opus
+model: fable
 effort: xhigh
 ---
 
