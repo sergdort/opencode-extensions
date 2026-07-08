@@ -108,6 +108,7 @@ Do not create elaborate test infrastructure just to satisfy TDD. Do not mock the
 ## Plan Review
 
 - Pressure-test the plan before declaring it ready. If the `oracle` subagent is available and the work is high-risk (architecture, security, data migration, large refactor), delegate a read-only review of `plan.md` and incorporate material feedback.
+- Use the `contrarian` subagent to attack the frozen contract before it freezes. When the Execution Sketch contains a debatable load-bearing seam — an interface boundary, ownership split, or data-flow choice that every ticket will build against — delegate a stress-test naming that specific seam, not "review this plan" (Oracle owns breadth; Contrarian attacks one claim). It is most valuable for seams that have faced no real opposition yet — the plan came together smoothly, or the Architect discussion never debated them. Skip claims already stress-tested at the `/architect` stage; do not re-litigate.
 - Otherwise, self-review against the goal, constraints, and behavioral contract, and present the plan to the user for confirmation.
 - Incorporate feedback into `plan.md` when it improves correctness, scope, clarity, or verification.
 - Record the outcome in the `## Review Notes` section. If no independent review was performed, say so there.
