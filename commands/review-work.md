@@ -26,17 +26,33 @@ Review the current implementation against the plan identified by these command a
 
 ## Findings Format
 
-Put findings first, ordered by severity.
+Put findings first, ordered by blast radius, not discovery order. For each candidate finding ask: who controls the input, and how wide does failure spread?
+
+- Must-fix: an attacker or unlucky caller can turn it into data loss, corruption, breach, or outage. Examples: unbounded caller-controlled cost, trust-boundary input not parsed or bounded, non-idempotent retry touching money or external state, failure that cascades past the feature.
+- Consider before shipping: real costs that stay contained. Examples: silent swallows, missing teardown, action-at-a-distance, missing contract tests.
+- Nice-to-have: clarity and taste with no correctness impact.
 
 For each finding, include:
 
-- Severity
+- Severity tier from above
 - File and line reference when available
 - The violated plan step, expected behavior, or verification requirement
 - Why it matters
 - A concrete fix or follow-up
 
 If there are no findings, say that explicitly and mention any residual verification gaps.
+
+## Noise Control
+
+Do not flag:
+
+- Missing atomicity or idempotency machinery where nothing actually interleaves and no retry touches money, state, or the outside world.
+- Missing re-validation at internal hops; parsing and bounding belong at real trust boundaries, once.
+- Missing fallbacks or bulkheads where the blast radius does not justify them; an untested degraded path is a second bug.
+- Deliberate, logged fallbacks as if they were silent failures; the sin is the silent swallow, not the catch keyword.
+- Flexibility the plan does not require; prefer fewer states over more guards.
+
+Where the implementation accepts a real tradeoff, name its cost explicitly instead of reporting it as a defect.
 
 ## Final Response
 
