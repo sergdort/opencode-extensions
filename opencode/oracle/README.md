@@ -27,7 +27,7 @@ Use this when you want Oracle available across projects on a machine.
 Run from any directory and set `ORACLE_DIR` to this package directory:
 
 ```bash
-ORACLE_DIR=/path/to/opencode-extensions/oracle
+ORACLE_DIR=/path/to/opencode-extensions/opencode/oracle
 mkdir -p ~/.config/opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" ~/.config/opencode/agents/oracle.md
 cp "$ORACLE_DIR/ORACLE_INSTRUCTIONS.md" ~/.config/opencode/ORACLE_INSTRUCTIONS.md
@@ -88,7 +88,7 @@ Use this when you want Oracle available only in one repository.
 Run from the target project root and set `ORACLE_DIR` to this package directory:
 
 ```bash
-ORACLE_DIR=/path/to/opencode-extensions/oracle
+ORACLE_DIR=/path/to/opencode-extensions/opencode/oracle
 mkdir -p .opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" .opencode/agents/oracle.md
 cp "$ORACLE_DIR/ORACLE_INSTRUCTIONS.md" .opencode/ORACLE_INSTRUCTIONS.md

@@ -1,28 +1,41 @@
 # Contributor Guidance
 
-This repo packages lightweight OpenCode extensions as copyable Markdown prompts, agent definitions, instruction files, and example config snippets.
+This repo packages lightweight agent extensions for two harnesses — OpenCode (`opencode/`) and Claude Code (`claude/`) — as copyable Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the two configurations; package READMEs hold the per-package details.
 
 ## Project Shape
 
 - Keep the project explicit and copy-based.
 - Do not add plugins, installers, hidden config mutation, subprocess harnesses, automatic model routing, or runtime state machines unless the user explicitly chooses that direction.
-- Prefer native OpenCode agents, commands, instruction files, and README documentation.
-- Each package should be understandable and usable on its own after copying files into `~/.config/opencode/` or a project `.opencode/` directory.
+- Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code).
+- The two trees are siblings, not mirrors: they share the architect-first, plan-artifact workflow idea, but each is written for its harness's native mechanisms. When changing shared concepts (e.g. the plan format or oracle's charter), check whether the counterpart tree needs an equivalent change — and adapt rather than copy.
 
 ## Current Packages
 
-- `commands/`: reusable slash command prompts.
-- `architect/`: primary agent for architecture alignment before planning, implementation, and review.
-- `oracle/`: read-only second-opinion subagent preset.
-- `librarian/`: GitHub research subagent preset and command.
+OpenCode packages live under `opencode/`:
 
-## File Conventions
+- `opencode/commands/`: reusable slash command prompts.
+- `opencode/architect/`: primary agent for architecture alignment before planning, implementation, and review.
+- `opencode/oracle/`: read-only second-opinion subagent preset.
+- `opencode/librarian/`: GitHub research subagent preset and command.
+
+The Claude Code package lives under `claude/`:
+
+- `claude/agents/` + `claude/commands/`: the ticket-driven architect/developer harness. See `claude/README.md` for the workflow, execution model, and model/effort allocation.
+
+## File Conventions — OpenCode (`opencode/`)
 
 - Agent files live under `<package>/agents/*.md`.
 - Package-level routing/delegation instructions use uppercase names such as `ORACLE_INSTRUCTIONS.md`.
 - Example OpenCode config snippets are named `opencode.<package>.example.json`.
 - Package READMEs should include what the package provides, non-goals, install steps, config snippets, usage, model defaults, and restart requirements.
-- Command files live in `commands/*.md` and should use only supported OpenCode command frontmatter used in this repo, such as `description` and `agent`.
+- Command files live in `opencode/commands/*.md` and should use only supported OpenCode command frontmatter used in this repo, such as `description` and `agent`.
+
+## File Conventions — Claude Code (`claude/`)
+
+- Subagents live in `claude/agents/*.md` with `name`, `description`, `tools`, `model`, and `effort` frontmatter. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`.
+- Commands live in `claude/commands/*.md`; they run in the main session (no `agent:` binding), so any role instructions belong in the command body itself.
+- The workflow's durable artifacts are `decision-brief.md`, `plan.md`, and `tickets/*.md`; ticket state is derived from git `Ticket:` trailers, not stored. Do not introduce hidden session state.
+- Keep `claude/README.md` in sync when changing agents, commands, or the loop mechanics — it is the package's contract.
 
 ## OpenCode Config Rules
 
@@ -48,7 +61,7 @@ This repo packages lightweight OpenCode extensions as copyable Markdown prompts,
 - Run `git diff --check` for tracked changes.
 - For new untracked files, use `git diff --check --no-index -- /dev/null <file>` and treat exit code `1` as normal for a no-index diff if there is no whitespace-error output.
 - Validate example JSON with `jq empty <file>`.
-- Re-read changed Markdown prompts before finalizing to catch stale command names, unsupported frontmatter, or copied instructions that do not fit OpenCode.
+- Re-read changed Markdown prompts before finalizing to catch stale command names, unsupported frontmatter, or copied instructions that do not fit the target harness.
 
 ## Git Hygiene
 

@@ -15,7 +15,7 @@ Reusable OpenCode command files.
 For global use:
 
 ```bash
-COMMANDS_DIR=/path/to/opencode-extensions/commands
+COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p ~/.config/opencode/commands
 cp "$COMMANDS_DIR"/*.md ~/.config/opencode/commands/
 ```
@@ -23,7 +23,7 @@ cp "$COMMANDS_DIR"/*.md ~/.config/opencode/commands/
 For one project:
 
 ```bash
-COMMANDS_DIR=/path/to/opencode-extensions/commands
+COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p .opencode/commands
 cp "$COMMANDS_DIR"/*.md .opencode/commands/
 ```

@@ -59,8 +59,8 @@ Use this when you want Architect available across projects on a machine.
 Run from any directory and set these paths to this repository:
 
 ```bash
-ARCHITECT_DIR=/path/to/opencode-extensions/architect
-COMMANDS_DIR=/path/to/opencode-extensions/commands
+ARCHITECT_DIR=/path/to/opencode-extensions/opencode/architect
+COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
 cp "$ARCHITECT_DIR/agents/architect.md" ~/.config/opencode/agents/architect.md
 cp "$ARCHITECT_DIR/ARCHITECT_INSTRUCTIONS.md" ~/.config/opencode/ARCHITECT_INSTRUCTIONS.md
@@ -86,8 +86,8 @@ Use this when you want Architect available only in one repository.
 Run from the target project root and set these paths to this repository:
 
 ```bash
-ARCHITECT_DIR=/path/to/opencode-extensions/architect
-COMMANDS_DIR=/path/to/opencode-extensions/commands
+ARCHITECT_DIR=/path/to/opencode-extensions/opencode/architect
+COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p .opencode/agents .opencode/commands
 cp "$ARCHITECT_DIR/agents/architect.md" .opencode/agents/architect.md
 cp "$ARCHITECT_DIR/ARCHITECT_INSTRUCTIONS.md" .opencode/ARCHITECT_INSTRUCTIONS.md

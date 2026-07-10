@@ -35,8 +35,8 @@ Use this when you want GitHub Librarian available across projects on a machine.
 Run from any directory and set these paths to this repository:
 
 ```bash
-LIBRARIAN_DIR=/path/to/opencode-extensions/librarian
-COMMANDS_DIR=/path/to/opencode-extensions/commands
+LIBRARIAN_DIR=/path/to/opencode-extensions/opencode/librarian
+COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
 cp "$LIBRARIAN_DIR/agents/github-librarian.md" ~/.config/opencode/agents/github-librarian.md
 cp "$LIBRARIAN_DIR/GITHUB_LIBRARIAN_INSTRUCTIONS.md" ~/.config/opencode/GITHUB_LIBRARIAN_INSTRUCTIONS.md
@@ -91,8 +91,8 @@ Use this when you want GitHub Librarian available only in one repository.
 Run from the target project root and set these paths to this repository:
 
 ```bash
-LIBRARIAN_DIR=/path/to/opencode-extensions/librarian
-COMMANDS_DIR=/path/to/opencode-extensions/commands
+LIBRARIAN_DIR=/path/to/opencode-extensions/opencode/librarian
+COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p .opencode/agents .opencode/commands
 cp "$LIBRARIAN_DIR/agents/github-librarian.md" .opencode/agents/github-librarian.md
 cp "$LIBRARIAN_DIR/GITHUB_LIBRARIAN_INSTRUCTIONS.md" .opencode/GITHUB_LIBRARIAN_INSTRUCTIONS.md
