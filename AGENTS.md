@@ -14,9 +14,9 @@ This repo packages lightweight agent extensions for two harnesses — OpenCode (
 OpenCode packages live under `opencode/`:
 
 - `opencode/commands/`: reusable slash command prompts.
-- `opencode/architect/`: primary agent for architecture alignment before planning, implementation, and review.
-- `opencode/oracle/`: read-only second-opinion subagent preset.
-- `opencode/librarian/`: GitHub research subagent preset and command.
+- `opencode/agents/architect/`: primary agent for architecture alignment before planning, implementation, and review.
+- `opencode/agents/oracle/`: read-only second-opinion subagent preset.
+- `opencode/agents/librarian/`: GitHub research subagent preset and command.
 
 The Claude Code package lives under `claude/`:
 
@@ -24,7 +24,7 @@ The Claude Code package lives under `claude/`:
 
 ## File Conventions — OpenCode (`opencode/`)
 
-- Agent files live under `<package>/agents/*.md`.
+- Agent packages live under `opencode/agents/<package>/`; the agent definition itself is at `opencode/agents/<package>/agents/*.md`.
 - Package-level routing/delegation instructions use uppercase names such as `ORACLE_INSTRUCTIONS.md`.
 - Example OpenCode config snippets are named `opencode.<package>.example.json`.
 - Package READMEs should include what the package provides, non-goals, install steps, config snippets, usage, model defaults, and restart requirements.

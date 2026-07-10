@@ -6,10 +6,11 @@ Copy-based agent extensions for two coding harnesses: **OpenCode** and **Claude 
 
 ```
 opencode/               OpenCode packages
-  architect/            primary agent for settling architecture before planning
+  agents/               agent packages, each self-contained (README, instructions, example config)
+    architect/           primary agent for settling architecture before planning
+    oracle/               read-only second-opinion subagent
+    librarian/            GitHub research subagent
   commands/             reusable slash commands (/plan-feature, /start-work, /review-work, ...)
-  oracle/               read-only second-opinion subagent
-  librarian/            GitHub research subagent + command
 
 claude/                 Claude Code package
   agents/               subagents (developer, repo-scout, oracle, contrarian, github-librarian)
@@ -47,7 +48,7 @@ In short: the OpenCode tree is a set of small, independent presets you compose t
 
 Pick a tree, pick the pieces you want, and copy:
 
-- OpenCode: follow the README in each package under `opencode/` (`architect/`, `oracle/`, `librarian/`, `commands/`). Config snippets go into `opencode.json`; restart OpenCode afterwards — it loads agents, commands, and instructions at startup.
+- OpenCode: follow the README in each package under `opencode/agents/` (`architect/`, `oracle/`, `librarian/`) or `opencode/commands/`. Config snippets go into `opencode.json`; restart OpenCode afterwards — it loads agents, commands, and instructions at startup.
 - Claude Code: follow `claude/README.md` — copy `claude/agents/*.md` and `claude/commands/*.md` into `~/.claude/` (global) or `.claude/` (per project). No restart or JSON config needed.
 
 Packages are independent: you can install just `oracle`, just the librarian, or the full workflow.

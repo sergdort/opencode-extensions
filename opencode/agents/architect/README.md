@@ -11,9 +11,9 @@ When optional subagents are installed, Architect can also delegate focused GitHu
 - `agents/architect.md`: the primary Architect agent definition
 - `ARCHITECT_INSTRUCTIONS.md`: optional routing policy for other agents
 - `opencode.architect.example.json`: copyable config snippet for the optional routing policy
-- `../commands/plan-feature.md`: command prompt for creating a Plannotator-reviewed executable implementation plan
-- `../commands/start-work.md`: command prompt for implementing work from `plan.md`
-- `../commands/review-work.md`: command prompt for reviewing an implementation against `plan.md`
+- `../../commands/plan-feature.md`: command prompt for creating a Plannotator-reviewed executable implementation plan
+- `../../commands/start-work.md`: command prompt for implementing work from `plan.md`
+- `../../commands/review-work.md`: command prompt for reviewing an implementation against `plan.md`
 
 ## What It Does Not Do
 
@@ -59,7 +59,7 @@ Use this when you want Architect available across projects on a machine.
 Run from any directory and set these paths to this repository:
 
 ```bash
-ARCHITECT_DIR=/path/to/opencode-extensions/opencode/architect
+ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
 COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
 cp "$ARCHITECT_DIR/agents/architect.md" ~/.config/opencode/agents/architect.md
@@ -86,7 +86,7 @@ Use this when you want Architect available only in one repository.
 Run from the target project root and set these paths to this repository:
 
 ```bash
-ARCHITECT_DIR=/path/to/opencode-extensions/opencode/architect
+ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
 COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p .opencode/agents .opencode/commands
 cp "$ARCHITECT_DIR/agents/architect.md" .opencode/agents/architect.md

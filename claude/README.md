@@ -109,7 +109,7 @@ Edit the `model:` / `effort:` frontmatter to taste. Note `xhigh` is not availabl
 
 ## Relationship To The OpenCode Extensions
 
-This package began as a mirror of the OpenCode `opencode/architect/`, `opencode/oracle/`, `opencode/librarian/`, and `opencode/commands/` packages and grew into a fuller ticket-driven harness. Notable translation points:
+This package began as a mirror of the OpenCode `opencode/agents/architect/`, `opencode/agents/oracle/`, `opencode/agents/librarian/`, and `opencode/commands/` packages and grew into a fuller ticket-driven harness. Notable translation points:
 
 - Claude Code slash commands run in the current session (no per-command `agent:` binding), so role instructions live in each command body.
 - Architect is a `/architect` command, not a `mode: primary` agent — Claude Code has no persistent primary-agent switch, and Architect is interactive.

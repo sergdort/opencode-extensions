@@ -9,7 +9,7 @@ It uses the `gh` CLI to search code, inspect repository trees, fetch only the fi
 - `agents/github-librarian.md`: the GitHub Librarian subagent definition
 - `GITHUB_LIBRARIAN_INSTRUCTIONS.md`: optional delegation policy for other agents
 - `opencode.github-librarian.example.json`: copyable config snippet for command delegation and optional delegation policy
-- `../commands/github-librarian.md`: slash command that delegates a query to the subagent
+- `../../commands/github-librarian.md`: slash command that delegates a query to the subagent
 
 ## What It Does Not Do
 
@@ -35,7 +35,7 @@ Use this when you want GitHub Librarian available across projects on a machine.
 Run from any directory and set these paths to this repository:
 
 ```bash
-LIBRARIAN_DIR=/path/to/opencode-extensions/opencode/librarian
+LIBRARIAN_DIR=/path/to/opencode-extensions/opencode/agents/librarian
 COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
 cp "$LIBRARIAN_DIR/agents/github-librarian.md" ~/.config/opencode/agents/github-librarian.md
@@ -91,7 +91,7 @@ Use this when you want GitHub Librarian available only in one repository.
 Run from the target project root and set these paths to this repository:
 
 ```bash
-LIBRARIAN_DIR=/path/to/opencode-extensions/opencode/librarian
+LIBRARIAN_DIR=/path/to/opencode-extensions/opencode/agents/librarian
 COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p .opencode/agents .opencode/commands
 cp "$LIBRARIAN_DIR/agents/github-librarian.md" .opencode/agents/github-librarian.md
