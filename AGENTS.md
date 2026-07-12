@@ -14,7 +14,7 @@ This repo packages lightweight agent extensions for two harnesses — OpenCode (
 OpenCode packages live under `opencode/`:
 
 - `opencode/commands/`: reusable slash command prompts.
-- `opencode/agents/architect/`: primary agent for architecture alignment before planning, implementation, and review.
+- `opencode/agents/architect/`: persistent primary orchestrator plus developer, repo-scout, and contrarian agents for ticket-driven feature work.
 - `opencode/agents/oracle/`: read-only second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
 

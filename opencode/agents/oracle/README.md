@@ -149,6 +149,12 @@ If you use deny-by-default task permissions, put the broad rule first and the Or
 
 OpenCode evaluates the last matching permission rule, so order matters.
 
+## Permissions
+
+Oracle allows file reads, local search, web fetching, and common read-only Git inspection without repeated prompts. Both direct commands such as `git diff` and RTK-wrapped forms such as `rtk git diff` are covered. Other Bash commands require confirmation, edits are denied, and nested Task delegation is denied.
+
+This is a workflow guardrail rather than a shell sandbox. If you broaden Bash access after copying the agent, keep the read-only prompt boundary in mind.
+
 ## Manual Use
 
 You can invoke Oracle directly with `@oracle` after installing the agent file.

@@ -16,6 +16,7 @@ permission:
     "/private/tmp/github-librarian-*": allow
     "/private/tmp/github-librarian-*/**": allow
   bash: allow
+  task: deny
 ---
 
 You are GitHub Librarian, an evidence-first GitHub research scout for OpenCode.

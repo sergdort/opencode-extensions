@@ -9,8 +9,26 @@ permission:
   grep: allow
   list: allow
   edit: deny
-  bash: ask
-  webfetch: ask
+  bash:
+    "*": ask
+    "git status*": allow
+    "rtk git status*": allow
+    "git diff*": allow
+    "rtk git diff*": allow
+    "git log*": allow
+    "rtk git log*": allow
+    "git show*": allow
+    "rtk git show*": allow
+    "git blame*": allow
+    "rtk git blame*": allow
+    "git ls-files*": allow
+    "rtk git ls-files*": allow
+    "git rev-parse*": allow
+    "rtk git rev-parse*": allow
+    "git merge-base*": allow
+    "rtk git merge-base*": allow
+  webfetch: allow
+  task: deny
 ---
 
 You are Oracle, a deliberate read-only second-opinion agent for OpenCode.

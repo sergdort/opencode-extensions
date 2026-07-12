@@ -1,5 +1,5 @@
 ---
-description: Review implemented work against plan.md
+description: Optional independent final review after Architect's inline per-ticket reviews
 agent: review
 ---
 Review the current implementation against the plan identified by these command arguments:

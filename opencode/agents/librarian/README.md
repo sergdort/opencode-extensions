@@ -156,7 +156,7 @@ OpenCode evaluates the last matching permission rule, so order matters.
 
 ## Permissions
 
-The default agent file denies edits, allows the read/search tools, and allows all bash commands so it can use `gh`, `git`, `jq`, temp workspace setup, and other repository-inspection utilities without repeated prompts.
+The default agent file denies edits and nested Task delegation, allows the read/search tools, and allows all bash commands so it can use `gh`, `git`, `jq`, temp workspace setup, and other repository-inspection utilities without repeated prompts.
 
 It also allows external-directory access only for the isolated temp workspace paths `/tmp/github-librarian-*` and `/private/tmp/github-librarian-*`, including nested files under those directories. This lets Librarian create its cache folders without prompting while keeping the permission scoped to its own workspace.
 

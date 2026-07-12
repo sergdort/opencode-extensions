@@ -1,14 +1,14 @@
 # Architect Routing Instructions
 
-Use the `architect` primary agent when the user is starting non-trivial feature work, a broad refactor, an architecture decision, or a change where the approach should be settled before implementation.
+Use the `architect` primary agent when the user is starting non-trivial feature work, a broad refactor, an architecture decision, or ticket-driven work that should remain under one orchestrator through implementation and review.
 
 Recommend Architect when:
 
 - the work needs design clarification before code changes
 - multiple implementation approaches are plausible
 - prior decisions, constraints, risks, or review focus should be settled before planning
-- planning should be handed to `/plan-feature` after alignment
-- implementation should be handed to build/review agents after planning
+- the work benefits from a durable decision brief, plan, and resumable ticket queue
+- implementation should be delegated to bounded Developer contexts and reviewed inline
 
 Do not route to Architect for:
 
@@ -17,6 +17,6 @@ Do not route to Architect for:
 - simple bug fixes where the implementation path is clear
 - requests that are already in implementation or review unless the plan is materially wrong
 
-Architect is a primary agent, not a subagent. Do not invoke it through the Task tool. If Architect is the right next step, tell the user to switch to or start the `architect` agent and include the concrete goal to bring there.
+Architect is a primary agent, not a subagent. Do not invoke it through the Task tool and do not look for an `/architect` command. Tell the user to switch to the top-level `architect` agent and include the concrete goal.
 
-Architect does not need to create a default handoff artifact. The durable workflow artifact is `plan.md`, created later by `/plan-feature` with the plan agent.
+Architect owns the workflow from repository reconnaissance through local ticket commits. It writes `decision-brief.md`; `/plan-feature`, `/decompose`, and `/start-work` then run under Architect. Developer subagents write product code while Architect reviews and commits accepted work.

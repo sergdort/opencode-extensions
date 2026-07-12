@@ -1,6 +1,6 @@
 ---
-description: Create a Plannotator-reviewed executable implementation plan
-agent: plan
+description: Have Architect turn decision-brief.md and repository evidence into a reviewed, executable plan.md
+agent: architect
 ---
 Create or update the implementation plan for the current feature.
 
@@ -10,15 +10,16 @@ Command arguments are optional:
 
 ## Resolve The Plan File
 
-- If command arguments name a Markdown file, use that file as the plan path.
+- If command arguments name a Markdown file, accept it only when its basename is `plan.md`; otherwise stop and ask for a directory or a `plan.md` path.
 - If command arguments name a directory, use `<directory>/plan.md`.
 - If no argument is provided, use `plan.md` in the current repository or working directory.
 - If the target plan already exists, read it before updating it.
-- Do not look for or require `handoffs/`, `decision.md`, ADRs, or any other handoff artifact.
+- Read `decision-brief.md` next to the plan when it exists. It is the durable architecture source of truth.
+- Do not look for or require `handoffs/`, `decision.md`, ADRs, or other handoff artifacts.
 
 ## Planning Inputs
 
-- Use the current conversation context, especially the recent Architect discussion, as the architecture source of truth.
+- Use `decision-brief.md` plus the current Architect conversation as the architecture source of truth.
 - Inspect the repository when needed to turn the agreed approach into realistic implementation steps.
 - Do not invent architecture decisions. If the context is missing, ambiguous, or conflicts with repository reality, stop and ask the user.
 - Keep rationale minimal. Capture only constraints that materially guide implementation.
@@ -63,12 +64,14 @@ Gherkin scenarios for observable behavior.
 
 How the important scenarios and risks will be checked.
 
-## Plannotator Notes
+## Review Notes
 
-Review status, useful feedback incorporated, or why review was unavailable.
+Review status, useful feedback incorporated, or why independent review was unnecessary or unavailable.
 ```
 
 The `Execution Sketch` should be mostly pseudo-code, types, interfaces, function boundaries, and composition notes. The `Call Flow` should show the path through entrypoints, modules, state/data changes, and result handling. Do not enumerate every branch; include the paths that clarify ownership or implementation risk.
+
+The Execution Sketch is the frozen contract. `/decompose` materializes its interfaces as compiling stubs in ticket zero, and later tickets build against them. Make shared interface seams explicit and stable here.
 
 ## Behavioral Contract
 
@@ -102,11 +105,13 @@ Choose the cheapest reliable verification strategy. Prefer test-first when behav
 
 Do not create elaborate test infrastructure just to satisfy TDD. Do not mock the world. Do not keep expanding the test plan without producing an implementable plan.
 
-## Plannotator Review
+## Plan Review
 
-- Submit `plan.md` to Plannotator using the plan agent's available planning review capability.
-- Incorporate Plannotator feedback into `plan.md` when it improves correctness, scope, clarity, or verification.
-- If Plannotator is unavailable or cannot review the plan, say so clearly in the final response and leave `plan.md` with visible review notes.
+- Self-review the plan against the decision brief, repository evidence, goal, constraints, and behavioral contract.
+- For high-risk architecture, security, migration, persistence, or broad refactor work, delegate a read-only plan review to `oracle` when available.
+- When one load-bearing interface seam remains meaningfully debatable and was not already stress-tested, delegate that specific claim to `contrarian` before freezing it.
+- Use Plannotator when available and useful, but do not make it a hard dependency.
+- Incorporate material feedback into `plan.md` and record the outcome in `## Review Notes`.
 - Do not build a rigid approval state machine. The user decides when to proceed.
 
 ## Final Response
@@ -115,6 +120,6 @@ Report:
 
 - The plan file used
 - Whether `plan.md` was created or updated
-- Whether Plannotator review was completed, revised from feedback, or unavailable
+- Whether self-review or an independent review changed the plan
 - Any open planning questions
-- The next command: `/start-work` or `/start-work <plan-path>` if a non-default plan path was used
+- The next command: `/decompose` or `/decompose <plan-path>` if a non-default plan path was used

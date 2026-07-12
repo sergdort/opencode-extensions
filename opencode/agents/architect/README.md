@@ -1,102 +1,120 @@
-# OpenCode Architect
+# OpenCode Architect Orchestrator
 
-Architect is a simple OpenCode primary agent for starting non-trivial feature work.
+Architect is a persistent OpenCode primary agent that carries non-trivial feature work from architecture through a resumable, ticket-driven implementation loop.
 
-It helps the user settle the architecture in conversation, then hands planning/implementation/review to normal OpenCode agents through commands.
-
-When optional subagents are installed, Architect can also delegate focused GitHub repository research to `github-librarian` and risky second-opinion review to `oracle`.
-
-## What It Provides
-
-- `agents/architect.md`: the primary Architect agent definition
-- `ARCHITECT_INSTRUCTIONS.md`: optional routing policy for other agents
-- `opencode.architect.example.json`: copyable config snippet for the optional routing policy
-- `../../commands/plan-feature.md`: command prompt for creating a Plannotator-reviewed executable implementation plan
-- `../../commands/start-work.md`: command prompt for implementing work from `plan.md`
-- `../../commands/review-work.md`: command prompt for reviewing an implementation against `plan.md`
-
-## What It Does Not Do
-
-- It does not install a plugin.
-- It does not add a custom tool.
-- It does not run a subprocess.
-- It does not mutate your `opencode.json`.
-- It does not auto-select models or enforce a runtime state machine.
-- It does not require GitHub Librarian or Oracle; those delegations are optional.
-
-All setup is explicit and copy-based so changes are visible and reversible.
+You switch to the top-level `architect` agent once. There is no `/architect` command. Architect remains accountable for planning, decomposition, dispatch, review, escalation, and local commits while fresh Developer subagents write product code.
 
 ## Workflow
 
-Start in the `architect` agent for meaningful feature work.
-
-Architect will interview, inspect the repo, settle the approach, and summarize the agreed direction in conversation. It does not create a default handoff artifact.
-
-Then create the implementation plan with the plan agent:
-
 ```text
-/plan-feature
+select architect
+  -> inspect repository and settle architecture
+  -> decision-brief.md
+  -> /plan-feature
+  -> plan.md
+  -> /decompose
+  -> tickets/*.md
+  -> /start-work
+  -> dispatch Developer, review, commit, repeat
 ```
 
-`/plan-feature` uses the preserved conversation context, inspects the repo as needed, writes one artifact at `plan.md` by default, and submits the plan to Plannotator. The plan is an executable sketch: goal, implementation-relevant constraints, pseudo-code/types/interfaces, call flow, work steps, embedded Gherkin behavioral contract, verification, and Plannotator notes.
+Inline per-ticket review is the normal review mechanism. `/review-work` remains available as an optional independent final pass.
 
-After planning, run:
+## What It Provides
 
-```text
-/start-work
-```
+Agents in `agents/`:
 
-After implementation, run:
+- `architect.md`: primary orchestrator and reviewer
+- `developer.md`: implements and verifies one ticket or focused fix; never commits
+- `repo-scout.md`: hidden read-only local discovery helper available only to Developer
+- `contrarian.md`: read-only adversarial review of one load-bearing decision
 
-```text
-/review-work
-```
+Commands in `../../commands/`:
+
+- `plan-feature.md`: turns the decision brief and repository evidence into a frozen executable plan
+- `decompose.md`: cuts the plan into dependency-ordered vertical slices with a contract ticket zero
+- `start-work.md`: dispatches, reviews, and commits tickets one at a time
+- `review-work.md`: optional outside review after the inline loop
+
+Optional sibling packages add `oracle` and `github-librarian` delegation.
+
+## Durable State
+
+- `decision-brief.md`: settled architecture, meaningful rejected options, risks, and review focus
+- `plan.md`: frozen interface sketch, call flow, behavioral contract, and verification strategy
+- `tickets/*.md`: approved work-unit specifications and dependency graph
+- Git trailers: `Ticket: <id>` records completion and `Fix: <slug>` records accepted post-queue fixes
+
+Ready and done state is derived from git plus ticket dependencies. A fresh or compacted Architect session can reconstruct the queue without hidden runtime state.
+
+## Boundaries
+
+- Architect researches the repository directly before asking design questions.
+- Architect may edit workflow artifacts but does not write product code during the workflow.
+- Developer edits product code and tests but cannot stage, commit, push, or discard worktree changes.
+- Architect reviews each ticket and creates local commits; it cannot push or run destructive cleanup commands.
+- A ticket receives at most two Developer rounds before requirements-level escalation.
+- Contract changes return to `/plan-feature` and `/decompose`; accepted commits are not rewritten.
+
+These boundaries use both prompts and OpenCode permissions. Unlisted Task delegation and non-artifact edits require approval; named subagents and workflow artifacts are allowed. Architect and Developer may run routine repository commands without confirmation, while direct and RTK-wrapped Git operations that publish, rewrite history, switch branches, stash, or discard work are denied. Repo Scout and Contrarian allow only read-only Git inspection through Bash.
+
+## Non-Goals
+
+- No plugin, installer, custom tool, subprocess harness, hidden config mutation, or runtime state machine
+- No automatic parallel ticket execution
+- No automatic push, squash, or history rewriting
+- No requirement that Oracle, GitHub Librarian, or Plannotator be installed
 
 ## Global Install
-
-Use this when you want Architect available across projects on a machine.
-
-Run from any directory and set these paths to this repository:
 
 ```bash
 ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
 COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
-cp "$ARCHITECT_DIR/agents/architect.md" ~/.config/opencode/agents/architect.md
+cp "$ARCHITECT_DIR"/agents/*.md ~/.config/opencode/agents/
 cp "$ARCHITECT_DIR/ARCHITECT_INSTRUCTIONS.md" ~/.config/opencode/ARCHITECT_INSTRUCTIONS.md
 cp "$COMMANDS_DIR/plan-feature.md" ~/.config/opencode/commands/plan-feature.md
+cp "$COMMANDS_DIR/decompose.md" ~/.config/opencode/commands/decompose.md
 cp "$COMMANDS_DIR/start-work.md" ~/.config/opencode/commands/start-work.md
+```
+
+Optionally copy `review-work.md` if a `review` agent is installed:
+
+```bash
 cp "$COMMANDS_DIR/review-work.md" ~/.config/opencode/commands/review-work.md
 ```
 
-Then optionally add the routing policy to your global config:
+Optionally append the routing policy to global `opencode.json`:
 
 ```json
 {
+  "$schema": "https://opencode.ai/config.json",
   "instructions": ["/Users/you/.config/opencode/ARCHITECT_INSTRUCTIONS.md"]
 }
 ```
 
-Use an absolute path for global instructions. If you already have `instructions`, append this path instead of replacing the array.
+Use an absolute path globally and merge it with existing instructions.
 
 ## Project Install
-
-Use this when you want Architect available only in one repository.
-
-Run from the target project root and set these paths to this repository:
 
 ```bash
 ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
 COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
 mkdir -p .opencode/agents .opencode/commands
-cp "$ARCHITECT_DIR/agents/architect.md" .opencode/agents/architect.md
+cp "$ARCHITECT_DIR"/agents/*.md .opencode/agents/
 cp "$ARCHITECT_DIR/ARCHITECT_INSTRUCTIONS.md" .opencode/ARCHITECT_INSTRUCTIONS.md
 cp "$COMMANDS_DIR/plan-feature.md" .opencode/commands/plan-feature.md
+cp "$COMMANDS_DIR/decompose.md" .opencode/commands/decompose.md
 cp "$COMMANDS_DIR/start-work.md" .opencode/commands/start-work.md
+```
+
+Optionally copy `review-work.md` if a `review` agent is installed:
+
+```bash
 cp "$COMMANDS_DIR/review-work.md" .opencode/commands/review-work.md
 ```
 
-Then optionally add the routing policy to your project config:
+Optionally add the project routing instruction:
 
 ```json
 {
@@ -105,129 +123,39 @@ Then optionally add the routing policy to your project config:
 }
 ```
 
-If your config already has `instructions`, append `.opencode/ARCHITECT_INSTRUCTIONS.md` instead of replacing the array.
+## Optional Agents
 
-If your review agent is not named `review`, edit the `agent:` frontmatter in `review-work.md` after copying it.
+Install the sibling Oracle or Librarian packages if desired. Architect's bundled Task policy already allows `oracle` and `github-librarian` by name; unavailable agents simply cannot be invoked.
 
-## Optional GitHub Librarian
+The bundled delegation graph is:
 
-Architect is aware of the `github-librarian` subagent and can delegate targeted GitHub research to it when external repository evidence matters.
-
-To enable that delegation, install GitHub Librarian and allow Architect to invoke it through the Task tool:
-
-```json
-{
-  "agent": {
-    "architect": {
-      "permission": {
-        "task": {
-          "github-librarian": "allow"
-        }
-      }
-    }
-  }
-}
+```text
+architect -> developer, contrarian, oracle, github-librarian
+developer -> repo-scout
 ```
 
-If you use deny-by-default task permissions, put the broad rule first and the Librarian allow rule later:
+All other programmatic delegation requires user approval. A hard parent-level Task denial would propagate into child sessions and prevent Developer from invoking Repo Scout. Users can also invoke visible subagents manually with `@` according to OpenCode's normal behavior.
 
-```json
-{
-  "agent": {
-    "architect": {
-      "permission": {
-        "task": {
-          "*": "deny",
-          "github-librarian": "allow"
-        }
-      }
-    }
-  }
-}
-```
+## Models
 
-OpenCode evaluates the last matching permission rule, so order matters.
+Defaults:
 
-If your `architect` agent already has `permission` or `task` settings, merge these keys manually. Do not replace your existing config wholesale.
+- Architect: `openai/gpt-5.5`, `xhigh`
+- Developer: `openai/gpt-5.5`, `high`
+- Repo Scout: `openai/gpt-5.5`, `low`
+- Contrarian: `openai/gpt-5.5`, `xhigh`
 
-## Optional Oracle
+Edit copied agent frontmatter to match available provider models and variants.
 
-Architect is aware of the `oracle` subagent and can delegate high-risk decisions to it for an independent read-only second opinion.
+## Usage
 
-Use this when the design involves high-risk architecture or API decisions, security-sensitive work, data migration/deletion/persistence changes, large refactors, or broad behavior changes where independent critique would materially reduce risk.
-
-To enable that delegation, install Oracle and allow Architect to invoke it through the Task tool:
-
-```json
-{
-  "agent": {
-    "architect": {
-      "permission": {
-        "task": {
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-If you enable both optional delegation subagents, merge them under the same `task` object:
-
-```json
-{
-  "agent": {
-    "architect": {
-      "permission": {
-        "task": {
-          "github-librarian": "allow",
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-If you use deny-by-default task permissions, put the broad rule first and the specific allows later:
-
-```json
-{
-  "agent": {
-    "architect": {
-      "permission": {
-        "task": {
-          "*": "deny",
-          "github-librarian": "allow",
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-OpenCode evaluates the last matching permission rule, so order matters.
-
-If your `architect` agent already has `permission` or `task` settings, merge these keys manually. Do not replace your existing config wholesale.
-
-## Delegated Use
-
-To help your default agents recommend Architect for non-trivial feature design, add `ARCHITECT_INSTRUCTIONS.md` to your OpenCode `instructions`, or copy its contents into an existing instruction file such as `AGENTS.md`, `CLAUDE.md`, or `RTK.md`.
-
-README text alone is documentation for humans. Agents will only reliably see the routing policy if it is part of their configured instructions or task context.
-
-## Model
-
-The default Architect agent uses:
-
-```yaml
-model: openai/gpt-5.5
-variant: xhigh
-```
-
-Edit `architect.md` after copying it if you want a different model or reasoning variant.
+1. Switch to the top-level `architect` agent.
+2. Describe the feature or decision. Architect inspects the repository before grilling the design.
+3. After `decision-brief.md` is agreed, run `/plan-feature`.
+4. Review the plan, then run `/decompose` and approve the ticket cut.
+5. Run `/start-work`. Architect drains the queue or stops on an escalation.
+6. Review the local commit series and decide whether to squash or push.
 
 ## Restart Required
 
-OpenCode loads agent, command, instruction, and config files at startup. Quit and restart OpenCode after changing agent files, command files, instruction files, or `opencode.json`.
+OpenCode loads agent, command, instruction, and config files at startup. Quit and restart OpenCode after copying or changing them.
