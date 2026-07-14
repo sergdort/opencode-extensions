@@ -26,7 +26,7 @@ Agents in `agents/`:
 
 - `architect.md`: primary orchestrator and reviewer
 - `developer.md`: implements and verifies one ticket or focused fix; never commits
-- `repo-scout.md`: hidden read-only local discovery helper available only to Developer
+- `repo-scout.md`: hidden read-only local discovery helper available to Architect and Developer
 - `contrarian.md`: read-only adversarial review of one load-bearing decision
 
 Commands in `../../commands/`:
@@ -66,6 +66,8 @@ These boundaries use both prompts and OpenCode permissions. Unlisted Task delega
 - No requirement that Oracle, GitHub Librarian, or Plannotator be installed
 
 ## Global Install
+
+For the complete Architect, Oracle, Librarian, and command set, run the repository-level `opencode/link-global.sh` helper. It creates global symlinks without changing `opencode.json`; use the copy instructions below when installing only this package.
 
 ```bash
 ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
@@ -130,7 +132,7 @@ Install the sibling Oracle or Librarian packages if desired. Architect's bundled
 The bundled delegation graph is:
 
 ```text
-architect -> developer, contrarian, oracle, github-librarian
+architect -> developer, repo-scout, contrarian, oracle, github-librarian
 developer -> repo-scout
 ```
 
@@ -140,10 +142,12 @@ All other programmatic delegation requires user approval. A hard parent-level Ta
 
 Defaults:
 
-- Architect: `openai/gpt-5.5`, `xhigh`
-- Developer: `openai/gpt-5.5`, `high`
-- Repo Scout: `openai/gpt-5.5`, `low`
-- Contrarian: `openai/gpt-5.5`, `xhigh`
+- Architect: `anthropic/claude-fable-5`, `high`
+- Developer: `openai/gpt-5.6-terra`, `high`
+- Repo Scout: `openai/gpt-5.6-terra`, `low`
+- Contrarian: `openai/gpt-5.6-sol`, `xhigh`
+
+The lead seat runs on the model with the strongest delegation judgment; execution seats run on a cheaper model. Contrarian (and the sibling Oracle package) intentionally use a different model family than Architect so second opinions do not share the lead's blind spots.
 
 Edit copied agent frontmatter to match available provider models and variants.
 

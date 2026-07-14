@@ -189,8 +189,8 @@ README text alone is documentation for humans. Agents will only reliably see the
 The default GitHub Librarian agent uses:
 
 ```yaml
-model: openai/gpt-5.5
-variant: xhigh
+model: openai/gpt-5.6-terra
+variant: high
 ```
 
 Edit `github-librarian.md` after copying it if you want a different model or reasoning variant.

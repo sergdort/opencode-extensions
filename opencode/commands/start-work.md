@@ -31,7 +31,7 @@ Process one ready ticket at a time in dependency order:
 2. Snapshot `git status --short`. If an already-dirty file overlaps the ticket's declared scope, stop and resolve ownership with the user before dispatch; path staging cannot separate pre-existing and Developer hunks safely.
 3. Dispatch a fresh `developer` Task. Pass the ticket path, plan path, and decision-brief path when present, not copied artifact contents.
 4. After Developer returns, inspect `git status`, the complete working-tree diff, and untracked files. Compare every Developer-touched path with the pre-dispatch snapshot, including necessary out-of-scope changes reported by Developer. If any touched path was already dirty, do not stage it; stop and resolve ownership with the user.
-5. Review contract and ticket scope fit, test faithfulness, implementation correctness, and actual verification results, in that order.
+5. Review contract and ticket scope fit, test faithfulness, implementation correctness, and actual verification results, in that order. Review from the diff; pull full files into your context only when the diff alone is insufficient to judge correctness.
 6. Accept by staging only that ticket's changes, inspecting the complete staged diff, and committing only if it contains the accepted ticket and no pre-existing work; request one fresh correction round with precise findings; or escalate immediately if Developer reports `BLOCKED`.
 7. Cap implementation at two Developer rounds. If round two is still unacceptable, stop and escalate instead of looping.
 

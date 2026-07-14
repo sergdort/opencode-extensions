@@ -32,7 +32,7 @@ Process tickets one at a time, in dependency order (ticket zero first), until no
 
 1. **Pick** the next ready ticket.
 2. **Dispatch** it to the `developer` subagent (via the Agent/Task tool). Pass the ticket file path, the plan path, and the brief path — not their contents. Round 1.
-3. **Review** the returned working-tree diff (`git diff`, `git status --short`, and any new untracked files) against the ticket. Apply this rubric, in order:
+3. **Review** the returned working-tree diff (`git diff`, `git status --short`, and any new untracked files) against the ticket. Review from the diff; pull full files into your context only when the diff alone is insufficient to judge correctness. Apply this rubric, in order:
    - **Contract fit** — does it honor the frozen contract and the ticket's scope?
    - **Test faithfulness** — do the tests genuinely encode the ticket's Gherkin/acceptance criteria, or are they hollow/tautological? This is the load-bearing check; a green suite means nothing if the tests are vacuous.
    - **Correctness & passes** — is the implementation correct, and did verification actually pass?

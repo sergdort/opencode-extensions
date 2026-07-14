@@ -176,7 +176,7 @@ README text alone is documentation for humans. Agents will only reliably see the
 The default Oracle agent uses:
 
 ```yaml
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 variant: xhigh
 ```
 

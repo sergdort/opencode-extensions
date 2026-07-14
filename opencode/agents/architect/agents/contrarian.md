@@ -1,7 +1,7 @@
 ---
 description: Read-only adversarial stress-test of one uncertain, hard-to-undo, or broad-blast-radius decision before its architecture or interface contract is frozen.
 mode: subagent
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 variant: xhigh
 permission:
   edit: deny

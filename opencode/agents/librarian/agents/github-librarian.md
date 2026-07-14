@@ -1,8 +1,8 @@
 ---
 description: GitHub research scout. Uses gh to locate exact code locations across GitHub repos and returns concise, path-first findings with line-ranged evidence.
 mode: subagent
-model: openai/gpt-5.5
-variant: xhigh
+model: openai/gpt-5.6-terra
+variant: high
 permission:
   read: allow
   glob: allow

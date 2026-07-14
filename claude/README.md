@@ -114,4 +114,4 @@ This package began as a mirror of the OpenCode `opencode/agents/architect/`, `op
 - Claude Code slash commands run in the current session (no per-command `agent:` binding), so role instructions live in each command body.
 - Architect is a `/architect` command, not a `mode: primary` agent — Claude Code has no persistent primary-agent switch, and Architect is interactive.
 - Claude Code auto-delegates to subagents by `description`; no `permission.task` wiring is needed. Read-only agents drop `Edit`/`Write` from their `tools`.
-- Models are remapped from OpenCode's `openai/gpt-5.5` to Claude models above.
+- Models are remapped from OpenCode's per-agent OpenAI/Anthropic mix to the Claude models above.

@@ -1,10 +1,10 @@
 # Contributor Guidance
 
-This repo packages lightweight agent extensions for two harnesses — OpenCode (`opencode/`) and Claude Code (`claude/`) — as copyable Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the two configurations; package READMEs hold the per-package details.
+This repo packages lightweight agent extensions for two harnesses — OpenCode (`opencode/`) and Claude Code (`claude/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the two configurations; package READMEs hold the per-package details.
 
 ## Project Shape
 
-- Keep the project explicit and copy-based.
+- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh` is the opt-in helper for a complete global symlink setup.
 - Do not add plugins, installers, hidden config mutation, subprocess harnesses, automatic model routing, or runtime state machines unless the user explicitly chooses that direction.
 - Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code).
 - The two trees are siblings, not mirrors: they share the architect-first, plan-artifact workflow idea, but each is written for its harness's native mechanisms. When changing shared concepts (e.g. the plan format or oracle's charter), check whether the counterpart tree needs an equivalent change — and adapt rather than copy.
@@ -13,6 +13,7 @@ This repo packages lightweight agent extensions for two harnesses — OpenCode (
 
 OpenCode packages live under `opencode/`:
 
+- `opencode/link-global.sh`: opt-in global symlink helper for the complete OpenCode setup.
 - `opencode/commands/`: reusable slash command prompts.
 - `opencode/agents/architect/`: persistent primary orchestrator plus developer, repo-scout, and contrarian agents for ticket-driven feature work.
 - `opencode/agents/oracle/`: read-only second-opinion subagent preset.
