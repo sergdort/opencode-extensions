@@ -4,6 +4,7 @@ Reusable OpenCode command files.
 
 ## Commands
 
+- `bro.md`: restate the last response plainly and concisely
 - `handoff.md`: create repo-local handoff documents for a fresh agent
 - `github-librarian.md`: investigate GitHub repositories with the `github-librarian` subagent
 - `plan-feature.md`: have Architect create a reviewed executable implementation plan

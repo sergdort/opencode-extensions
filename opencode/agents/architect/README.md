@@ -26,8 +26,9 @@ Agents in `agents/`:
 
 - `architect.md`: primary orchestrator and reviewer
 - `developer.md`: implements and verifies one ticket or focused fix; never commits
-- `repo-scout.md`: hidden read-only local discovery helper available to Architect and Developer
 - `contrarian.md`: read-only adversarial review of one load-bearing decision
+
+Architect and Developer use OpenCode's built-in Explore agent for focused read-only codebase discovery.
 
 Commands in `../../commands/`:
 
@@ -56,7 +57,7 @@ Ready and done state is derived from git plus ticket dependencies. A fresh or co
 - A ticket receives at most two Developer rounds before requirements-level escalation.
 - Contract changes return to `/plan-feature` and `/decompose`; accepted commits are not rewritten.
 
-These boundaries use both prompts and OpenCode permissions. Unlisted Task delegation and non-artifact edits require approval; named subagents and workflow artifacts are allowed. Architect and Developer may run routine repository commands without confirmation, while direct and RTK-wrapped Git operations that publish, rewrite history, switch branches, stash, or discard work are denied. Repo Scout and Contrarian allow only read-only Git inspection through Bash.
+These boundaries use both prompts and OpenCode permissions. Architect edits are allowed without per-file approval, while its prompt limits direct writes to workflow artifacts, temporary drafting files, and specific edits explicitly requested by the user. Named subagents and the built-in Explore agent are allowed; unlisted Task delegation still requires approval. Architect and Developer may run routine repository commands without confirmation, while direct and RTK-wrapped Git operations that publish, rewrite history, switch branches, stash, or discard work are denied. Explore has no Bash access; Contrarian allows only read-only Git inspection through Bash.
 
 ## Non-Goals
 
@@ -132,11 +133,11 @@ Install the sibling Oracle or Librarian packages if desired. Architect's bundled
 The bundled delegation graph is:
 
 ```text
-architect -> developer, repo-scout, contrarian, oracle, github-librarian
-developer -> repo-scout
+architect -> developer, explore, contrarian, oracle, github-librarian
+developer -> explore
 ```
 
-All other programmatic delegation requires user approval. A hard parent-level Task denial would propagate into child sessions and prevent Developer from invoking Repo Scout. Users can also invoke visible subagents manually with `@` according to OpenCode's normal behavior.
+All other programmatic delegation requires user approval. A hard parent-level Task denial would propagate into child sessions and prevent Developer from invoking Explore. Users can also invoke visible subagents manually with `@` according to OpenCode's normal behavior.
 
 ## Models
 
@@ -144,8 +145,10 @@ Defaults:
 
 - Architect: `anthropic/claude-fable-5`, `high`
 - Developer: `openai/gpt-5.6-terra`, `high`
-- Repo Scout: `openai/gpt-5.6-terra`, `low`
+- Explore: OpenCode built-in; recommended override is `openai/gpt-5.6-terra`, `low`
 - Contrarian: `openai/gpt-5.6-sol`, `xhigh`
+
+Built-in Explore does not declare its own model and otherwise inherits the caller's model. Merge the `agent.explore` block from `opencode.architect.example.json` into your global or project config to keep discovery on the cheaper model.
 
 The lead seat runs on the model with the strongest delegation judgment; execution seats run on a cheaper model. Contrarian (and the sibling Oracle package) intentionally use a different model family than Architect so second opinions do not share the lead's blind spots.
 

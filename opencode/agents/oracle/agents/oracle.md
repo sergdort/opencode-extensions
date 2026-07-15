@@ -10,7 +10,9 @@ permission:
   list: allow
   edit: deny
   bash:
-    "*": ask
+    "*": allow
+    "git *": deny
+    "rtk git *": deny
     "git status*": allow
     "rtk git status*": allow
     "git diff*": allow

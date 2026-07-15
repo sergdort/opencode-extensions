@@ -78,7 +78,6 @@ link_file() {
 
 link_file "$SCRIPT_DIR/agents/architect/agents/architect.md" "$CONFIG_DIR/agents/architect.md"
 link_file "$SCRIPT_DIR/agents/architect/agents/developer.md" "$CONFIG_DIR/agents/developer.md"
-link_file "$SCRIPT_DIR/agents/architect/agents/repo-scout.md" "$CONFIG_DIR/agents/repo-scout.md"
 link_file "$SCRIPT_DIR/agents/architect/agents/contrarian.md" "$CONFIG_DIR/agents/contrarian.md"
 link_file "$SCRIPT_DIR/agents/oracle/agents/oracle.md" "$CONFIG_DIR/agents/oracle.md"
 link_file "$SCRIPT_DIR/agents/librarian/agents/github-librarian.md" "$CONFIG_DIR/agents/github-librarian.md"
@@ -87,7 +86,7 @@ link_file "$SCRIPT_DIR/agents/architect/ARCHITECT_INSTRUCTIONS.md" "$CONFIG_DIR/
 link_file "$SCRIPT_DIR/agents/oracle/ORACLE_INSTRUCTIONS.md" "$CONFIG_DIR/ORACLE_INSTRUCTIONS.md"
 link_file "$SCRIPT_DIR/agents/librarian/GITHUB_LIBRARIAN_INSTRUCTIONS.md" "$CONFIG_DIR/GITHUB_LIBRARIAN_INSTRUCTIONS.md"
 
-for command_name in plan-feature decompose start-work review-work github-librarian handoff; do
+for command_name in bro plan-feature decompose start-work review-work github-librarian handoff; do
   link_file "$SCRIPT_DIR/commands/$command_name.md" "$CONFIG_DIR/commands/$command_name.md"
 done
 

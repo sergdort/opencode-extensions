@@ -8,7 +8,7 @@ File-based agent extensions for two coding harnesses: **OpenCode** and **Claude 
 opencode/               OpenCode packages
   link-global.sh         opt-in global symlink setup for the complete package set
   agents/               agent packages, each self-contained (README, instructions, example config)
-    architect/           primary orchestrator plus developer, repo-scout, and contrarian
+    architect/           primary orchestrator plus developer and contrarian
     oracle/               read-only second-opinion subagent
     librarian/            GitHub research subagent
   commands/             reusable slash commands (/plan-feature, /decompose, /start-work, ...)
@@ -32,8 +32,8 @@ Both trees implement the same ticket-driven workflow, adapted to each harness's 
 | Workflow depth | Select Architect → `/plan-feature` → `/decompose` → `/start-work` | `/architect` → `/plan-feature` → `/decompose` → `/start-work` |
 | Implementation | A `developer` subagent implements one ticket at a time; Architect reviews and commits | A `developer` subagent implements one ticket at a time; the main session reviews and commits |
 | Review | Inline per-ticket review; `/review-work` is an optional outside pass | Inline per-ticket review; Claude Code's built-in `/review` is optional |
-| Subagents | `developer`, `repo-scout`, `contrarian`, plus optional `oracle` and `github-librarian` | `developer`, `repo-scout`, `contrarian`, `oracle`, `github-librarian` |
-| Default models | Per-agent: Fable for architect, Terra for developer/repo-scout/librarian, Sol for oracle/contrarian | Per-agent Claude models: Sonnet for developer/librarian, Haiku for repo-scout, Fable for oracle/contrarian |
+| Subagents | `developer`, built-in `explore`, `contrarian`, plus optional `oracle` and `github-librarian` | `developer`, `repo-scout`, `contrarian`, `oracle`, `github-librarian` |
+| Default models | Per-agent: Fable for architect, Terra for developer/explore/librarian, Sol for oracle/contrarian | Per-agent Claude models: Sonnet for developer/librarian, Haiku for repo-scout, Fable for oracle/contrarian |
 | Config format | `opencode.json` (strict schema, restart required) | Markdown frontmatter only; no JSON config needed |
 | Install target | `~/.config/opencode/` or project `.opencode/` | `~/.claude/` or project `.claude/` |
 
