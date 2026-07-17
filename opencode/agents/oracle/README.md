@@ -7,8 +7,6 @@ It is inspired by Pi Oracle, but the OpenCode version intentionally uses native 
 ## What It Provides
 
 - `agents/oracle.md`: the Oracle subagent definition
-- `ORACLE_INSTRUCTIONS.md`: optional delegation policy for your primary agents
-- `opencode.oracle.example.json`: copyable config snippets
 
 ## What It Does Not Do
 
@@ -30,56 +28,9 @@ Run from any directory and set `ORACLE_DIR` to this package directory:
 ORACLE_DIR=/path/to/opencode-extensions/opencode/agents/oracle
 mkdir -p ~/.config/opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" ~/.config/opencode/agents/oracle.md
-cp "$ORACLE_DIR/ORACLE_INSTRUCTIONS.md" ~/.config/opencode/ORACLE_INSTRUCTIONS.md
 ```
 
-Then manually merge the config you want into:
-
-```text
-~/.config/opencode/opencode.json
-```
-
-Minimal task permission snippet:
-
-```json
-{
-  "agent": {
-    "build": {
-      "permission": {
-        "task": {
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-Optional Architect delegation snippet:
-
-```json
-{
-  "agent": {
-    "architect": {
-      "permission": {
-        "task": {
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-Optional instruction wiring:
-
-```json
-{
-  "instructions": ["/Users/you/.config/opencode/ORACLE_INSTRUCTIONS.md"]
-}
-```
-
-Use an absolute path for global instructions. If you already have `instructions`, append this path instead of replacing the array.
+No `opencode.json` changes are needed for direct `@oracle` use. The Architect package already includes the scoped policy and Task permission it needs to delegate to Oracle.
 
 ## Project Install
 
@@ -91,63 +42,9 @@ Run from the target project root and set `ORACLE_DIR` to this package directory:
 ORACLE_DIR=/path/to/opencode-extensions/opencode/agents/oracle
 mkdir -p .opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" .opencode/agents/oracle.md
-cp "$ORACLE_DIR/ORACLE_INSTRUCTIONS.md" .opencode/ORACLE_INSTRUCTIONS.md
 ```
 
-Then manually merge the config you want into your project OpenCode config, such as:
-
-```text
-opencode.json
-```
-
-or:
-
-```text
-.opencode/opencode.json
-```
-
-Example project config:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "instructions": [".opencode/ORACLE_INSTRUCTIONS.md"],
-  "agent": {
-    "build": {
-      "permission": {
-        "task": {
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-If your `build` agent already has `permission` or `task` settings, merge these keys manually. Do not replace your existing config wholesale.
-
-If you want Architect to delegate high-risk decisions to Oracle, also allow `architect` to invoke `oracle` through the Task tool.
-
-If your config already has `instructions`, append `.opencode/ORACLE_INSTRUCTIONS.md` instead of replacing the array.
-
-If you use deny-by-default task permissions, put the broad rule first and the Oracle allow rule later:
-
-```json
-{
-  "agent": {
-    "build": {
-      "permission": {
-        "task": {
-          "*": "deny",
-          "oracle": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-OpenCode evaluates the last matching permission rule, so order matters.
+No project config changes are needed for direct `@oracle` use. Install the Architect package as well when you want scoped Oracle delegation during its workflow.
 
 ## Permissions
 
@@ -165,12 +62,6 @@ Good prompts include the context Oracle needs to answer without guessing:
 @oracle Review this migration plan for data-loss risks. Relevant files are src/db/migrate.ts and src/user/repository.ts. I am considering making the write path dual-write for one release before switching reads. What failure modes am I missing?
 ```
 
-## Delegated Use
-
-To help primary agents decide when to call Oracle, add `ORACLE_INSTRUCTIONS.md` to your OpenCode `instructions`, or copy its contents into an existing instruction file such as `AGENTS.md`, `CLAUDE.md`, or `RTK.md`.
-
-README text alone is documentation for humans. Agents will only reliably see the delegation policy if it is part of their configured instructions or task context.
-
 ## Model
 
 The default Oracle agent uses:
@@ -184,4 +75,4 @@ Edit `oracle.md` after copying it if you want a different model or reasoning var
 
 ## Restart Required
 
-OpenCode loads agent and config files at startup. Quit and restart OpenCode after changing agent files, instruction files, or `opencode.json`.
+OpenCode loads agent files at startup. Quit and restart OpenCode after changing them.

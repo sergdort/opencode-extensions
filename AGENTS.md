@@ -26,9 +26,9 @@ The Claude Code package lives under `claude/`:
 ## File Conventions — OpenCode (`opencode/`)
 
 - Agent packages live under `opencode/agents/<package>/`; the agent definition itself is at `opencode/agents/<package>/agents/*.md`.
-- Package-level routing/delegation instructions use uppercase names such as `ORACLE_INSTRUCTIONS.md`.
+- The Architect package's routing instruction is named `ARCHITECT_INSTRUCTIONS.md`.
 - Example OpenCode config snippets are named `opencode.<package>.example.json`.
-- Package READMEs should include what the package provides, non-goals, install steps, config snippets, usage, model defaults, and restart requirements.
+- Package READMEs should include what the package provides, non-goals, install steps, any required config, usage, model defaults, and restart requirements.
 - Command files live in `opencode/commands/*.md` and should use only supported OpenCode command frontmatter used in this repo, such as `description` and `agent`.
 
 ## File Conventions — Claude Code (`claude/`)
