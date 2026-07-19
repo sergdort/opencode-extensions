@@ -37,7 +37,7 @@ Per-ticket review happens inline in the loop, so there is no `/review-work`; use
 Subagents (`claude/agents/`):
 
 - `developer.md` (Sonnet): implements exactly one ticket, writes and verifies its own tests, returns a structured report. Does not commit.
-- `repo-scout.md` (Haiku): fast read-only codebase discovery, spawned by the developer when a ticket's seeds run dry.
+- `repo-scout.md` (Haiku): fast read-only codebase discovery, spawned by the Architect session for pre-question recon and by the developer when a ticket's seeds run dry.
 - `oracle.md` (Fable): read-only second opinion on high-risk architecture, security, refactors, and plans.
 - `contrarian.md` (Fable): adversarial stress-test of one specific decision — steelmans the strongest opposing case and reports confirmed vs. speculative objections. Gated to uncertain, hard-to-undo, or broad-blast-radius calls.
 - `github-librarian.md` (Sonnet): GitHub research scout that uses `gh` to find and cite exact upstream code locations.

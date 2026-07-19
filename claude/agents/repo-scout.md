@@ -1,6 +1,6 @@
 ---
 name: repo-scout
-description: Fast read-only codebase discovery scout. Given a focused question, locates the relevant files, patterns, conventions, and symbols and returns a concise digest. Used by the developer subagent when a ticket's seeds run dry.
+description: Fast read-only codebase discovery scout. Given a focused question, locates the relevant files, patterns, conventions, and symbols and returns a concise digest. Used by the Architect session for pre-question reconnaissance and by the developer subagent when a ticket's seeds run dry.
 tools: Read, Grep, Glob, Bash
 model: haiku
 effort: low
