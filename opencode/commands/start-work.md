@@ -28,14 +28,26 @@ Never write `done`, `ready`, or `in-progress` into tickets. A fresh or compacted
 Process one ready ticket at a time in dependency order:
 
 1. Pick the next ready ticket.
-2. Snapshot `git status --short`. If an already-dirty file overlaps the ticket's declared scope, stop and resolve ownership with the user before dispatch; path staging cannot separate pre-existing and Developer hunks safely.
-3. Dispatch a fresh `developer` Task. Pass the ticket path, plan path, and decision-brief path when present, not copied artifact contents.
-4. After Developer returns, inspect `git status`, the complete working-tree diff, and untracked files. Compare every Developer-touched path with the pre-dispatch snapshot, including necessary out-of-scope changes reported by Developer. If any touched path was already dirty, do not stage it; stop and resolve ownership with the user.
-5. Review contract and ticket scope fit, test faithfulness, implementation correctness, and actual verification results, in that order. Review from the diff; pull full files into your context only when the diff alone is insufficient to judge correctness.
-6. Accept by staging only that ticket's changes, inspecting the complete staged diff, and committing only if it contains the accepted ticket and no pre-existing work; request one fresh correction round with precise findings; or escalate immediately if Developer reports `BLOCKED`.
-7. Cap implementation at two Developer rounds. If round two is still unacceptable, stop and escalate instead of looping.
+2. Verify the ticket's `seeds` still exist on disk. A missing seed means the repository drifted since decomposition, for example an earlier ticket moved a file; resolve the current location and pass the corrected pointer in the dispatch message rather than letting Developer hunt or guess. If the drift indicates the contract itself moved, escalate instead.
+3. Snapshot `git status --short`. If an already-dirty file overlaps the ticket's declared scope, stop and resolve ownership with the user before dispatch; path staging cannot separate pre-existing and Developer hunks safely.
+4. Dispatch a fresh `developer` Task. Pass the ticket path, plan path, and decision-brief path when present, not copied artifact contents.
+5. After Developer returns, inspect `git status`, the complete working-tree diff, and untracked files. Compare every Developer-touched path with the pre-dispatch snapshot, including necessary out-of-scope changes reported by Developer. If any touched path was already dirty, do not stage it; stop and resolve ownership with the user.
+6. Review contract and ticket scope fit, test faithfulness, implementation correctness, and actual verification results, in that order. Review from the diff; pull full files into your context only when the diff alone is insufficient to judge correctness.
+7. Accept by staging only that ticket's changes, inspecting the complete staged diff, and committing only if it contains the accepted ticket and no pre-existing work; request one fresh correction round with a Correction Brief; or escalate immediately if Developer reports `BLOCKED`.
+8. Cap implementation at two Developer rounds. If round two is still unacceptable, stop and escalate instead of looping.
 
 Do not repair rejected product code yourself.
+
+## Correction Brief
+
+The round-two dispatch passes the same artifact paths plus a Correction Brief. Round-one work stays in the worktree; the fresh Developer starts from it and inspects the diff itself. The brief contains exactly:
+
+- Verdict: one line per review axis (contract and scope fit, test faithfulness, correctness) stating pass or fail.
+- Findings: each as `path:line`, what is wrong, and what the acceptance criterion requires instead.
+- Keep: what round one got right and must not be reworked.
+- Prohibitions: out-of-scope paths round one drifted into that must be reverted or left alone.
+
+Do not include the round-one transcript and do not paste the diff. Findings only; the worktree is the source of truth.
 
 ## Escalation
 

@@ -77,6 +77,8 @@ Allowed ticket types are `contract` and `behavior`. Allowed statuses are `open` 
 
 `corrects` and `supersedes` are optional id lists. Use `corrects` when fresh work repairs or updates an accepted historical ticket. Use `supersedes` when replacing an unfinished ticket and preserving that relationship is useful for traceability. Neither field makes an old id runnable again.
 
+`seeds` reference the existing repository only. A forward reference to a file another ticket will create belongs in `## Contract`, not in `seeds`.
+
 ## Mechanical Gate
 
 Before presenting the cut, verify:
@@ -85,6 +87,9 @@ Before presenting the cut, verify:
 - Dependencies are acyclic and every behavior ticket reaches the initial contract ticket plus any applicable corrective contract tickets.
 - Sibling ticket scopes do not overlap, or every unavoidable overlap is surfaced.
 - Every ticket has a verification method.
+- Every `seeds` entry exists on disk at decomposition time, checked mechanically per path with no judgment. Move forward references into `## Contract` instead of dropping them.
+- Every `scope` entry that names a not-yet-existing file inside a not-yet-existing parent directory is surfaced — usually a typo, occasionally an intentional new module.
+- Every ticket's frontmatter `id` equals its filename stem; state derivation depends on the literal id.
 - Every new ticket id is unique in the effective set and does not already appear as an exact `Ticket: <id>` trailer in git history. Preserved completed ids are exempt because their matching trailers are their completion record.
 
 ## Approval

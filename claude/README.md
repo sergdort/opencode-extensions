@@ -104,7 +104,7 @@ Edit the `model:` / `effort:` frontmatter to taste. Note `xhigh` is not availabl
 
 ## Execution Model & Limits
 
-- **Sequential by default.** Tickets run one at a time. Parallel execution is a future opt-in, gated on no dependency edges, disjoint file scopes, and a concurrency-safe build toolchain — iOS projects (XcodeGen/Tuist project regeneration, shared DerivedData) do not qualify and stay sequential.
+- **The ticket loop is intentionally serial.** Ticket-level parallelism is a non-goal: declared scopes are predictions, shared generated files (`project.pbxproj`, `Package.resolved`, codegen output) conflict even across "disjoint" modules, and interleaved diffs break per-ticket review attribution. Parallelize at the **feature level** instead — one git worktree and one architect session per feature.
 - **Grounded on verified runtime facts:** subagents are one-shot (no mid-task back-and-forth, no sibling channel), can nest up to 5 levels deep, and inherit project `CLAUDE.md` but not the parent conversation. The developer's BLOCKED protocol exists because it cannot ask a question mid-task.
 
 ## Relationship To The OpenCode Extensions

@@ -42,7 +42,7 @@ scope:                    # files/dirs this ticket owns
   - Tests/AuthTests/LoginTests.swift
 gherkin:                  # scenario references from plan.md (behavior tickets)
   - "@must Login succeeds with valid credentials"
-seeds:                    # entry points, conventions, where tests live
+seeds:                    # entry points, conventions, where tests live (existing files only)
   - Sources/Auth/AuthService.swift
 verification: test-first  # test-first | implementation-first | characterization | manual (+ command if useful)
 ---
@@ -68,6 +68,9 @@ Concrete, checkable criteria. For behavior tickets, derived from the Gherkin sub
 - **DAG:** dependencies are acyclic and ticket zero is the root (every behavior ticket reaches it).
 - **Scope disjointness:** report any two tickets that declare overlapping `scope` files.
 - **Verifiability:** every ticket has a verification method.
+- **Seeds exist:** every `seeds` entry resolves to a path that exists on disk right now — check each one mechanically (`ls`/glob), no judgment. Seeds point at the existing codebase; a forward reference to a file a dependency ticket will create belongs in the ticket's `## Contract` section, not in `seeds`.
+- **Scope sanity:** `scope` entries may name files that don't exist yet, but flag any entry whose parent directory is also missing — usually a typo, occasionally an intentional new module.
+- **Id hygiene:** each ticket's frontmatter `id` equals its filename stem, and ids are unique across the tickets directory. Completion is derived from the literal `Ticket: <id>` trailer, so an inconsistent id silently breaks state derivation.
 
 ## Approval
 

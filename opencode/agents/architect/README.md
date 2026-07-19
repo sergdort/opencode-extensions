@@ -62,7 +62,7 @@ These boundaries use both prompts and OpenCode permissions. Architect edits are 
 ## Non-Goals
 
 - No plugin, installer, custom tool, subprocess harness, hidden config mutation, or runtime state machine
-- No automatic parallel ticket execution
+- No parallel ticket execution — the loop is intentionally serial; parallelize at the feature level with one git worktree and one Architect session per feature
 - No automatic push, squash, or history rewriting
 - No requirement that Oracle, GitHub Librarian, or Plannotator be installed
 

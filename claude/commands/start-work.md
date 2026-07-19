@@ -31,16 +31,22 @@ A fresh session (after compaction or a new day) reconstructs the whole picture f
 Process tickets one at a time, in dependency order (ticket zero first), until no ready tickets remain:
 
 1. **Pick** the next ready ticket.
-2. **Dispatch** it to the `developer` subagent (via the Agent/Task tool). Pass the ticket file path, the plan path, and the brief path — not their contents. Round 1.
-3. **Review** the returned working-tree diff (`git diff`, `git status --short`, and any new untracked files) against the ticket. Review from the diff; pull full files into your context only when the diff alone is insufficient to judge correctness. Apply this rubric, in order:
+2. **Re-check seeds** — `ls` the ticket's `seeds` before dispatch. A missing seed means the codebase drifted since decomposition (e.g. an earlier ticket moved a file); resolve the current location and pass the corrected pointer in the dispatch message rather than letting the developer hunt or guess. If the drift indicates the contract itself moved, escalate instead.
+3. **Dispatch** it to the `developer` subagent (via the Agent/Task tool). Pass the ticket file path, the plan path, and the brief path — not their contents. Round 1.
+4. **Review** the returned working-tree diff (`git diff`, `git status --short`, and any new untracked files) against the ticket. Review from the diff; pull full files into your context only when the diff alone is insufficient to judge correctness. Apply this rubric, in order:
    - **Contract fit** — does it honor the frozen contract and the ticket's scope?
    - **Test faithfulness** — do the tests genuinely encode the ticket's Gherkin/acceptance criteria, or are they hollow/tautological? This is the load-bearing check; a green suite means nothing if the tests are vacuous.
    - **Correctness & passes** — is the implementation correct, and did verification actually pass?
-4. **Decide:**
+5. **Decide:**
    - **Accept** — `git add -A` and commit with a message ending in a `Ticket: <id>` trailer. The commit is the completion record and the user's review surface. Do not push. Move to the next ticket.
-   - **Request changes** — re-dispatch the same ticket to a fresh `developer` with (ticket + current diff + your specific findings). This is **round 2**.
+   - **Request changes** — re-dispatch the same ticket to a fresh `developer` with the ticket path plus a **Correction Brief**. This is **round 2**. Round 1's work stays in the worktree; the fresh developer starts from it and inspects `git diff` itself. The brief contains exactly:
+     - **Verdict** — one line per rubric axis (contract fit / test faithfulness / correctness): pass or fail.
+     - **Findings** — each as `path:line`, what is wrong, and what the acceptance criterion requires instead.
+     - **Keep** — what round 1 got right; do not rework it.
+     - **Prohibitions** — out-of-scope paths round 1 drifted into that must be reverted or left alone.
+     Do not include the round-1 transcript or paste the diff — findings only; the worktree is the source of truth.
    - If the developer returned `BLOCKED`, go straight to Escalate.
-5. **Round cap = 2.** If a ticket is still not acceptable after round 2, **stop and escalate** — do not keep looping. Repeated failure on a vertical slice usually means the ticket or the contract is wrong, not the developer.
+6. **Round cap = 2.** If a ticket is still not acceptable after round 2, **stop and escalate** — do not keep looping. Repeated failure on a vertical slice usually means the ticket or the contract is wrong, not the developer.
 
 ## Escalation (the sync point)
 
