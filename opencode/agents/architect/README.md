@@ -48,6 +48,8 @@ Optional sibling packages add `oracle` and `github-librarian` delegation.
 
 Ready and done state is derived from git plus ticket dependencies. A fresh or compacted Architect session can reconstruct the queue without hidden runtime state.
 
+The workflow is a feedback loop over this externalized state, with a closed event set: a Developer report (`DONE` or `BLOCKED`), Architect's review verdict, a user decision, or a post-queue bug report. Only Architect writes state — through a commit or an approved artifact edit; Developer diffs are proposals until reviewed. Explore, Contrarian, Oracle, and GitHub Librarian inform judgment but never transition state; only a Developer dispatch returns a completion event to the loop.
+
 ## Boundaries
 
 - Architect researches the repository directly before asking design questions.

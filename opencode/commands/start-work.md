@@ -53,7 +53,7 @@ Do not include the round-one transcript and do not paste the diff. Findings only
 
 Explain the disagreement at the requirements level: what the ticket requires, what Developer or the repository implies, and the decision needed from the user. Mark the ticket `status: blocked` and append a concise `## Escalation` note. This is the only normal ticket mutation after approval.
 
-The user's decision must update a durable artifact. For a ticket-only correction, amend the ticket, resolve its escalation note, and restore `status: open`. Alternatively, accept with a recorded note or replace it through re-decomposition. A shared contract change returns to `/plan-feature` and `/decompose`. Never rewrite accepted commits; corrections move forward as new tickets with ids not previously used in `Ticket:` trailers.
+The user's decision must update a durable artifact. For a ticket-only correction, amend the ticket, resolve its escalation note, and restore `status: open`. Alternatively, accept with a recorded note or replace it through re-decomposition. A shared contract change returns to `/plan-feature` and `/decompose`. Re-decomposition cancels the superseded scope: never dispatch a superseded ticket, and never review or commit uncommitted Developer work produced against a superseded spec — a diff against a dead spec yields neither a valid accept nor a useful correction. Report the orphaned paths and let the user decide whether to discard them; you cannot discard worktree changes yourself. Never rewrite accepted commits; corrections move forward as new tickets with ids not previously used in `Ticket:` trailers.
 
 ## Commits
 

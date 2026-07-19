@@ -52,7 +52,7 @@ Process tickets one at a time, in dependency order (ticket zero first), until no
 
 When a ticket trips the cap or comes back blocked, present the disagreement to the user at the **requirements level**, not as a code dump: what the ticket asked for, how each side read it, and the specific decision you need. Mark the ticket `status: blocked` in its frontmatter and append a short `## Escalation` note (this is the only ticket mutation the loop ever makes — it records a real pending decision, and prevents auto-retry).
 
-The user's decision edits a durable artifact: amend the ticket's acceptance criteria, fix the plan's contract, accept-with-note, or re-decompose. A **mid-feature contract change is a re-decompose event** — send the user back to `/plan-feature` then `/decompose` for the delta; the compiler will enumerate the blast radius. Never rewrite existing commits; corrections move forward as new tickets.
+The user's decision edits a durable artifact: amend the ticket's acceptance criteria, fix the plan's contract, accept-with-note, or re-decompose. A **mid-feature contract change is a re-decompose event** — send the user back to `/plan-feature` then `/decompose` for the delta; the compiler will enumerate the blast radius. **Re-decomposition cancels the superseded scope:** never dispatch a superseded ticket, and never review or commit uncommitted developer work produced against a superseded spec — a diff against a dead spec yields neither a valid accept nor a useful correction. List the orphaned paths so the user can discard them. Never rewrite existing commits; corrections move forward as new tickets.
 
 ## Commits
 
