@@ -1,6 +1,6 @@
 ---
 description: Have Architect turn decision-brief.md and repository evidence into a reviewed, executable plan.md
-agent: architect
+agent: plan
 ---
 Create or update the implementation plan for the current feature.
 

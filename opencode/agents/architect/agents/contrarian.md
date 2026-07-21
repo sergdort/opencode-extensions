@@ -1,8 +1,8 @@
 ---
 description: Read-only adversarial stress-test of one uncertain, hard-to-undo, or broad-blast-radius decision before its architecture or interface contract is frozen.
 mode: subagent
-model: openai/gpt-5.6-sol
-variant: xhigh
+model: opencode-go/kimi-k3
+variant: max
 permission:
   edit: deny
   bash:

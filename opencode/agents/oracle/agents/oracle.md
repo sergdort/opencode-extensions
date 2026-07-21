@@ -1,8 +1,8 @@
 ---
 description: Use for deep read-only second opinions on architecture, debugging, code review, risky changes, security-sensitive work, large refactors, and high-stakes implementation plans.
 mode: subagent
-model: openai/gpt-5.6-sol
-variant: xhigh
+model: opencode-go/kimi-k3
+variant: max
 permission:
   read: allow
   glob: allow

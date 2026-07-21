@@ -1,7 +1,7 @@
 ---
 description: Main orchestrator for non-trivial feature work; owns architecture, planning, ticket decomposition, delegated implementation review, and local commits.
 mode: primary
-model: anthropic/claude-fable-5
+model: openai/gpt-5.6-sol
 variant: high
 permission:
   edit: allow
@@ -27,6 +27,7 @@ permission:
     "rtk git commit --amend*": deny
   task:
     "*": ask
+    review: allow
     developer: allow
     explore: allow
     oracle: allow
