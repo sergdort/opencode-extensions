@@ -31,9 +31,28 @@ Deep reasoning belongs in bounded subagent bursts — `oracle` and `contrarian` 
 5. Delegate adversarial stress-tests to the `contrarian` subagent when one specific load-bearing decision is uncertain, hard to undo, or has broad blast radius.
 6. Ask one load-bearing question at a time until the important decisions are resolved.
 7. Recommend concrete options instead of staying neutral when the evidence is strong enough.
-8. Once the approach is settled, summarize the agreed direction in conversation: goal, key constraints, ownership boundaries, rejected options if important, risks, and review focus.
-9. Write that agreed direction to `decision-brief.md` — concise and decision-focused: context and goal, the decisions with brief rationale, rejected alternatives that matter, the risk map, and review focus. This is the durable input to `/plan-feature`. Do not create `plan.md`; `/plan-feature` owns it.
-10. End by telling the user to run `/plan-feature` next, then `/decompose`, then `/start-work`.
+8. Classify the work as `small`, `standard`, or `high-risk` using the workflow profiles below. Agree on the human review cadence before implementation.
+9. If the user accepts a `small` classification, take the early return: write no artifact, do not dispatch Developer, do not advertise the artifact commands, and tell the user to start a fresh normal Claude session with the direct implementation request.
+10. For `standard` or `high-risk` work, once the approach is settled, summarize the agreed direction in conversation: product or operational problem, success signal, non-goals, system boundaries, key constraints, rejected options if important, risks, and review focus.
+11. Write that agreed direction to `decision-brief.md`. Keep it concise, but include product intent, system architecture, settled decisions, workflow profile, risks, and human review checkpoints as described below. This is the durable input to `/plan-feature`. Do not create `plan.md`; `/plan-feature` owns it.
+12. End by telling the user to run `/plan-feature` next, then `/decompose`, then `/start-work`.
+
+## Workflow Profiles
+
+- **Small:** an obvious edit or bug with a clear implementation path. Recommend bypassing the artifact workflow and tell the user to start a fresh normal Claude session with the direct implementation request. This `/architect` command does not dispatch Developer or write product code.
+- **Standard:** a non-trivial feature or refactor. Use the normal artifacts, start implementation with the smallest runnable tracer, pause for human review before accepting that tracer, and require final human review before merge or release.
+- **High-risk:** security, persistence, migration, public API, broad refactor, or hard-to-reverse work. Add independent plan review when available and human checkpoints before accepting the first tracer and each load-bearing or migration slice, plus final review before merge or release.
+
+Do not turn the profiles into an approval state machine. They set the minimum design and review cadence. Record the chosen profile and checkpoints in `decision-brief.md` so a fresh session can apply them.
+
+## Decision Brief Content
+
+Use these sections when relevant:
+
+- **Product Intent:** the user, developer, or operational problem; the success signal; and explicit non-goals. For a pure refactor, state the change-cost or reliability problem instead of inventing a customer story.
+- **System Architecture:** ownership and service boundaries, external contracts, data or persistence changes, rollout, compatibility, and observability where they matter.
+- **Decisions:** settled choices with short rationale and meaningful rejected alternatives.
+- **Risk And Review:** risk map, workflow profile, code-review focus, and required human checkpoints.
 
 ## GitHub Librarian Delegation
 
@@ -59,7 +78,7 @@ Contrarian is not Oracle and not a reviewer: Oracle gives a broad independent se
 
 ## Artifact Rules
 
-- Produce exactly one durable artifact: `decision-brief.md`, written when the approach is settled. Keep it concise and decision-focused, not a transcript of the discussion.
+- Produce exactly one durable artifact: `decision-brief.md`, written when the approach is settled. Keep it concise and decision-focused, not a transcript. Include product intent, system architecture, decisions, and risk/review content when relevant.
 - Do not create `plan.md`; `/plan-feature` owns the single planning artifact. Do not create ADRs or handoff directories by default.
 - Redact secrets, credentials, private tokens, and personally identifiable information.
 
@@ -78,4 +97,4 @@ Then implement the tickets:
 Run `/start-work`.
 ```
 
-If the work is small enough to skip planning, say that explicitly and ask the user before bypassing `/plan-feature`.
+For small work, use the early return above after the user agrees; do not continue into artifact creation or the planning-command handoff.

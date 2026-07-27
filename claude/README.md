@@ -12,25 +12,27 @@ Four commands, one durable artifact each, each pointing to the next:
 /architect      grill the design        -> decision-brief.md   -> "run /plan-feature"
         |
 /plan-feature   brief + repo            -> plan.md             -> "run /decompose"
-                (Gherkin contract +
-                 frozen interface sketch)
+                 (Gherkin contract +
+                  reviewed program design +
+                  file change map)
         |
 /decompose      plan.md                 -> tickets/*.md         -> "run /start-work"
-                (ticket-0 = compiling
-                 contract stubs; 1..N =
-                 vertical slices; you
-                 approve the cut)
+                 (first behavior = runnable
+                  tracer; optional narrow
+                  contract predecessor;
+                  you approve the cut)
         |
 /start-work     tickets/ (the loop)     -> local commits        -> done
-                (dispatch one ticket ->
-                 developer implements +
-                 verifies -> architect
-                 reviews -> accept /
-                 re-dispatch(<=2) /
-                 escalate -> repeat)
+                 (dispatch one ticket ->
+                  developer implements +
+                  verifies -> architect
+                  reviews -> human checkpoint
+                  where planned -> accept /
+                  re-dispatch(<=2) /
+                  escalate -> repeat)
 ```
 
-Per-ticket review happens inline in the loop, so there is no `/review-work`; use Claude Code's built-in `/review` for an outside pass.
+Per-ticket agent review happens inline in the loop, so there is no `/review-work`; use Claude Code's built-in `/review` for an optional outside pass. Neither replaces the planned human checkpoints or final human review.
 
 ## What This Provides
 
@@ -44,22 +46,30 @@ Subagents (`claude/agents/`):
 
 Slash commands (`claude/commands/`):
 
-- `/architect`: enter Architect mode to grill a design; emits `decision-brief.md`.
-- `/plan-feature`: produce `plan.md` — Gherkin behavioral contract plus a frozen interface sketch.
-- `/decompose`: cut `plan.md` into dependency-ordered `tickets/`, starting with a contract-materialization ticket zero.
+- `/architect`: enter Architect mode to settle product intent, system architecture, risk, workflow profile, and review cadence; emits `decision-brief.md`.
+- `/plan-feature`: produce `plan.md` - Gherkin behavioral contract, reviewed execution sketch, call flow, file change map, verification, and human checkpoints.
+- `/decompose`: cut `plan.md` into a runnable tracer and dependency-ordered vertical slices; add a narrow contract-only predecessor only when justified.
 - `/start-work`: drive the implement-and-review loop over `tickets/`.
 - `/handoff`: write repo-local handoff documents for a fresh agent.
 - `/github-librarian`: delegate a GitHub research query to the `github-librarian` subagent.
 
 ## How The Loop Works
 
-- **Architect = orchestrator + reviewer.** It dispatches each ticket to the `developer` subagent, reviews the working-tree diff (contract fit, test faithfulness, correctness), and commits on approval. It never writes product code within the flow.
+- **Architect = orchestrator + agent reviewer.** It dispatches each ticket to `developer`, reviews design/scope fit, test faithfulness, correctness/verification, and maintainability, pauses at declared human checkpoints, and commits on approval. It never writes product code within the flow.
 - **The role survives the queue.** Draining the tickets ends the loop, not the orchestration: bugs found during manual testing become micro-briefs dispatched to `developer` (committed with a `Fix:` trailer), not direct edits by the main session.
-- **State is derived, not stored.** Ticket files are immutable specs. A ticket is *done* when a commit with a `Ticket: <id>` trailer exists; *ready* when its deps are done. A fresh session resumes from git plus the dependency graph. The only mutation is a `blocked` marker on an escalated ticket.
+- **State is derived, not stored.** Completed tickets are immutable specs. Open or blocked tickets change only through approved escalation resolution or re-decomposition. A ticket is *done* when a commit with a `Ticket: <id>` trailer exists; *ready* when its deps are done. A fresh session reconstructs queue state from git plus the dependency graph; an ambiguous interrupted review round requires user confirmation.
 - **Single writer, closed event set.** The loop is a feedback system over that externalized state. State changes only through the orchestrator — a commit, or an approved artifact edit (the `blocked` marker, an escalation resolution). Everything else is an event proposing a transition: a developer report (`DONE`/`BLOCKED`), a review verdict, a user decision, a manual-test bug report. A move not triggered by one of these is not a move — there is no partial accept and no silent spec drift. Advisors (oracle, contrarian, repo-scout, github-librarian) inform judgment but never transition state; only a developer dispatch returns a completion event to the loop.
-- **Per-ticket local commits** are the completion ledger and your review surface — never pushed. Review the commit series at the end (`git show`, `/review`) and squash before pushing if you like.
+- **Per-ticket local commits** are the completion ledger and stay local. The runnable tracer is a human checkpoint, as are load-bearing high-risk slices. Human review of the final series is required before merge or release and may happen locally or in the pull request; `/review` is only supporting evidence.
 - **2-round cap.** If a ticket fails review twice it escalates to you at the requirements level — usually a sign the ticket or contract is wrong, not the developer.
-- **Contract changes are a re-decompose event:** bounce back to `/plan-feature` then `/decompose`; the compiler enumerates the blast radius; corrections move forward as new tickets (old commits are never rewritten). Re-decomposition also cancels: superseded tickets are never dispatched, and uncommitted developer work against a superseded spec is not reviewed or committed — the orchestrator lists the orphaned paths for you to discard.
+- **Program-design changes are a re-decompose event:** bounce back to `/plan-feature` then `/decompose`; corrections move forward as new tickets and old commits are never rewritten. Replaced open tickets are removed, and uncommitted work against a replaced spec is not reviewed or committed.
+
+## Workflow Profiles
+
+- **Small:** direct implementation for obvious edits and bugs with a clear path; `/architect` creates no artifact and sends the user to a fresh normal Claude session for the implementation request.
+- **Standard:** the normal artifacts, a runnable tracer first, human review before accepting that tracer, and final human review before merge or release.
+- **High-risk:** the standard flow plus independent plan review when available and human checkpoints for load-bearing, migration, security, persistence, or hard-to-reverse slices.
+
+The artifacts map cleanly to the design phases: `decision-brief.md` owns product intent and system architecture, `plan.md` owns program design and the change map, and `tickets/` owns vertical delivery slices. Bug fixes and `test-first` tickets report fail-before/pass-after evidence when meaningful.
 
 ## Non-Goals
 

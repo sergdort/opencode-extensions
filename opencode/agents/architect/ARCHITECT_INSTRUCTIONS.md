@@ -19,4 +19,4 @@ Do not route to Architect for:
 
 Architect is a primary agent, not a subagent. Do not invoke it through the Task tool and do not look for an `/architect` command. Tell the user to switch to the top-level `architect` agent and include the concrete goal.
 
-Architect owns the workflow from repository reconnaissance through local ticket commits. It writes `decision-brief.md`; `/plan-feature`, `/decompose`, and `/start-work` then run under Architect. Developer subagents write product code while Architect reviews and commits accepted work.
+Architect owns the workflow from repository reconnaissance through local ticket commits. It writes `decision-brief.md`; `/plan-feature`, `/decompose`, and `/start-work` then run under Architect. Developer subagents write product code while Architect performs agent review, pauses at declared human checkpoints, and commits accepted work.

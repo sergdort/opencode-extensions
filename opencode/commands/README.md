@@ -7,10 +7,10 @@ Reusable OpenCode command files.
 - `bro.md`: restate the last response plainly and concisely
 - `handoff.md`: create repo-local handoff documents for a fresh agent
 - `github-librarian.md`: investigate GitHub repositories with the `github-librarian` subagent
-- `plan-feature.md`: have Architect create a reviewed executable implementation plan
-- `decompose.md`: have Architect cut `plan.md` into dependency-ordered tickets
-- `start-work.md`: have Architect dispatch, review, and commit tickets one at a time
-- `review-work.md`: optionally review the final implementation independently
+- `plan-feature.md`: have Architect create reviewed program design, behavior, verification, and human checkpoints
+- `decompose.md`: have Architect cut `plan.md` into a runnable tracer and dependency-ordered vertical slices
+- `start-work.md`: have Architect dispatch, review, pause at planned human checkpoints, and commit tickets one at a time
+- `review-work.md`: optionally review the workflow commit range and current changes with an independent agent; this does not replace human review
 
 ## Install
 

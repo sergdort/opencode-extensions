@@ -1,5 +1,5 @@
 ---
-description: Have Architect decompose plan.md into dependency-ordered tickets with a contract-materialization ticket zero
+description: Have Architect decompose plan.md into a runnable tracer and dependency-ordered vertical slices
 agent: architect
 ---
 
@@ -28,15 +28,17 @@ You remain Architect. Do not write product code here. Cut the plan into tickets,
 
 Each ticket must be implementable by a fresh Developer context using only its ticket, the plan, the decision brief when present, and repository seeds.
 
-1. On an initial cut, ticket zero has `type: contract` and no dependencies. It materializes planned protocols, types, and function signatures as compiling stubs. Every behavior ticket depends on it directly or transitively.
-2. Behavior tickets own observable behavior end to end, not technical layers. Each owns a subset of the plan's Gherkin scenarios.
-3. Keep each ticket to the smallest group of scenarios that shares an interface seam and can be verified together.
-4. Declare expected file scope. Resolve overlapping scopes between sibling tickets before implementation.
-5. On an incremental cut, retain the completed contract foundation. If the contract changed, add a fresh corrective contract ticket and make affected new behavior depend on the applicable contract chain.
+1. On an initial cut, the first behavior ticket has `tracer: true` and delivers the smallest observable path through the system. It materializes only the interfaces it needs and proves them through the closest real boundary: browser, CLI, API, integration point, or public library interface. Every later behavior ticket depends on it directly or transitively.
+2. A `type: contract` ticket may precede the tracer only for a narrow, genuinely stable external or shared boundary that consumers need first, such as a schema, public protocol, or ABI. State the justification in the ticket. Do not create one merely because stubs compile.
+3. Later behavior tickets own observable behavior end to end, not technical layers. Each owns a subset of the plan's Gherkin scenarios.
+4. Keep each ticket to the smallest group of scenarios that shares an interface seam and can be verified together. Aim for a diff a human can review in one sitting, roughly 100-200 hand-written changed lines when practical. Explain a likely larger slice when it cannot be split without destroying the end-to-end proof.
+5. Declare expected file scope. Treat overlap between sibling scopes as a prompt to inspect sequencing and ownership, not an automatic failure: shared routers, schemas, and registries can require deliberate serial overlap.
+6. The tracer has `checkpoint: human`. For a high-risk profile, give every load-bearing, migration, security, persistence, or hard-to-reverse slice the same checkpoint. Other tickets use `checkpoint: none`; the final series still requires human review.
+7. On an incremental cut, preserve the completed effective tracer if it still proves the current path. If the plan invalidates it, add a fresh correcting behavior ticket with `tracer: true` and `corrects: [<old-tracer>]`; later behavior depends on the effective tracer. Add a corrective contract ticket only when a separately justified stable boundary changed.
 
 ## Proposed Cut And Approval
 
-Draft the complete cut in memory first. Present ticket id, title, dependencies, expected scope, and owned scenarios, followed by preliminary gate results. Wait for explicit user approval before writing ticket files. Ticket existence with `status: open` is the durable approval record.
+Draft the complete cut in memory first. Present ticket id, title, type, tracer, checkpoint, dependencies, expected scope, owned scenarios, and observable proof, followed by preliminary gate results. Wait for explicit user approval before writing ticket files. Ticket existence with `status: open` is the durable approval record.
 
 ## Ticket Schema
 
@@ -47,10 +49,11 @@ Write one file per ticket at `tickets/<id>.md`:
 id: auth-001
 title: <short imperative title>
 type: behavior
+tracer: true
+checkpoint: human
 status: open
-deps: [auth-000]
+deps: []
 corrects: []
-supersedes: []
 scope:
   - Sources/Auth/Login.swift
   - Tests/AuthTests/LoginTests.swift
@@ -65,17 +68,22 @@ verification: test-first
 One or two sentences.
 
 ## Contract
-The interface slice this ticket builds against. Reference the plan's Execution Sketch.
+The interface slice this ticket builds or materializes. Reference the plan's Execution Sketch. A contract ticket also explains why a separate behaviorless predecessor is necessary.
 
 ## Acceptance Criteria
 Concrete, checkable criteria derived from the assigned scenarios.
 
+## Observable Proof
+How to exercise the completed slice through a real boundary. For pure library work, a focused test through the public interface is acceptable. A contract ticket names its compile, schema, or compatibility check.
+
 ## Notes
 ```
 
-Allowed ticket types are `contract` and `behavior`. Allowed statuses are `open` and `blocked`. Never write `done`, `ready`, or `in-progress`; `/start-work` derives those states from git.
+Allowed ticket types are `contract` and `behavior`. Allowed checkpoints are `human` and `none`. Allowed statuses are `open` and `blocked`. Never write `done`, `ready`, or `in-progress`; `/start-work` derives those states from git. A contract ticket uses `tracer: false` and normally `checkpoint: none` unless the risk profile requires human review.
 
-`corrects` and `supersedes` are optional id lists. Use `corrects` when fresh work repairs or updates an accepted historical ticket. Use `supersedes` when replacing an unfinished ticket and preserving that relationship is useful for traceability. Neither field makes an old id runnable again.
+`corrects` is an optional id list. It retires an accepted historical ticket from current-plan ownership in full; a correcting behavior ticket carries every still-current non-`@deferred` scenario owned by that historical ticket, plus the corrected behavior. Use a new extension ticket without `corrects` when the old behavior remains current. It does not make an old id runnable again.
+
+The effective current set is the proposed tickets plus preserved completed tickets that are not transitively named by `corrects`. Prior open or blocked tickets being replaced are removed after approval and leave no lineage state; their fresh replacement ids and the approved current queue are sufficient. Completed files remain as history even after correction. In a correction chain, only the tip is effective and only its `tracer` value counts toward the one-tracer rule.
 
 `seeds` reference the existing repository only. A forward reference to a file another ticket will create belongs in `## Contract`, not in `seeds`.
 
@@ -83,9 +91,13 @@ Allowed ticket types are `contract` and `behavior`. Allowed statuses are `open` 
 
 Before presenting the cut, verify:
 
-- Every Gherkin scenario in `plan.md` belongs to exactly one effective ticket across preserved completed tickets plus the proposed cut. A fresh ticket that `corrects` a completed ticket replaces that historical ticket's ownership for affected current-plan scenarios, avoiding duplicate ownership.
-- Dependencies are acyclic and every behavior ticket reaches the initial contract ticket plus any applicable corrective contract tickets.
-- Sibling ticket scopes do not overlap, or every unavoidable overlap is surfaced.
+- Every non-`@deferred` Gherkin scenario in `plan.md` belongs to exactly one effective behavior ticket across preserved completed tickets plus the proposed cut. `@deferred` scenarios belong to no ticket. A correcting ticket replaces the historical ticket's current-plan ownership in full and carries all of its still-current scenarios. Contract tickets own no behavior scenarios.
+- Exactly one effective behavior ticket has `tracer: true`; it is the first observable slice, and every later behavior ticket reaches it through dependencies. If a contract ticket precedes it, that ticket contains a concrete stability and consumer justification.
+- Dependencies and correction chains are acyclic. Every `deps` id resolves to an effective ticket or a preserved completed ticket, and no effective ticket depends on replaced unfinished work. Every `corrects` id resolves to a completed preserved ticket. A contract ticket, when present, is a narrow predecessor of the tracer rather than a universal default.
+- Every behavior ticket explains how to exercise the completed slice. The tracer reaches a real boundary rather than stopping at compilation or internal mocks.
+- The tracer has `checkpoint: human`; high-risk slices match the plan's Human Review section.
+- Likely large tickets are surfaced with the reason they should not be split.
+- Sibling scope overlap is surfaced and classified as intentional serial work or a bad cut.
 - Every ticket has a verification method.
 - Every `seeds` entry exists on disk at decomposition time, checked mechanically per path with no judgment. Move forward references into `## Contract` instead of dropping them.
 - Every `scope` entry that names a not-yet-existing file inside a not-yet-existing parent directory is surfaced — usually a typo, occasionally an intentional new module.
@@ -94,7 +106,7 @@ Before presenting the cut, verify:
 
 ## Approval
 
-After approval, preserve completed files, write the approved new files, and remove only superseded open or blocked files so the directory contains exactly the effective set. Rerun the mechanical gate against disk plus git history. If decomposition exposes a bad contract at any point, return to `/plan-feature`; do not hide the problem in ticket wording.
+After approval, preserve completed files as history, write the approved new files, and remove only the replaced open or blocked files so the directory contains preserved history plus the effective current set. Rerun the mechanical gate against disk and git history. If decomposition exposes a bad contract at any point, return to `/plan-feature`; do not hide the problem in ticket wording.
 
 ## Final Response
 

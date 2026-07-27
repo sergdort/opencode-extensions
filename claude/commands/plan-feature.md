@@ -15,11 +15,12 @@ Command arguments are optional:
 - If command arguments name a directory, use `<directory>/plan.md`.
 - If no argument is provided, use `plan.md` in the current repository or working directory.
 - If the target plan already exists, read it before updating it.
+- Read `decision-brief.md` next to the plan when it exists. It is the durable architecture source of truth.
 - Do not look for or require `handoffs/`, `decision.md`, ADRs, or any other handoff artifact.
 
 ## Planning Inputs
 
-- Use the current conversation context, especially the recent Architect discussion, as the architecture source of truth.
+- Use `decision-brief.md` plus the current Architect conversation as the architecture source of truth.
 - Inspect the repository when needed to turn the agreed approach into realistic implementation steps.
 - Do not invent architecture decisions. If the context is missing, ambiguous, or conflicts with repository reality, stop and ask the user.
 - Keep rationale minimal. Capture only constraints that materially guide implementation.
@@ -52,9 +53,13 @@ Pseudo-code-level structure showing key types, interfaces, functions, ownership 
 
 Representative happy path and important failure path call stacks.
 
+## Change Map
+
+A compact file-tree diff of expected additions, modifications, and removals, with key symbols or ownership noted where useful.
+
 ## Work Steps
 
-Small ordered implementation steps.
+Ordered vertical slices. The first slice must produce the smallest runnable or otherwise directly observable end-to-end path.
 
 ## Behavioral Contract
 
@@ -62,7 +67,11 @@ Gherkin scenarios for observable behavior.
 
 ## Verification
 
-How the important scenarios and risks will be checked.
+How the important scenarios and risks will be checked, including runtime touchpoints and fail-before/pass-after evidence where required.
+
+## Human Review
+
+Workflow profile, reviewer, and required checkpoints. For standard and high-risk work, the first runnable tracer requires review before acceptance and the final series requires review before merge or release.
 
 ## Review Notes
 
@@ -71,7 +80,11 @@ Review status, useful feedback incorporated, or why review was unavailable.
 
 The `Execution Sketch` should be mostly pseudo-code, types, interfaces, function boundaries, and composition notes. The `Call Flow` should show the path through entrypoints, modules, state/data changes, and result handling. Do not enumerate every branch; include the paths that clarify ownership or implementation risk.
 
-The Execution Sketch **is the frozen contract.** `/decompose` materializes these interfaces — protocols, types, function signatures — as compiling stubs in ticket zero, and every later ticket builds against them. Make the interface seams explicit and stable here; this is where contract drift is prevented.
+The Execution Sketch is the reviewed program-design baseline and the authority for shared interfaces. `/decompose` normally materializes only the interfaces needed by the first runnable tracer, inside that behavior ticket. A separate contract-only ticket is reserved for a narrow, genuinely stable external or shared boundary that must exist before its consumers. If tracer feedback disproves a planned seam, update the plan before later slices build on it; do not preserve a bad interface merely because it was written down.
+
+The `Change Map` should use a compact tree or diff-style list. Show expected add/modify/remove paths, key symbols, and migration, generated-file, or shared-registry impact. It is a design review aid, not a promise that no neighboring file will change.
+
+The `Work Steps` must be vertical, touchable slices rather than database/service/API/UI layers. Prefer a browser path, CLI command, API call, integration boundary, or direct public API test as the first feedback point. For pure libraries, a focused test through the public interface can be the touchpoint.
 
 ## Behavioral Contract
 
@@ -103,13 +116,16 @@ manual-verification
 
 Choose the cheapest reliable verification strategy. Prefer test-first when behavior is pure, local, risky, or easy to assert. Use implementation-first for exploratory, UI-heavy, integration-heavy, or high-scaffolding work. Use characterization tests when changing existing behavior. Use manual verification notes when automation would be wasteful.
 
+For bug fixes and `test-first` scenarios, require the implementation report to show that the targeted test failed for the expected reason before the fix and passed afterward. Allow an explicit exception when the pre-change failure cannot be run safely or meaningfully; record why.
+
 Do not create elaborate test infrastructure just to satisfy TDD. Do not mock the world. Do not keep expanding the test plan without producing an implementable plan.
 
 ## Plan Review
 
 - Pressure-test the plan before declaring it ready. If the `oracle` subagent is available and the work is high-risk (architecture, security, data migration, large refactor), delegate a read-only review of `plan.md` and incorporate material feedback.
-- Use the `contrarian` subagent to attack the frozen contract before it freezes. When the Execution Sketch contains a debatable load-bearing seam — an interface boundary, ownership split, or data-flow choice that every ticket will build against — delegate a stress-test naming that specific seam, not "review this plan" (Oracle owns breadth; Contrarian attacks one claim). It is most valuable for seams that have faced no real opposition yet — the plan came together smoothly, or the Architect discussion never debated them. Skip claims already stress-tested at the `/architect` stage; do not re-litigate.
+- Use the `contrarian` subagent to attack a debatable program-design seam before accepting it as the baseline. When the Execution Sketch contains a load-bearing interface boundary, ownership split, or data-flow choice that later tickets will build against, delegate a stress-test naming that seam, not "review this plan" (Oracle owns breadth; Contrarian attacks one claim). It is most valuable for seams that have faced no real opposition yet. Skip claims already stress-tested at the `/architect` stage; do not re-litigate.
 - Otherwise, self-review against the goal, constraints, and behavioral contract, and present the plan to the user for confirmation.
+- Confirm the workflow profile and human checkpoints from the decision brief. Assign an available user or peer to pre-acceptance checkpoints. Record whether final review happens locally or through the eventual pull request. Agent review does not replace either form of human review.
 - Incorporate feedback into `plan.md` when it improves correctness, scope, clarity, or verification.
 - Record the outcome in the `## Review Notes` section. If no independent review was performed, say so there.
 - Do not build a rigid approval state machine. The user decides when to proceed.

@@ -31,9 +31,9 @@ Both trees implement the same ticket-driven workflow, adapted to each harness's 
 | Delegation wiring | Explicit `permission.task` rules in agent frontmatter or `opencode.json` | Automatic — Claude Code picks subagents by their `description` field |
 | Workflow depth | Select Architect → `/plan-feature` → `/decompose` → `/start-work` | `/architect` → `/plan-feature` → `/decompose` → `/start-work` |
 | Implementation | A `developer` subagent implements one ticket at a time; Architect reviews and commits | A `developer` subagent implements one ticket at a time; the main session reviews and commits |
-| Review | Inline per-ticket review; `/review-work` is an optional outside pass | Inline per-ticket review; Claude Code's built-in `/review` is optional |
+| Review | Inline agent review, planned human checkpoints, and required final human review; `/review-work` is an optional outside pass | Inline agent review, planned human checkpoints, and required final human review; built-in `/review` is optional |
 | Subagents | `developer`, built-in `explore`, `contrarian`, plus optional `oracle` and `github-librarian` | `developer`, `repo-scout`, `contrarian`, `oracle`, `github-librarian` |
-| Default models | Per-agent: Fable for architect, Terra for developer/explore/librarian, Sol for oracle/contrarian | Per-agent Claude models: Sonnet for developer/librarian, Haiku for repo-scout, Fable for oracle/contrarian |
+| Default models | Per-agent: Sol for architect/oracle/contrarian, Terra for developer/explore/librarian | Per-agent Claude models: Sonnet for developer/librarian, Haiku for repo-scout, Fable for oracle/contrarian |
 | Config format | `opencode.json` (strict schema, restart required) | Markdown frontmatter only; no JSON config needed |
 | Install target | `~/.config/opencode/` or project `.opencode/` | `~/.claude/` or project `.claude/` |
 
@@ -41,9 +41,9 @@ In both trees, the main session orchestrates a ticket queue and durable state li
 
 ## How the Workflows Run
 
-**OpenCode** — switch to `architect`; it inspects the repository, grills the design, and writes `decision-brief.md`. `/plan-feature` freezes the executable plan, `/decompose` creates dependency-ordered tickets, and `/start-work` dispatches each ticket to Developer, reviews the diff, and commits accepted work. Completion is derived from `Ticket:` trailers. `oracle` and `github-librarian` are optional delegation targets.
+**OpenCode** — switch to `architect`; it inspects the repository, settles product intent and system architecture, chooses a workflow profile, and writes `decision-brief.md`. `/plan-feature` records the reviewed program design and change map. `/decompose` starts with the smallest runnable tracer and creates later vertical slices; a contract-only predecessor is optional and must be justified. `/start-work` dispatches each ticket, applies agent review, pauses at planned human checkpoints, and commits accepted work. Completion is derived from `Ticket:` trailers. `oracle` and `github-librarian` are optional delegation targets.
 
-**Claude Code** — `/architect` grills the design and emits `decision-brief.md`; `/plan-feature` turns brief + repo into `plan.md`; `/decompose` cuts the plan into dependency-ordered `tickets/`; `/start-work` drives the loop: dispatch one ticket to the `developer` subagent, review the diff, commit on approval, repeat. Ticket completion is derived from `Ticket:` trailers in git, so a fresh session can resume from the repo state alone. See `claude/README.md` for the full mechanics (2-round review cap, escalation, contract-change handling).
+**Claude Code** — `/architect` settles product intent, system architecture, risk, and review cadence in `decision-brief.md`; `/plan-feature` turns the brief and repository evidence into `plan.md`; `/decompose` cuts a runnable tracer followed by dependency-ordered vertical slices; `/start-work` dispatches one ticket, reviews design fit, tests, correctness, and maintainability, pauses at planned human checkpoints, and commits on approval. Ticket completion is derived from `Ticket:` trailers, so a fresh session reconstructs queue state from the repository; ambiguous interrupted review rounds require user confirmation. See `claude/README.md` for the full mechanics.
 
 ## Install
 
@@ -61,6 +61,9 @@ Packages are independent: you can install just `oracle`, just the librarian, or 
 
 - **File-based and reversible.** Install by copying selected packages or using the explicit OpenCode symlink helper. No hidden config mutation, subprocess harnesses, or runtime state machines.
 - **Durable artifacts over hidden state.** Decisions live in `decision-brief.md` / `plan.md` / `tickets/` and git, not in the session.
+- **Proportional process.** Small work can bypass the artifact flow; standard and high-risk work receive explicit design and review cadence.
+- **Runnable feedback early.** The first behavior ticket is a touchable end-to-end tracer, not a behaviorless layer of speculative stubs.
+- **Humans own maintainability judgment.** Agent review raises the floor, but selected code checkpoints and final review remain human decisions.
 - **Additive.** Outside the workflow your session behaves normally; nothing is enforced globally.
 
 ## Contributing

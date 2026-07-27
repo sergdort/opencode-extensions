@@ -18,7 +18,7 @@ select architect
   -> dispatch Developer, review, commit, repeat
 ```
 
-Inline per-ticket review is the normal review mechanism. `/review-work` remains available as an optional independent final pass.
+Inline per-ticket agent review is the normal review mechanism. Selected tickets pause for human review before acceptance, and the final series requires human review before merge or release. `/review-work` remains available as an optional independent agent pass; it does not replace either human check.
 
 ## What It Provides
 
@@ -32,8 +32,8 @@ Architect and Developer use OpenCode's built-in Explore agent for focused read-o
 
 Commands in `../../commands/`:
 
-- `plan-feature.md`: turns the decision brief and repository evidence into a frozen executable plan
-- `decompose.md`: cuts the plan into dependency-ordered vertical slices with a contract ticket zero
+- `plan-feature.md`: turns the decision brief and repository evidence into reviewed program design, a change map, behavior, verification, and review checkpoints
+- `decompose.md`: cuts the plan into a runnable tracer and dependency-ordered vertical slices; a narrow contract-only predecessor is optional
 - `start-work.md`: dispatches, reviews, and commits tickets one at a time
 - `review-work.md`: optional outside review after the inline loop
 
@@ -41,23 +41,31 @@ Optional sibling packages add `oracle` and `github-librarian` delegation.
 
 ## Durable State
 
-- `decision-brief.md`: settled architecture, meaningful rejected options, risks, and review focus
-- `plan.md`: frozen interface sketch, call flow, behavioral contract, and verification strategy
+- `decision-brief.md`: product intent, system architecture, settled decisions, workflow profile, risks, and review cadence
+- `plan.md`: reviewed execution sketch, call flow, change map, behavioral contract, verification, and human checkpoints
 - `tickets/*.md`: approved work-unit specifications and dependency graph
 - Git trailers: `Ticket: <id>` records completion and `Fix: <slug>` records accepted post-queue fixes
 
-Ready and done state is derived from git plus ticket dependencies. A fresh or compacted Architect session can reconstruct the queue without hidden runtime state.
+Ready and done state is derived from git plus ticket dependencies. A fresh or compacted Architect session can reconstruct the queue; an ambiguous interrupted review round requires user confirmation rather than hidden runtime state.
 
-The workflow is a feedback loop over this externalized state, with a closed event set: a Developer report (`DONE` or `BLOCKED`), Architect's review verdict, a user decision, or a post-queue bug report. Only Architect writes state — through a commit or an approved artifact edit; Developer diffs are proposals until reviewed. Explore, Contrarian, Oracle, and GitHub Librarian inform judgment but never transition state; only a Developer dispatch returns a completion event to the loop.
+The workflow is a feedback loop over this externalized state, with a closed event set: a Developer report (`DONE` or `BLOCKED`), Architect's review verdict, a human checkpoint decision, or a post-queue bug report. Only Architect writes state through a commit or approved artifact edit; Developer diffs are proposals until reviewed. Explore, Contrarian, Oracle, and GitHub Librarian inform judgment but never transition state.
+
+## Workflow Profiles
+
+- **Small:** direct implementation for obvious edits and bugs with a clear path; Architect sends the user to the normal `build` agent instead of creating artifacts.
+- **Standard:** the normal artifacts, a runnable tracer first, human review before accepting that tracer, and final human review before merge or release.
+- **High-risk:** the standard flow plus independent plan review when available and human checkpoints for load-bearing, migration, security, persistence, or hard-to-reverse slices.
+
+The artifacts map to the design phases without adding files: the brief owns product intent and system architecture, the plan owns program design and the file change map, and tickets own vertical delivery slices. Bug fixes and `test-first` tickets report fail-before/pass-after evidence when meaningful.
 
 ## Boundaries
 
 - Architect researches the repository directly before asking design questions.
 - Architect may edit workflow artifacts but does not write product code during the workflow.
 - Developer edits product code and tests but cannot stage, commit, push, or discard worktree changes.
-- Architect reviews each ticket and creates local commits; it cannot push or run destructive cleanup commands.
+- Architect reviews each ticket, pauses at declared human checkpoints, and creates local commits; it cannot push or run destructive cleanup commands.
 - A ticket receives at most two Developer rounds before requirements-level escalation.
-- Contract changes return to `/plan-feature` and `/decompose`; accepted commits are not rewritten.
+- Shared-interface or program-design changes return to `/plan-feature` and `/decompose`; accepted commits are not rewritten.
 
 These boundaries use both prompts and OpenCode permissions. Architect edits are allowed without per-file approval, while its prompt limits direct writes to workflow artifacts, temporary drafting files, and specific edits explicitly requested by the user. Named subagents and the built-in Explore agent are allowed; unlisted Task delegation still requires approval. Architect and Developer may run routine repository commands without confirmation, while direct and RTK-wrapped Git operations that publish, rewrite history, switch branches, stash, or discard work are denied. Explore has no Bash access; Contrarian allows only read-only Git inspection through Bash.
 
@@ -145,14 +153,14 @@ All other programmatic delegation requires user approval. A hard parent-level Ta
 
 Defaults:
 
-- Architect: `anthropic/claude-fable-5`, `high`
+- Architect: `openai/gpt-5.6-sol`, `high`
 - Developer: `openai/gpt-5.6-terra`, `high`
 - Explore: OpenCode built-in; recommended override is `openai/gpt-5.6-terra`, `low`
 - Contrarian: `openai/gpt-5.6-sol`, `xhigh`
 
 Built-in Explore does not declare its own model and otherwise inherits the caller's model. Merge the `agent.explore` block from `opencode.architect.example.json` into your global or project config to keep discovery on the cheaper model.
 
-The lead seat runs on the model with the strongest delegation judgment; execution seats run on a cheaper model. Contrarian (and the sibling Oracle package) intentionally use a different model family than Architect so second opinions do not share the lead's blind spots.
+The lead seat runs with sustained high reasoning while execution seats use a cheaper model. Contrarian and the sibling Oracle package run in fresh, bounded `xhigh` contexts with distinct review roles; their independence comes from context and charter, not a different model family.
 
 Edit copied agent frontmatter to match available provider models and variants.
 
@@ -162,8 +170,8 @@ Edit copied agent frontmatter to match available provider models and variants.
 2. Describe the feature or decision. Architect inspects the repository before grilling the design.
 3. After `decision-brief.md` is agreed, run `/plan-feature`.
 4. Review the plan, then run `/decompose` and approve the ticket cut.
-5. Run `/start-work`. Architect drains the queue or stops on an escalation.
-6. Review the local commit series and decide whether to squash or push.
+5. Run `/start-work`. Architect drains the queue, pausing at declared human checkpoints, or stops on an escalation.
+6. Complete final human review locally or in the pull request before merge or release. The user decides whether to squash or push.
 
 ## Restart Required
 
