@@ -1,6 +1,6 @@
 # opencode-extensions
 
-File-based agent extensions for two coding harnesses: **OpenCode** and **Claude Code**. Everything here is plain Markdown prompts, agent definitions, instruction files, example config snippets, and one explicit OpenCode symlink helper. There are no plugins or hidden config mutations; every installed file remains visible and reversible.
+File-based agent extensions for three coding harnesses: **OpenCode**, **Claude Code**, and **Codex**. Everything here is plain Markdown prompts, agent definitions, instruction files, example config snippets, and explicit opt-in global symlink helpers. There are no plugins or hidden config mutations; every installed file remains visible and reversible.
 
 ## Repository Layout
 
@@ -16,34 +16,41 @@ opencode/               OpenCode packages
 claude/                 Claude Code package
   agents/               subagents (developer, repo-scout, oracle, contrarian, github-librarian)
   commands/             slash commands (/architect, /plan-feature, /decompose, /start-work, ...)
+
+codex/                  Codex package
+  link-global.sh        opt-in global symlink setup for the core package
+  agents/               custom subagents (developer, oracle, contrarian)
+  skills/               manual-only workflow skills ($architect, $plan-feature, $decompose, $start-work)
+  optional/librarian/   optional GitHub research agent and skill
 ```
 
-Each package directory has its own README with install steps, config snippets, and usage. `opencode/link-global.sh` can link the complete OpenCode setup globally when you want repository edits reflected without copying again.
+Each package directory has its own README with install steps, config snippets, and usage. The OpenCode and Codex link helpers provide opt-in global setups when you want repository edits reflected without copying again.
 
-## The Two Configurations
+## The Three Configurations
 
-Both trees implement the same ticket-driven workflow, adapted to each harness's native agent and command model.
+All three trees implement the same ticket-driven workflow, adapted to each harness's native agent and command model.
 
-| | OpenCode (`opencode/`) | Claude Code (`claude/`) |
-|---|---|---|
-| Architect role | Persistent `mode: primary` orchestrator you switch into | `/architect` slash command (no persistent primary-agent switch in Claude Code) |
-| Where role instructions live | Agent definition files; commands can bind an `agent:` in frontmatter | In each command body — commands run in the current session |
-| Delegation wiring | Explicit `permission.task` rules in agent frontmatter or `opencode.json` | Automatic — Claude Code picks subagents by their `description` field |
-| Workflow depth | Select Architect → `/plan-feature` → `/decompose` → `/start-work` | `/architect` → `/plan-feature` → `/decompose` → `/start-work` |
-| Implementation | A `developer` subagent implements one ticket at a time; Architect reviews and commits | A `developer` subagent implements one ticket at a time; the main session reviews and commits |
-| Review | Inline agent review, planned human checkpoints, and required final human review; `/review-work` is an optional outside pass | Inline agent review, planned human checkpoints, and required final human review; built-in `/review` is optional |
-| Subagents | `developer`, built-in `explore`, `contrarian`, plus optional `oracle` and `github-librarian` | `developer`, `repo-scout`, `contrarian`, `oracle`, `github-librarian` |
-| Default models | Per-agent: Sol for architect/oracle/contrarian, Terra for developer/explore/librarian | Per-agent Claude models: Sonnet for developer/librarian, Haiku for repo-scout, Fable for oracle/contrarian |
-| Config format | `opencode.json` (strict schema, restart required) | Markdown frontmatter only; no JSON config needed |
-| Install target | `~/.config/opencode/` or project `.opencode/` | `~/.claude/` or project `.claude/` |
+| | OpenCode (`opencode/`) | Claude Code (`claude/`) | Codex (`codex/`) |
+|---|---|---|---|
+| Architect role | Persistent `mode: primary` orchestrator you switch into | `/architect` installs the role in the current session | `$architect` installs the role in the current thread; Codex custom agents are spawned roles, not primary modes |
+| Role instructions | Agent definition plus agent-bound commands | Command bodies | Manual-only skills in the main thread |
+| Delegation | Explicit `permission.task` rules | Description-driven subagents | Named custom agents plus built-in `explorer` |
+| Workflow | Select Architect → `/plan-feature` → `/decompose` → `/start-work` | `/architect` → `/plan-feature` → `/decompose` → `/start-work` | `$architect` → `$plan-feature` → `$decompose` → `$start-work` |
+| Implementation | `developer` writes one ticket; Architect reviews and commits | `developer` writes one ticket; main session reviews and commits | Custom `developer` writes one ticket; main thread reviews and commits |
+| Review | Inline review, human checkpoints, final human review; optional `/review-work` | Inline review, human checkpoints, final human review; optional built-in `/review` | Inline review, human checkpoints, final human review; optional built-in `/review` |
+| Discovery and advice | Built-in Explore, Contrarian, optional Oracle and Librarian | Repo Scout, Contrarian, Oracle, Librarian | Built-in `explorer`, custom Contrarian and Oracle, optional Librarian |
+| Default models | Sol for architect/oracle/contrarian; Terra for developer/explore/librarian | Sonnet for developer/librarian; Haiku for repo-scout; Fable for oracle/contrarian | Main model inherited; GPT-5.6 Terra for developer; GPT-5.6 for oracle/contrarian |
+| Install target | `~/.config/opencode/` or project `.opencode/` | `~/.claude/` or project `.claude/` | `~/.agents/skills` + `~/.codex/agents`, or project `.agents/skills` + `.codex/agents` |
 
-In both trees, the main session orchestrates a ticket queue and durable state lives in Markdown plus git. OpenCode uses a selectable primary Architect and explicit Task permissions; Claude Code installs the role into the current session through `/architect` and routes subagents by description.
+In all three trees, the main session orchestrates a serial ticket queue. Markdown artifacts externalize workflow state, and exact `Ticket:` commit trailers form the accepted implementation ledger. OpenCode uses a selectable primary Architect; Claude Code and Codex install the role into the active session or thread.
 
 ## How the Workflows Run
 
 **OpenCode** — switch to `architect`; it inspects the repository, settles product intent and system architecture, chooses a workflow profile, and writes `decision-brief.md`. `/plan-feature` records the reviewed program design and change map. `/decompose` starts with the smallest runnable tracer and creates later vertical slices; a contract-only predecessor is optional and must be justified. `/start-work` dispatches each ticket, applies agent review, pauses at planned human checkpoints, and commits accepted work. Completion is derived from `Ticket:` trailers. `oracle` and `github-librarian` are optional delegation targets.
 
 **Claude Code** — `/architect` settles product intent, system architecture, risk, and review cadence in `decision-brief.md`; `/plan-feature` turns the brief and repository evidence into `plan.md`; `/decompose` cuts a runnable tracer followed by dependency-ordered vertical slices; `/start-work` dispatches one ticket, reviews design fit, tests, correctness, and maintainability, pauses at planned human checkpoints, and commits on approval. Ticket completion is derived from `Ticket:` trailers, so a fresh session reconstructs queue state from the repository; ambiguous interrupted review rounds require user confirmation. See `claude/README.md` for the full mechanics.
+
+**Codex** — `$architect` establishes the main-thread role, requires the separately installed `grill-me-architecture` skill, and writes the decision brief. `$plan-feature` records the reviewed program design. `$decompose` creates the tracer-first queue after user approval. `$start-work` dispatches a fresh custom Developer for each ticket, verifies that the Developer did not mutate Git state, applies the same four-axis review and human checkpoints, and creates local ticket commits. The artifacts stay uncommitted and temporary; the user removes them after the workflow. See `codex/README.md` for supported Codex surfaces, limitations, and install paths.
 
 ## Install
 
@@ -52,15 +59,21 @@ Pick a tree and installation style:
 - OpenCode package-by-package: follow the README under `opencode/agents/` or `opencode/commands/` and copy only the pieces you want.
 - OpenCode complete global setup: run `opencode/link-global.sh --dry-run`, then `opencode/link-global.sh --force` if existing differing copies should be replaced. The script links only repository-owned agents, commands, and instructions; it does not edit `opencode.json` or unrelated files.
 - Claude Code: follow `claude/README.md` — copy `claude/agents/*.md` and `claude/commands/*.md` into `~/.claude/` (global) or `.claude/` (per project). No restart or JSON config needed.
+- Codex global setup: run `codex/link-global.sh --dry-run`, then
+  `codex/link-global.sh --force` if existing differing copies or directories
+  should be replaced. Add `--with-librarian` for the optional package. For a
+  project-local setup, follow `codex/README.md`.
 
-Restart OpenCode after linking or changing files because it loads agents, commands, and instructions at startup.
+Restart OpenCode after linking or changing files. Reload Codex after changing skills or custom agents.
 
 Packages are independent: you can install just `oracle`, just the librarian, or the full workflow.
 
 ## Shared Principles
 
-- **File-based and reversible.** Install by copying selected packages or using the explicit OpenCode symlink helper. No hidden config mutation, subprocess harnesses, or runtime state machines.
-- **Durable artifacts over hidden state.** Decisions live in `decision-brief.md` / `plan.md` / `tickets/` and git, not in the session.
+- **File-based and reversible.** Install by copying selected packages or using
+  the explicit OpenCode and Codex symlink helpers. No hidden config mutation,
+  subprocess harnesses, or runtime state machines.
+- **Externalized artifacts over hidden state.** Decisions live in visible `decision-brief.md` / `plan.md` / `tickets/` files, with lifecycle and git treatment defined by each package.
 - **Proportional process.** Small work can bypass the artifact flow; standard and high-risk work receive explicit design and review cadence.
 - **Runnable feedback early.** The first behavior ticket is a touchable end-to-end tracer, not a behaviorless layer of speculative stubs.
 - **Humans own maintainability judgment.** Agent review raises the floor, but selected code checkpoints and final review remain human decisions.
@@ -68,4 +81,4 @@ Packages are independent: you can install just `oracle`, just the librarian, or 
 
 ## Contributing
 
-See `AGENTS.md` for contributor guidance: file conventions, OpenCode config rules, verification steps, and git hygiene.
+See `AGENTS.md` for contributor guidance: file conventions, harness config rules, verification steps, and git hygiene.

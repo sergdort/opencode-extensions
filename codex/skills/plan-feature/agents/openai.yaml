@@ -1,0 +1,7 @@
+interface:
+  display_name: "Plan Feature"
+  short_description: "Write the reviewed program design"
+  default_prompt: "Use $plan-feature to write plan.md for the active workflow."
+
+policy:
+  allow_implicit_invocation: false

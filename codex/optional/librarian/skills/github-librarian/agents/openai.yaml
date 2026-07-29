@@ -1,0 +1,7 @@
+interface:
+  display_name: "GitHub Librarian"
+  short_description: "Research external GitHub repositories"
+  default_prompt: "Use $github-librarian to research this GitHub question."
+
+policy:
+  allow_implicit_invocation: false

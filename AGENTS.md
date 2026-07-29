@@ -1,13 +1,13 @@
 # Contributor Guidance
 
-This repo packages lightweight agent extensions for two harnesses — OpenCode (`opencode/`) and Claude Code (`claude/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the two configurations; package READMEs hold the per-package details.
+This repo packages lightweight agent extensions for three harnesses — OpenCode (`opencode/`), Claude Code (`claude/`), and Codex (`codex/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the three configurations; package READMEs hold the per-package details.
 
 ## Project Shape
 
-- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh` is the opt-in helper for a complete global symlink setup.
+- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh` and `codex/link-global.sh` are opt-in helpers for global symlink setups.
 - Do not add plugins, installers, hidden config mutation, subprocess harnesses, automatic model routing, or runtime state machines unless the user explicitly chooses that direction.
-- Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code).
-- The two trees are siblings, not mirrors: they share the architect-first, plan-artifact workflow idea, but each is written for its harness's native mechanisms. When changing shared concepts (e.g. the plan format or oracle's charter), check whether the counterpart tree needs an equivalent change — and adapt rather than copy.
+- Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code; `~/.agents/skills` + `~/.codex/agents` / project `.agents/skills` + `.codex/agents` for Codex).
+- The three trees are siblings, not mirrors: they share the architect-first, plan-artifact workflow idea, but each is written for its harness's native mechanisms. When changing shared concepts (e.g. the plan format or oracle's charter), check whether the counterpart trees need equivalent changes — and adapt rather than copy.
 
 ## Current Packages
 
@@ -23,6 +23,14 @@ The Claude Code package lives under `claude/`:
 
 - `claude/agents/` + `claude/commands/`: the ticket-driven architect/developer harness. See `claude/README.md` for the workflow, execution model, and model/effort allocation.
 
+The Codex package lives under `codex/`:
+
+- `codex/link-global.sh`: opt-in global symlink helper for the core Codex setup, with an explicit optional Librarian flag.
+- `codex/skills/`: manual-only Architect workflow skills.
+- `codex/agents/`: custom Developer, Oracle, and Contrarian spawned-session profiles.
+- `codex/optional/librarian/`: optional GitHub research skill and custom agent.
+- `codex/README.md`: install, workflow, execution, permission limits, model defaults, and non-goals.
+
 ## File Conventions — OpenCode (`opencode/`)
 
 - Agent packages live under `opencode/agents/<package>/`; the agent definition itself is at `opencode/agents/<package>/agents/*.md`.
@@ -37,6 +45,19 @@ The Claude Code package lives under `claude/`:
 - Commands live in `claude/commands/*.md`; they run in the main session (no `agent:` binding), so any role instructions belong in the command body itself.
 - The workflow's durable artifacts are `decision-brief.md`, `plan.md`, and `tickets/*.md`; ticket state is derived from git `Ticket:` trailers, not stored. Do not introduce hidden session state.
 - Keep `claude/README.md` in sync when changing agents, commands, or the loop mechanics — it is the package's contract.
+
+## File Conventions — Codex (`codex/`)
+
+- Core custom agents live in `codex/agents/*.toml` with `name`, `description`, and `developer_instructions`. Model, reasoning effort, and sandbox defaults may be set with normal Codex config keys.
+- Core skills live in `codex/skills/<skill>/SKILL.md` and use valid skill frontmatter. Each bundled workflow skill has `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
+- Keep skill descriptions explicit about manual invocation and scope. Do not add an implicit router in `AGENTS.md`.
+- Use Codex's built-in `explorer` for routine discovery instead of adding a duplicate Repo Scout.
+- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$architect` requires the separately installed `grill-me-architecture` skill.
+- Keep `codex/link-global.sh` limited to named global skill and agent symlinks. It must not install dependencies, edit config, or change unrelated files.
+- Treat `decision-brief.md`, `plan.md`, and `tickets/*.md` as temporary uncommitted Codex workflow state. The workflow never removes them; cleanup belongs to the user.
+- Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Do not claim that Developer's no-git boundary is mechanically enforced. Keep the prompt contract and Architect's pre/post Git invariant checks aligned.
+- Keep `codex/README.md` in sync when changing skills, custom agents, lifecycle rules, permissions, or model defaults.
+- Remind users to reload Codex after changing skills or custom agents.
 
 ## OpenCode Config Rules
 
@@ -62,6 +83,7 @@ The Claude Code package lives under `claude/`:
 - Run `git diff --check` for tracked changes.
 - For new untracked files, use `git diff --check --no-index -- /dev/null <file>` and treat exit code `1` as normal for a no-index diff if there is no whitespace-error output.
 - Validate example JSON with `jq empty <file>`.
+- Validate Codex TOML and YAML with available parsers.
 - Re-read changed Markdown prompts before finalizing to catch stale command names, unsupported frontmatter, or copied instructions that do not fit the target harness.
 
 ## Git Hygiene

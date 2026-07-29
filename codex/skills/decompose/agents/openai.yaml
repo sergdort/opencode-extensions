@@ -1,0 +1,7 @@
+interface:
+  display_name: "Decompose"
+  short_description: "Cut a tracer-first ticket queue"
+  default_prompt: "Use $decompose to turn plan.md into approved vertical tickets."
+
+policy:
+  allow_implicit_invocation: false

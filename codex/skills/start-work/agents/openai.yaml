@@ -1,0 +1,7 @@
+interface:
+  display_name: "Start Work"
+  short_description: "Run the serial reviewed ticket queue"
+  default_prompt: "Use $start-work to implement the approved ticket queue."
+
+policy:
+  allow_implicit_invocation: false

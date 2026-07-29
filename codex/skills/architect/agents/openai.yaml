@@ -1,0 +1,7 @@
+interface:
+  display_name: "Architect"
+  short_description: "Settle architecture before planning"
+  default_prompt: "Use $architect to settle this feature's architecture."
+
+policy:
+  allow_implicit_invocation: false
