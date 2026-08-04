@@ -1,15 +1,15 @@
 ---
-description: Have Architect decompose plan.md into a runnable tracer and dependency-ordered vertical slices
+description: Have Architect decompose plan.md into routed, dependency-ordered vertical slices
 agent: architect
 ---
 
-Decompose the implementation plan into independently implementable tickets under `tickets/`.
+Decompose the implementation plan into independently implementable, Developer-routed tickets under `tickets/`.
 
 Command arguments are optional:
 
 `$ARGUMENTS`
 
-You remain Architect. Do not write product code here. Cut the plan into tickets, validate the cut, and get the user's approval before implementation starts.
+You remain Architect. Do not write product code here. Cut the plan into tickets, assign the cheapest reliable Developer to each ticket, validate the cut, and get the user's approval before implementation starts.
 
 ## Resolve The Plan
 
@@ -36,9 +36,18 @@ Each ticket must be implementable by a fresh Developer context using only its ti
 6. The tracer has `checkpoint: human`. For a high-risk profile, give every load-bearing, migration, security, persistence, or hard-to-reverse slice the same checkpoint. Other tickets use `checkpoint: none`; the final series still requires human review.
 7. On an incremental cut, preserve the completed effective tracer if it still proves the current path. If the plan invalidates it, add a fresh correcting behavior ticket with `tracer: true` and `corrects: [<old-tracer>]`; later behavior depends on the effective tracer. Add a corrective contract ticket only when a separately justified stable boundary changed.
 
+## Assign The Developer
+
+Every proposed ticket names exactly one installed Developer. This is execution metadata; keep model routing out of `plan.md`.
+
+- Assign `developer-luna` only when all of these are true: the ticket is a behavior slice; its acceptance criteria are unambiguous; shared interfaces are already settled by the plan or completed dependencies; expected scope is local and predictable; automated verification is credible; observable proof is direct; and implementation requires no architectural judgment.
+- Assign `developer` whenever any of these apply: a contract or shared interface is created or changed; ownership crosses several modules; repository behavior remains unclear; verification is weak, expensive, or mainly manual; implementation is exploratory or integration-heavy; or the slice involves security, authentication, concurrency, persistence, migration, schemas, public APIs, data loss, or another hard-to-reverse concern.
+- Use `developer` when the evidence is mixed. Ticket size alone never justifies `developer-luna`.
+- Record a concise `routing` reason tied to scope, interface stability, verification, or risk. Do not justify a route only by model price or expected changed-line count.
+
 ## Proposed Cut And Approval
 
-Draft the complete cut in memory first. Present ticket id, title, type, tracer, checkpoint, dependencies, expected scope, owned scenarios, and observable proof, followed by preliminary gate results. Wait for explicit user approval before writing ticket files. Ticket existence with `status: open` is the durable approval record.
+Draft the complete cut in memory first. Present ticket id, title, type, assigned Developer, routing reason, tracer, checkpoint, dependencies, expected scope, owned scenarios, and observable proof, followed by preliminary gate results. Wait for explicit user approval before writing ticket files. Ticket existence with `status: open` is the durable approval record for both scope and routing.
 
 ## Ticket Schema
 
@@ -49,6 +58,8 @@ Write one file per ticket at `tickets/<id>.md`:
 id: auth-001
 title: <short imperative title>
 type: behavior
+developer: developer-luna
+routing: "Local behavior with settled interfaces and test-first verification"
 tracer: true
 checkpoint: human
 status: open
@@ -79,7 +90,7 @@ How to exercise the completed slice through a real boundary. For pure library wo
 ## Notes
 ```
 
-Allowed ticket types are `contract` and `behavior`. Allowed checkpoints are `human` and `none`. Allowed statuses are `open` and `blocked`. Never write `done`, `ready`, or `in-progress`; `/start-work` derives those states from git. A contract ticket uses `tracer: false` and normally `checkpoint: none` unless the risk profile requires human review.
+Allowed ticket types are `contract` and `behavior`. Allowed Developers are `developer` and `developer-luna`. Allowed checkpoints are `human` and `none`. Allowed statuses are `open` and `blocked`. Never write `done`, `ready`, or `in-progress`; `/start-work` derives those states from git. A contract ticket uses `developer`, `tracer: false`, and normally `checkpoint: none` unless the risk profile requires human review.
 
 `corrects` is an optional id list. It retires an accepted historical ticket from current-plan ownership in full; a correcting behavior ticket carries every still-current non-`@deferred` scenario owned by that historical ticket, plus the corrected behavior. Use a new extension ticket without `corrects` when the old behavior remains current. It does not make an old id runnable again.
 
@@ -95,6 +106,8 @@ Before presenting the cut, verify:
 - Exactly one effective behavior ticket has `tracer: true`; it is the first observable slice, and every later behavior ticket reaches it through dependencies. If a contract ticket precedes it, that ticket contains a concrete stability and consumer justification.
 - Dependencies and correction chains are acyclic. Every `deps` id resolves to an effective ticket or a preserved completed ticket, and no effective ticket depends on replaced unfinished work. Every `corrects` id resolves to a completed preserved ticket. A contract ticket, when present, is a narrow predecessor of the tracer rather than a universal default.
 - Every behavior ticket explains how to exercise the completed slice. The tracer reaches a real boundary rather than stopping at compilation or internal mocks.
+- Every proposed ticket names `developer` or `developer-luna` and has a non-empty routing reason grounded in scope, interface stability, verification, or risk.
+- Every `developer-luna` ticket satisfies all bounded-work criteria. Contract, shared-interface, ambiguous, weakly verified, cross-boundary, and high-risk tickets use `developer`.
 - The tracer has `checkpoint: human`; high-risk slices match the plan's Human Review section.
 - Likely large tickets are surfaced with the reason they should not be split.
 - Sibling scope overlap is surfaced and classified as intentional serial work or a bad cut.

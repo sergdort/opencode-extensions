@@ -78,6 +78,7 @@ link_file() {
 
 link_file "$SCRIPT_DIR/agents/architect/agents/architect.md" "$CONFIG_DIR/agents/architect.md"
 link_file "$SCRIPT_DIR/agents/architect/agents/developer.md" "$CONFIG_DIR/agents/developer.md"
+link_file "$SCRIPT_DIR/agents/architect/agents/developer-luna.md" "$CONFIG_DIR/agents/developer-luna.md"
 link_file "$SCRIPT_DIR/agents/architect/agents/contrarian.md" "$CONFIG_DIR/agents/contrarian.md"
 link_file "$SCRIPT_DIR/agents/oracle/agents/oracle.md" "$CONFIG_DIR/agents/oracle.md"
 link_file "$SCRIPT_DIR/agents/librarian/agents/github-librarian.md" "$CONFIG_DIR/agents/github-librarian.md"

@@ -6,7 +6,7 @@ Drive the implementation loop over the tickets produced by `/decompose`.
 
 `$ARGUMENTS`
 
-You remain Architect and reviewer. Developer writes product code; you dispatch, inspect, accept or reject, and commit.
+You remain Architect and reviewer. The ticket's approved Developer writes product code; you dispatch, inspect, accept or reject, and commit.
 
 ## Resolve Tickets
 
@@ -28,20 +28,22 @@ Never write `done`, `ready`, or `in-progress` into tickets. A fresh or compacted
 Process one ready ticket at a time in dependency order. A justified contract ticket may precede the tracer; otherwise the runnable tracer is first.
 
 1. Pick the next ready ticket.
-2. Verify the ticket's `seeds` still exist on disk. A missing seed means the repository drifted since decomposition, for example an earlier ticket moved a file; resolve the current location and pass the corrected pointer in the dispatch message rather than letting Developer hunt or guess. If the drift indicates the contract itself moved, escalate instead.
-3. Snapshot `git status --short`. If an already-dirty file overlaps the ticket's declared scope, stop and resolve ownership with the user before dispatch; path staging cannot separate pre-existing and Developer hunks safely.
-4. Dispatch a fresh `developer` Task. Pass the ticket path, plan path, and decision-brief path when present, not copied artifact contents.
-5. After Developer returns, inspect `git status`, the complete working-tree diff, and untracked files. Compare every Developer-touched path with the pre-dispatch snapshot, including necessary out-of-scope changes reported by Developer. If any touched path was already dirty, do not stage it; stop and resolve ownership with the user.
-6. Review from the diff; pull full files into context only when needed. Apply these axes in order:
+2. Resolve the approved Developer from the ticket's `developer` field. Accept only `developer` or `developer-luna`. For a ticket created before Developer routing existed, a missing field retains the old behavior and resolves to `developer`; report that compatibility route without editing the ticket. Stop on any unknown or unavailable named agent rather than substituting another model. Keep the resolved Developer for both implementation rounds.
+3. Verify the ticket's `seeds` still exist on disk. A missing seed means the repository drifted since decomposition, for example an earlier ticket moved a file; resolve the current location and pass the corrected pointer in the dispatch message rather than letting Developer hunt or guess. If the drift indicates the contract itself moved, escalate instead.
+4. Snapshot `git status --short`. If an already-dirty file overlaps the ticket's declared scope, stop and resolve ownership with the user before dispatch; path staging cannot separate pre-existing and Developer hunks safely.
+5. Dispatch a fresh Task to the resolved Developer. Pass the ticket path, plan path, and decision-brief path when present, not copied artifact contents.
+6. After Developer returns, inspect `git status`, the complete working-tree diff, and untracked files. Compare every Developer-touched path with the pre-dispatch snapshot, including necessary out-of-scope changes reported by Developer. If any touched path was already dirty, do not stage it; stop and resolve ownership with the user.
+7. Review from the diff; pull full files into context only when needed. Apply these axes in order:
    - Design and scope fit: reviewed interfaces, ticket scope, acceptance criteria, and necessary deviations from the plan's Change Map.
    - Test faithfulness: real coverage of assigned behavior, plus credible fail-before/pass-after evidence for bugs and `test-first` work or a valid exception.
    - Correctness and verification: implementation correctness and actual build, test, and Observable Proof results.
    - Maintainability and program-design fit: local ownership and future change, without needless coupling, shotgun edits, indirection, or type/error workarounds.
-7. When all agent-review axes pass and the ticket says `checkpoint: human`, pause before staging. Present the goal, diff summary, Observable Proof result, remaining manual checks, and exact paths or commands the human can inspect. Ask the human to judge whether the code remains understandable, cohesive, and locally changeable, then choose approval, a code correction, or a plan correction. A code correction consumes the remaining Developer round; if round two has already run, rejection escalates instead of creating round three. A plan correction returns to planning immediately. Agent review does not stand in for this decision.
-8. After any required human approval, accept by staging only that ticket's changes, inspecting the complete staged diff, and committing only if it contains the accepted ticket and no pre-existing work; request one fresh correction round with a Correction Brief; or escalate immediately if Developer reports `BLOCKED`.
-9. Cap implementation at two Developer rounds. If round one reaches the checkpoint and the human requests a code correction, dispatch round two and run the checkpoint again after agent review passes. If round two reaches the checkpoint and the human rejects it, stop and escalate instead of creating round three.
+8. When all agent-review axes pass and the ticket says `checkpoint: human`, pause before staging. Present the goal, diff summary, Observable Proof result, remaining manual checks, and exact paths or commands the human can inspect. Ask the human to judge whether the code remains understandable, cohesive, and locally changeable, then choose approval, a code correction, or a plan correction. A code correction consumes the remaining Developer round; if round two has already run, rejection escalates instead of creating round three. A plan correction returns to planning immediately. Agent review does not stand in for this decision.
+9. After any required human approval, accept by staging only that ticket's changes, inspecting the complete staged diff, and committing only if it contains the accepted ticket and no pre-existing work; request one fresh correction round from the same resolved Developer with a Correction Brief; or escalate immediately if Developer reports `BLOCKED`.
+10. Cap implementation at two Developer rounds. If round one reaches the checkpoint and the human requests a code correction, dispatch round two to the same Developer and run the checkpoint again after agent review passes. If round two reaches the checkpoint and the human rejects it, stop and escalate instead of creating round three.
 
 Do not repair rejected product code yourself.
+Do not promote a `developer-luna` ticket to `developer` inside the loop. A load-bearing ambiguity or invalid route is an escalation and artifact correction, not an automatic model retry.
 
 ## Correction Brief
 
@@ -72,7 +74,7 @@ The user's decision must update a durable artifact. For a ticket-only correction
 Draining the queue does not end your orchestrator role. For each manual-testing bug or failing test:
 
 1. Triage read-only when useful and decide whether it is an in-scope defect or a requirement change.
-2. Dispatch a focused micro-brief to `developer`: symptom, reproduction, suspected locations, targeted fail-before check, and pass-after proof. No ticket file is required.
+2. Dispatch a focused micro-brief to the Terra `developer`: symptom, reproduction, suspected locations, targeted fail-before check, and pass-after proof. No ticket file is required and post-queue fixes are not dynamically routed.
 3. Apply the same four-axis review rubric and two-round cap. Require credible fail-before/pass-after evidence or a valid exception. Use a human checkpoint before committing any risky fix that changes a load-bearing interface, persistence, security, or migration behavior.
 4. Commit accepted fixes with a `Fix: <short-slug>` trailer.
 5. Escalate requirement changes back to planning rather than disguising them as fixes.
@@ -84,6 +86,7 @@ Every accepted `Fix:` commit makes final human review pending again and expands 
 Report:
 
 - Completed tickets and commit hashes
+- Developer route used for each completed or blocked ticket
 - Blocked or remaining tickets and reasons
 - Verification commands and results
 - Commit series and comparison range for required final human review
