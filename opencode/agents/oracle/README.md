@@ -30,7 +30,7 @@ mkdir -p ~/.config/opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" ~/.config/opencode/agents/oracle.md
 ```
 
-No `opencode.json` changes are needed for direct `@oracle` use. The Architect package already includes the scoped policy and Task permission it needs to delegate to Oracle.
+No `opencode.json` changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. The Architect package already includes the scoped policy and Task permission it needs to delegate to Oracle.
 
 ## Project Install
 
@@ -44,7 +44,7 @@ mkdir -p .opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" .opencode/agents/oracle.md
 ```
 
-No project config changes are needed for direct `@oracle` use. Install the Architect package as well when you want scoped Oracle delegation during its workflow.
+No project config changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. Install the Architect package as well when you want scoped Oracle delegation during its workflow.
 
 ## Permissions
 
@@ -64,14 +64,19 @@ Good prompts include the context Oracle needs to answer without guessing:
 
 ## Model
 
-The default Oracle agent uses:
+The agent definition intentionally omits `model` and `variant`. To use the recommended route, merge this into global or project `opencode.json`:
 
-```yaml
-model: openai/gpt-5.6-sol
-variant: xhigh
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "oracle": {
+      "model": "openai/gpt-5.6-sol",
+      "variant": "xhigh"
+    }
+  }
+}
 ```
-
-Edit `oracle.md` after copying it if you want a different model or reasoning variant.
 
 ## Restart Required
 

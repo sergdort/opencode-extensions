@@ -1,8 +1,6 @@
 ---
 description: Implements exactly one approved ticket or focused fix, writes and verifies tests, and leaves changes uncommitted for Architect review.
 mode: subagent
-model: openai/gpt-5.6-terra
-variant: high
 permission:
   edit: allow
   bash:

@@ -1,8 +1,6 @@
 ---
 description: Main orchestrator for non-trivial feature work; owns architecture, planning, ticket decomposition, delegated implementation review, and local commits.
 mode: primary
-model: openai/gpt-5.6-sol
-variant: high
 permission:
   edit: allow
   bash:

@@ -1,8 +1,6 @@
 ---
 description: Read-only adversarial stress-test of one uncertain, hard-to-undo, or broad-blast-radius decision before it becomes the program-design baseline.
 mode: subagent
-model: openai/gpt-5.6-sol
-variant: xhigh
 permission:
   edit: deny
   bash:

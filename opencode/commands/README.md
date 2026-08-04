@@ -36,4 +36,4 @@ Restart OpenCode after copying command files. OpenCode loads commands at startup
 
 `plan-feature.md`, `decompose.md`, and `start-work.md` require the Architect package, including its `developer` and `developer-luna` subagents. They intentionally run under the persistent `architect` primary agent.
 
-`review-work.md` is outside the normal inline-review loop and assumes your optional review agent is named `review`. If it has a different name, edit the command frontmatter.
+`review-work.md` is outside the normal inline-review loop and assumes your optional review agent is named `review`. That agent must be read-only and return findings in its response; `review.md` is not workflow state. If the agent has a different name, edit the command frontmatter.

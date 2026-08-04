@@ -40,7 +40,7 @@ cp "$LIBRARIAN_DIR/agents/github-librarian.md" ~/.config/opencode/agents/github-
 cp "$COMMANDS_DIR/github-librarian.md" ~/.config/opencode/commands/github-librarian.md
 ```
 
-No `opencode.json` changes are needed to use `/github-librarian` or `@github-librarian`. The Architect package already includes the scoped policy and Task permission it needs to delegate GitHub research.
+No `opencode.json` changes are needed to use `/github-librarian` or `@github-librarian`. Without an explicit route, GitHub Librarian inherits OpenCode's configured default model. The Architect package already includes the scoped policy and Task permission it needs to delegate GitHub research.
 
 ## Project Install
 
@@ -56,7 +56,7 @@ cp "$LIBRARIAN_DIR/agents/github-librarian.md" .opencode/agents/github-librarian
 cp "$COMMANDS_DIR/github-librarian.md" .opencode/commands/github-librarian.md
 ```
 
-No project config changes are needed to use `/github-librarian` or `@github-librarian`. Install the Architect package as well when you want scoped GitHub-research delegation during its workflow.
+No project config changes are needed to use `/github-librarian` or `@github-librarian`. Without an explicit route, GitHub Librarian inherits OpenCode's configured default model. Install the Architect package as well when you want scoped GitHub-research delegation during its workflow.
 
 ## Permissions
 
@@ -84,14 +84,19 @@ You can also invoke the subagent directly with `@github-librarian` after install
 
 ## Model
 
-The default GitHub Librarian agent uses:
+The agent definition intentionally omits `model` and `variant`. To use the recommended route, merge this into global or project `opencode.json`:
 
-```yaml
-model: openai/gpt-5.6-terra
-variant: high
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "github-librarian": {
+      "model": "openai/gpt-5.6-terra",
+      "variant": "high"
+    }
+  }
+}
 ```
-
-Edit `github-librarian.md` after copying it if you want a different model or reasoning variant.
 
 ## Restart Required
 

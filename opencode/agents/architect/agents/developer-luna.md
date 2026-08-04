@@ -1,8 +1,6 @@
 ---
 description: Implements exactly one bounded, approved ticket with strong verification and leaves changes uncommitted for Architect review.
 mode: subagent
-model: openai/gpt-5.6-luna
-variant: max
 permission:
   edit: allow
   bash:

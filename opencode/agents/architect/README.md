@@ -18,7 +18,7 @@ select architect
   -> dispatch Developer, review, commit, repeat
 ```
 
-Inline per-ticket agent review is the normal review mechanism. Selected tickets pause for human review before acceptance, and the final series requires human review before merge or release. `/review-work` remains available as an optional independent agent pass; it does not replace either human check.
+Inline per-ticket agent review is the normal review mechanism. Selected tickets pause for human review before acceptance, and the final series requires human review before merge or release. `/review-work` remains available as an optional independent, response-only agent pass; it does not create `review.md` or replace either human check.
 
 ## What It Provides
 
@@ -153,7 +153,9 @@ All other programmatic delegation requires user approval. A hard parent-level Ta
 
 ## Models
 
-Defaults:
+Agent definitions intentionally omit `model` and `variant`. Configure role routing in global `~/.config/opencode/opencode.json` or project `opencode.json`; an agent without an explicit route inherits OpenCode's configured default.
+
+Recommended routes:
 
 - Architect: `openai/gpt-5.6-sol`, `high`
 - Standard Developer: `openai/gpt-5.6-terra`, `high`
@@ -161,11 +163,11 @@ Defaults:
 - Explore: OpenCode built-in; recommended override is `openai/gpt-5.6-terra`, `low`
 - Contrarian: `openai/gpt-5.6-sol`, `xhigh`
 
-Built-in Explore does not declare its own model and otherwise inherits the caller's model. Merge the `agent.explore` block from `opencode.architect.example.json` into your global or project config to keep discovery on the cheaper model.
+Merge the `agent` block from `opencode.architect.example.json` into your global or project config to apply these routes. Built-in Explore otherwise inherits the caller's model.
 
 The lead seat runs with sustained high reasoning. `/decompose` assigns Luna only when a behavior ticket has unambiguous acceptance criteria, settled shared interfaces, predictable local scope, credible automated verification, direct observable proof, and no architectural judgment or hard-to-reverse risk. Terra remains the safe default when any of that evidence is missing. Contrarian and the sibling Oracle package run in fresh, bounded `xhigh` contexts with distinct review roles; their independence comes from context and charter, not a different model family.
 
-Edit copied agent frontmatter to match available provider models and variants.
+Edit the `agent` routes in `opencode.json` to match available provider models and variants.
 
 ## Usage
 
