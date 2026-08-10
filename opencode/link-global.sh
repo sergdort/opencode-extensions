@@ -76,6 +76,24 @@ link_file() {
   fi
 }
 
+remove_obsolete_link() {
+  source_path=$1
+  destination_path=$2
+
+  if [[ -L "$destination_path" && "$(readlink "$destination_path")" == "$source_path" ]]; then
+    run rm "$destination_path"
+    if $DRY_RUN; then
+      printf 'Would remove obsolete link: %s\n' "$destination_path"
+    else
+      printf 'Removed obsolete link: %s\n' "$destination_path"
+    fi
+  elif [[ -L "$destination_path" ]]; then
+    printf 'Obsolete command link points elsewhere; inspect it manually: %s -> %s\n' "$destination_path" "$(readlink "$destination_path")"
+  elif [[ -e "$destination_path" ]]; then
+    printf 'Obsolete copied command remains; remove it manually: %s\n' "$destination_path"
+  fi
+}
+
 link_file "$SCRIPT_DIR/agents/architect/agents/architect.md" "$CONFIG_DIR/agents/architect.md"
 link_file "$SCRIPT_DIR/agents/architect/agents/developer.md" "$CONFIG_DIR/agents/developer.md"
 link_file "$SCRIPT_DIR/agents/architect/agents/developer-luna.md" "$CONFIG_DIR/agents/developer-luna.md"
@@ -85,7 +103,9 @@ link_file "$SCRIPT_DIR/agents/librarian/agents/github-librarian.md" "$CONFIG_DIR
 
 link_file "$SCRIPT_DIR/agents/architect/ARCHITECT_INSTRUCTIONS.md" "$CONFIG_DIR/ARCHITECT_INSTRUCTIONS.md"
 
-for command_name in bro plan-feature decompose start-work review-work github-librarian handoff; do
+remove_obsolete_link "$SCRIPT_DIR/commands/decompose.md" "$CONFIG_DIR/commands/decompose.md"
+
+for command_name in bro plan-feature start-work github-librarian handoff; do
   link_file "$SCRIPT_DIR/commands/$command_name.md" "$CONFIG_DIR/commands/$command_name.md"
 done
 

@@ -1,63 +1,68 @@
 ---
-description: Optional independent agent review after Architect's inline reviews; does not replace human review
+description: Optional independent review of the completed plan implementation; does not replace human QA or acceptance
 agent: review
 ---
-Review the current implementation against the plan identified by these command arguments:
+Review the current implementation against its working plan.
+
+Usage: `/review-work [plan-path-or-directory] [git-range]`
 
 `$ARGUMENTS`
 
-## Resolve The Plan
+Plan argument: `$1`
 
-- If the argument names a Markdown file, use that file as the plan path.
-- If the argument names a directory, use `<directory>/plan.md`.
-- If no argument is provided, use `plan.md` in the current repository or working directory.
-- Read the resolved `plan.md` before judging the implementation.
-- If `plan.md` is missing, warn that `/plan-feature` must create the implementation plan first and stop.
-- Read ticket ids from `tickets/` next to the plan and locate commits with exact full-line `Ticket: <id>` trailers. If matching commits exist, review from the parent of the earliest matching commit through `HEAD`, including later `Fix:` commits, plus current tracked and untracked changes. Report unrelated commits separately.
-- If no matching ticket commit exists, review current tracked and untracked changes. If neither a workflow commit nor a current change exists, ask the user for an explicit git comparison range and stop.
+Git range argument: `$2`
+
+## Resolve The Plan And Range
+
+- If `$1` names a Markdown file, require its basename to be `plan.md` and use it.
+- If `$1` names a directory, use `<directory>/plan.md`.
+- If `$1` is empty, use `plan.md` in the current repository or working directory.
+- Reject a non-empty `$1` that is not an existing directory or valid `plan.md`. Do not fall back to the default plan.
+- Require the resolved plan to exist. If missing, report the expected path and stop.
+- Require `decision-brief.md` next to the plan and read it before review.
+- If `$2` is provided, verify that it is a valid Git range. Reject an invalid range instead of guessing. An explicit range overrides the plan.
+- Without `$2`, use the plan's `Review baseline` SHA and review from that commit through `HEAD`. Verify that the SHA exists in this repository.
+- If the plan has no baseline and the worktree has changes, review current tracked and untracked changes.
+- If the plan has no baseline and the worktree is clean, ask for an explicit comparison range instead of guessing from workflow metadata.
+- Always include current tracked and untracked changes in the review.
+- Reject unexpected extra arguments.
+- Do not look for tickets or workflow trailers.
 
 ## Review Scope
 
-- Review the resolved commit comparison and current changes, then read relevant touched files.
-- Compare the implementation to `plan.md`.
-- Flag deviations from the goal, constraints, execution sketch, call flow, work steps, behavioral contract, and verification plan.
-- Flag implementation defects, regressions, missing tests, missing fail-before evidence where required, and missing verification.
+- Read the complete comparison and relevant touched files.
+- Compare product behavior and hard constraints with the decision brief.
+- Check the implementation against the plan's architecture table: component responsibilities, excluded responsibilities, allowed dependencies, settled interfaces, and state transition ownership. A dependency outside a component's allowlist, a component that absorbed work its `Does not own` cell excludes, or a second writer to an owned state machine is a finding.
+- Check each behavior ID in the test strategy for the proof its `Mode` requires.
+- Treat provisional details, predicted files, and phase boundaries as guidance. Flag unexplained harmful drift, not reasonable adaptation.
+- Flag defects, regressions, unsafe behavior, missing tests, weak verification, and incomplete required behavior.
 - Review maintainability and program-design fit: ownership, change locality, cohesion, unnecessary coupling or indirection, shotgun edits, and workarounds that bypass types or error handling.
-- Treat the plan's Change Map as a design aid. Flag unexplained structural drift, not necessary neighboring edits merely because they were not predicted exactly.
 - Distinguish code problems from plan problems.
-- If the diff includes unrelated changes, call them out separately instead of treating them as part of the planned work.
-- Stay read-only. Do not edit files, stage changes, commit, or push.
+- Report unrelated changes separately.
+- Stay read-only. Do not edit, stage, commit, or push.
 
 ## Findings Format
 
-Put findings first, ordered by blast radius, not discovery order. For each candidate finding ask: who controls the input, and how wide does failure spread?
+Put findings first, ordered by blast radius.
 
-- Must-fix: an attacker or unlucky caller can turn it into data loss, corruption, breach, or outage. Examples: unbounded caller-controlled cost, trust-boundary input not parsed or bounded, non-idempotent retry touching money or external state, failure that cascades past the feature.
-- Consider before shipping: real costs that stay contained. Examples: silent swallows, missing teardown, action-at-a-distance, missing contract tests.
-- Nice-to-have: clarity and taste with no correctness impact.
+- **Must-fix:** credible data loss, corruption, security exposure, outage, or failure that spreads beyond the feature.
+- **Consider before shipping:** real correctness, lifecycle, maintainability, or verification costs that remain contained.
+- **Nice-to-have:** clarity or simplification with no correctness impact.
 
 For each finding, include:
 
-- Severity tier from above
-- File and line reference when available
-- The violated plan step, expected behavior, or verification requirement
-- Why it matters
-- A concrete fix or follow-up
+- Severity.
+- File and line reference when available.
+- Violated required behavior, settled decision, or verification need.
+- Why the issue matters.
+- A concrete fix or follow-up check.
 
-If there are no findings, say that explicitly and mention any residual verification gaps.
+If there are no findings, say so and identify residual verification or QA gaps.
 
 ## Noise Control
 
-Do not flag:
-
-- Missing atomicity or idempotency machinery where nothing actually interleaves and no retry touches money, state, or the outside world.
-- Missing re-validation at internal hops; parsing and bounding belong at real trust boundaries, once.
-- Missing fallbacks or bulkheads where the blast radius does not justify them; an untested degraded path is a second bug.
-- Deliberate, logged fallbacks as if they were silent failures; the sin is the silent swallow, not the catch keyword.
-- Flexibility the plan does not require; prefer fewer states over more guards.
-
-Where the implementation accepts a real tradeoff, name its cost explicitly instead of reporting it as a defect.
+Do not flag speculative safeguards without a credible failure mode. Do not require flexibility, fallback paths, abstractions, or test infrastructure that the feature does not need. Name accepted tradeoffs and their costs instead of presenting every tradeoff as a defect.
 
 ## Final Response
 
-Keep the response concise. Do not restate the whole plan. Focus on risks the implementer should act on before the work is considered complete. State that this agent review does not replace the final human review required by the workflow.
+Keep the response concise. Focus on findings that should affect implementation or release. State that independent agent review does not replace final human QA and acceptance.

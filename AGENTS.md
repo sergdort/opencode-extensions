@@ -13,9 +13,9 @@ This repo packages lightweight agent extensions for three harnesses — OpenCode
 
 OpenCode packages live under `opencode/`:
 
-- `opencode/link-global.sh`: opt-in global symlink helper for the complete OpenCode setup.
+- `opencode/link-global.sh`: opt-in global symlink helper for the core OpenCode setup.
 - `opencode/commands/`: reusable slash command prompts.
-- `opencode/agents/architect/`: persistent primary orchestrator plus Terra and Luna developer profiles and a contrarian agent for ticket-driven feature work; local discovery uses OpenCode's built-in Explore agent.
+- `opencode/agents/architect/`: persistent primary orchestrator plus Terra and Luna developer profiles and a contrarian agent for plan-driven feature work; local discovery uses OpenCode's built-in Explore agent.
 - `opencode/agents/oracle/`: read-only second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
 
