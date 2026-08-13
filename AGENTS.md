@@ -31,6 +31,16 @@ The Codex package lives under `codex/`:
 - `codex/optional/librarian/`: optional GitHub research skill and custom agent.
 - `codex/README.md`: install, workflow, execution, permission limits, model defaults, and non-goals.
 
+Shared skills live under `skills/`:
+
+- `skills/grill-me-architecture/`: the canonical copy of the visual-first architecture grilling skill, consumed by OpenCode's Architect, Claude Code's `/architect`, and Codex's `$architect`. `opencode/link-global.sh` links it into `~/.agents/skills/grill-me-architecture/`.
+
+## File Conventions — Shared Skills (`skills/`)
+
+- Shared skills live in `skills/<skill>/SKILL.md` with valid skill frontmatter (`name`, `description`).
+- Keep shared skill bodies harness-agnostic: no OpenCode-, Claude Code-, or Codex-specific workflow references.
+- `skills/` holds the only canonical copy; do not mirror a shared skill into a harness tree or an external repository.
+
 ## File Conventions — OpenCode (`opencode/`)
 
 - Agent packages live under `opencode/agents/<package>/`; the agent definition itself is at `opencode/agents/<package>/agents/*.md`.
@@ -52,7 +62,7 @@ The Codex package lives under `codex/`:
 - Core skills live in `codex/skills/<skill>/SKILL.md` and use valid skill frontmatter. Each bundled workflow skill has `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
 - Keep skill descriptions explicit about manual invocation and scope. Do not add an implicit router in `AGENTS.md`.
 - Use Codex's built-in `explorer` for routine discovery instead of adding a duplicate Repo Scout.
-- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$architect` requires the separately installed `grill-me-architecture` skill.
+- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$architect` requires the separately installed `grill-me-architecture` skill; this repository's `skills/` directory is its canonical source.
 - Keep `codex/link-global.sh` limited to named global skill and agent symlinks. It must not install dependencies, edit config, or change unrelated files.
 - Treat `decision-brief.md`, `plan.md`, and `tickets/*.md` as temporary uncommitted Codex workflow state. The workflow never removes them; cleanup belongs to the user.
 - Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Do not claim that Developer's no-git boundary is mechanically enforced. Keep the prompt contract and Architect's pre/post Git invariant checks aligned.

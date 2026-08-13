@@ -80,7 +80,7 @@ After each `DONE` result, check:
 
 Inspect the diff for these rules. Do not accept a Developer's conformance claim without checking the paths it names.
 
-This is not full code review. Do not apply the final review rubric or pause for human approval after every phase.
+This is not full code review. Do not apply the final review rubric.
 
 ## Regression Cadence
 
@@ -90,11 +90,18 @@ This is not full code review. Do not apply the final review rubric or pause for 
 
 A check that passed in an earlier phase and fails now is a regression and blocks acceptance, unless it is listed in the plan's `Known gate failures at baseline`.
 
-## Human Checkpoints
+## Human Involvement
 
-Pause for the user at a phase whose plan `Checkpoint` is `human`. The first runnable phase is a human checkpoint by default. Add one for any phase crossing a security, persistence, migration, public API, or other hard-to-reverse boundary.
+Run the phase loop to completion without asking the user to review partial work. Do not pause to show a diff, a working slice, or an intermediate result for approval. The user reviews the feature once, at final acceptance.
 
-At a checkpoint, present the behavior now working, the diff summary, conformance result, verification output, and remaining manual checks. Leave the relevant changes uncommitted until the user approves them, then create the next milestone commit. On resume, an uncommitted checkpoint is pending unless the user confirms prior approval; a following milestone commit is evidence that the checkpoint completed.
+Ask the user only when the loop cannot proceed correctly on its own:
+
+- A `NEEDS_DECISION` result about product behavior or a hard-to-reverse boundary.
+- Unrelated dirty worktree changes at startup.
+- A missing or unusable `Review baseline`.
+- Evidence that the plan's product intent is wrong, not merely its program design.
+
+These are blocking questions, not reviews. Keep each one short and specific. Do not attach a progress report to them. When the conflict concerns structure, flow, or state, show it as one compact shape — a `diff`, call stack, or table — directly before the question.
 
 ## Updating The Plan
 
@@ -137,7 +144,7 @@ The plan's `Review baseline` field survives compaction. Read it instead of re-de
 
 ## Final Response
 
-Report:
+Prefer tables, call stacks, and diffs over prose in this report. Report:
 
 - Coherent phases completed and Developer route used.
 - Architecture changes: settled rules updated in the plan, and provisional adaptations accepted without a plan change.

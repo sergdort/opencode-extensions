@@ -22,6 +22,9 @@ codex/                  Codex package
   agents/               custom subagents (developer, oracle, contrarian)
   skills/               manual-only workflow skills ($architect, $plan-feature, $decompose, $start-work)
   optional/librarian/   optional GitHub research agent and skill
+
+skills/                 shared skills used by more than one harness
+  grill-me-architecture/ visual-first architecture grilling skill (canonical copy)
 ```
 
 Each package directory has its own README with install steps, config snippets, and usage. The OpenCode and Codex link helpers provide opt-in global setups when you want repository edits reflected without copying again.
@@ -46,18 +49,18 @@ OpenCode uses a selectable primary Architect and keeps durable intent in `decisi
 
 ## How the Workflows Run
 
-**OpenCode** — switch to `architect`; it inspects the repository, grills the design, settles product intent and hard constraints, and writes `decision-brief.md`. `/plan-feature` settles the program design and test strategy in `plan.md`: a component table with owned, excluded, and allowed dependencies, settled interfaces, state ownership, and behavior IDs with proof modes. `/start-work` selects the next coherent phase, carries that architecture slice into every phase brief, routes Terra-high or Luna-max just in time, and checks conformance against the diff. Developers adapt provisional details and escalate a settled rule they cannot meet. After the required behavior works, Architect runs full review, QA, and final human acceptance. `oracle` and `github-librarian` are optional delegation targets.
+**OpenCode** — switch to `architect`; it inspects the repository, grills the design, settles product intent and hard constraints, and writes `decision-brief.md`. `/plan-feature` settles the program design and test strategy in `plan.md`: a component table with owned, excluded, and allowed dependencies, settled interfaces, state ownership, and behavior IDs with proof modes. `/start-work` selects the next coherent phase, carries that architecture slice into every phase brief, routes Terra-high or Luna-max just in time, and checks conformance against the diff. Developers adapt provisional details and escalate a settled rule they cannot meet. After the required behavior works, Architect runs full review, QA, and final human acceptance. Outside the workflow, both Developers also accept direct fix briefs — follow-up sessions, QA findings, ad hoc fixes — with the same verdict protocol and Git limits. `oracle` and `github-librarian` are optional delegation targets.
 
 **Claude Code** — `/architect` settles product intent, system architecture, risk, and review cadence in `decision-brief.md`; `/plan-feature` turns the brief and repository evidence into `plan.md`; `/decompose` cuts a runnable tracer followed by dependency-ordered vertical slices; `/start-work` dispatches one ticket, reviews design fit, tests, correctness, and maintainability, pauses at planned human checkpoints, and commits on approval. Ticket completion is derived from `Ticket:` trailers, so a fresh session reconstructs queue state from the repository; ambiguous interrupted review rounds require user confirmation. See `claude/README.md` for the full mechanics.
 
-**Codex** — `$architect` establishes the main-thread role, requires the separately installed `grill-me-architecture` skill, and writes the decision brief. `$plan-feature` records the reviewed program design. `$decompose` creates the tracer-first queue after user approval. `$start-work` dispatches a fresh custom Developer for each ticket, verifies that the Developer did not mutate Git state, applies the same four-axis review and human checkpoints, and creates local ticket commits. The artifacts stay uncommitted and temporary; the user removes them after the workflow. See `codex/README.md` for supported Codex surfaces, limitations, and install paths.
+**Codex** — `$architect` establishes the main-thread role, requires the `grill-me-architecture` skill from this repository's `skills/` directory (linked by `opencode/link-global.sh` or copied manually), and writes the decision brief. `$plan-feature` records the reviewed program design. `$decompose` creates the tracer-first queue after user approval. `$start-work` dispatches a fresh custom Developer for each ticket, verifies that the Developer did not mutate Git state, applies the same four-axis review and human checkpoints, and creates local ticket commits. The artifacts stay uncommitted and temporary; the user removes them after the workflow. See `codex/README.md` for supported Codex surfaces, limitations, and install paths.
 
 ## Install
 
 Pick a tree and installation style:
 
 - OpenCode package-by-package: follow the README under `opencode/agents/` or `opencode/commands/` and copy only the pieces you want.
-- OpenCode core global setup: run `opencode/link-global.sh --dry-run`, then `opencode/link-global.sh --force` if existing differing copies should be replaced. The script links repository-owned core agents, commands, and instructions; it does not install the optional review command, edit `opencode.json`, or change unrelated files.
+- OpenCode core global setup: run `opencode/link-global.sh --dry-run`, then `opencode/link-global.sh --force` if existing differing copies should be replaced. The script links repository-owned core agents, commands, instructions, and the shared `grill-me-architecture` skill into `~/.agents/skills`; it does not install the optional review command, edit `opencode.json`, or change unrelated files. Remove any previously installed `grill-me-architecture` copy before linking.
 - Claude Code: follow `claude/README.md` — copy `claude/agents/*.md` and `claude/commands/*.md` into `~/.claude/` (global) or `.claude/` (per project). No restart or JSON config needed.
 - Codex global setup: run `codex/link-global.sh --dry-run`, then
   `codex/link-global.sh --force` if existing differing copies or directories
@@ -77,7 +80,7 @@ Packages are independent: you can install just `oracle`, just the librarian, or 
 - **Proportional process.** Small work can bypass the artifact flow; standard and high-risk work receive explicit design and review cadence.
 - **Runnable feedback early.** Start with a useful end-to-end path or focused technical proof instead of speculative layers.
 - **Program design before implementation.** Component responsibilities, allowed dependencies, and state ownership are settled in the plan and carried into every implementation dispatch, because a goal alone does not constrain structure.
-- **Humans own maintainability judgment.** Agent review raises the floor, but selected code checkpoints and final review remain human decisions.
+- **Humans own maintainability judgment.** Agent review raises the floor, but final review and acceptance remain human decisions. Claude Code and Codex also pause at selected mid-implementation checkpoints; OpenCode runs its phase loop uninterrupted and reviews once.
 - **Additive.** Outside the workflow your session behaves normally; nothing is enforced globally.
 
 ## Contributing

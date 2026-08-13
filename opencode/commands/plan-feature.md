@@ -157,11 +157,11 @@ func test_leavingLoading_cancelsFetchTask() async
 
 ## Phases
 
-| # | Phase | Components | Behaviors | Checkpoint |
-|---|---|---|---|---|
-| 1 | Tracer: stub API, state stream, banner renders | `SyncCoordinator`, `SyncStore`, `FeedViewModel` | B3 | human |
-| 2 | Real API and backoff | `SyncCoordinator` | B1, B2 | none |
-| 3 | Conflict resolution | `SyncStore` | B4 | none |
+| # | Phase | Components | Behaviors |
+|---|---|---|---|
+| 1 | Tracer: stub API, state stream, banner renders | `SyncCoordinator`, `SyncStore`, `FeedViewModel` | B3 |
+| 2 | Real API and backoff | `SyncCoordinator` | B1, B2 |
+| 3 | Conflict resolution | `SyncStore` | B4 |
 
 ## Risks And QA
 
@@ -223,10 +223,11 @@ Follow this order. Do not start by drawing a diagram.
 
 1. Finish the normative component table and the interfaces first.
 2. List the design questions that remain materially hard to answer by reading them.
-3. Match each remaining question to one row of the selection table below.
-4. Keep a diagram only when removing it would hide a load-bearing topology, ordering, lifecycle, or cardinality relationship.
-5. Use `flowchart` only as a fallback, when no other row fits the question.
-6. Emit no diagram when no row qualifies. Zero diagrams is a valid answer, and three is a maximum, never a target.
+3. Try a code-shaped text form first: a textual call stack for control flow, a `diff` block for a change to existing code. These cost less than diagrams and stay outside the budget. See Call Stacks And Diffs.
+4. Match each remaining question to one row of the selection table below.
+5. Keep a diagram only when removing it would hide a load-bearing topology, ordering, lifecycle, or cardinality relationship.
+6. Use `flowchart` only as a fallback, when no other row fits the question.
+7. Emit no diagram when no row qualifies. Zero diagrams is a valid answer, and three is a maximum, never a target.
 
 Give every diagram a heading that states its question, for example `### Flow: Where can cancellation race completion?`. A diagram whose question you cannot write in one line does not belong in the plan.
 
@@ -235,7 +236,7 @@ Give every diagram a heading that states its question, for example `### Flow: Wh
 | Design question | Diagram | Skip when |
 |---|---|---|
 | Which types share an abstraction, and what owns what lifetime? | `classDiagram` | The relationship graph has one obvious edge and no lifetime or cardinality question |
-| In what order do collaborators interact, and where can that ordering go wrong? | `sequenceDiagram` | The path is straight-line, synchronous, and not behaviorally important |
+| In what order do collaborators interact, and where can that ordering go wrong? | `sequenceDiagram` | A textual call stack already shows the path; keep the diagram for concurrency, reentrancy, and interleaving |
 | What states exist, and how does the machine move between them? | `stateDiagram-v2` | The transition table is short, linear, acyclic, and easy to scan |
 | What entities exist, and how do they relate? | `erDiagram` | No entity, relationship, cardinality, ownership, or deletion behavior changes |
 | How does data or control branch, route, or transform across components? | `flowchart` | Every edge is already clear from `May depend on`, or there is no branching, routing, transformation, or layer crossing |
@@ -269,6 +270,34 @@ Three diagrams is the maximum. When over budget, cut in this order:
 - Prefer settled names in diagrams. A diagram built from provisional names goes stale without any settled boundary changing.
 - When a settled boundary changes, update or delete the affected diagram. Updating or deleting an explanatory diagram is housekeeping, not a program-design change.
 
+## Call Stacks And Diffs
+
+Two code-shaped text forms are allowed anywhere in the plan. Neither counts against the diagram budget.
+
+A textual call stack is the default for plain control flow. Reserve `sequenceDiagram` for concurrency, reentrancy, and interleaving:
+
+```text
+requestSync(reason)
+├─ guard state != .loading          → early return
+├─ APIClient.fetch(since:)
+│  ├─ ok      → SyncStore.merge(payload)
+│  └─ 503     → scheduleBackoff(attempt)   [cancels fetch task]
+└─ state.yield(.loaded | .backoff)
+```
+
+A `diff` block presents a change to an existing interface, signature, file layout, or call tree. When the feature modifies existing code, prefer the diff over restating the whole target:
+
+```diff
+ protocol SyncCoordinating: Sendable {
+     func requestSync(reason: SyncReason) async
++    func cancelSync() async
+-    var state: AsyncStream<SyncState> { get }
++    var state: AsyncStream<SyncPhase> { get }
+ }
+```
+
+A diff against existing repository code may serve as the interface proposal itself; the post-change form is the normative fact and carries the `settled` or `provisional` status. A call stack follows the diagram rule: it must not introduce a settled fact absent from the tables or interface code.
+
 ## Test Strategy Rules
 
 - Give every row a stable ID such as `B1`. Phases reference these IDs. Never reuse an ID for different behavior.
@@ -285,9 +314,9 @@ Three diagrams is the maximum. When over budget, cut in this order:
 ## Phase Rules
 
 - Order phases so the first one produces a runnable end-to-end path, or a focused technical proof that can cheaply disprove a risky assumption.
-- Size each phase as the smallest coherent slice that a reviewer can judge in one sitting. Roughly 100 to 200 hand-written changed lines is a useful heuristic, not a limit.
+- Size each phase as the smallest coherent slice whose diff Architect can judge for architecture conformance in one pass. Roughly 100 to 200 hand-written changed lines is a useful heuristic, not a limit.
 - Reference components by their exact name in the architecture table and behaviors by their exact ID in the test strategy. Every reference must resolve; `/start-work` rejects a plan whose phases name something undefined.
-- Set `Checkpoint` to `human` for the first runnable phase and for any phase that crosses a security, persistence, migration, public API, or other hard-to-reverse boundary. Otherwise use `none`.
+- Do not schedule human review of a phase. The user reviews the feature once, after the required behavior works.
 - Do not assign `developer` or `developer-luna` in the plan. Architect chooses the route immediately before each phase.
 - Do not pre-cut phases into ticket files or pre-approved task lists.
 
@@ -308,7 +337,7 @@ Required structured content is exempt: header fields, table cells, illegal-trans
 
 ## Final Response
 
-Present the architecture and the test strategy for alignment. Report:
+Present the architecture and the test strategy for alignment. Reuse the plan's tables, call stacks, and diffs; do not rewrite them into a prose summary. Report:
 
 - The plan path, and whether the plan was created or updated.
 - The component and ownership table.

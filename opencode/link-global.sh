@@ -3,7 +3,9 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 CONFIG_DIR=${OPENCODE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/opencode}
+SKILLS_DIR=${AGENTS_SKILLS_DIR:-$HOME/.agents/skills}
 FORCE=false
 DRY_RUN=false
 
@@ -11,9 +13,14 @@ usage() {
   cat <<'EOF'
 Usage: opencode/link-global.sh [--dry-run] [--force]
 
-Symlink this repository's OpenCode agents, commands, and instruction files into
-the global OpenCode config directory. Existing differing regular files require
---force. Unrelated config files are never changed.
+Symlink this repository's OpenCode agents, commands, instruction files, and the
+shared grill-me-architecture skill into the global OpenCode config directory
+and the global skills directory. Existing differing regular files require
+--force. Unrelated files are never changed.
+
+Environment:
+  OPENCODE_CONFIG_DIR  Config destination (default: ~/.config/opencode).
+  AGENTS_SKILLS_DIR    Skill destination (default: ~/.agents/skills).
 EOF
 }
 
@@ -108,6 +115,8 @@ remove_obsolete_link "$SCRIPT_DIR/commands/decompose.md" "$CONFIG_DIR/commands/d
 for command_name in bro plan-feature start-work github-librarian handoff; do
   link_file "$SCRIPT_DIR/commands/$command_name.md" "$CONFIG_DIR/commands/$command_name.md"
 done
+
+link_file "$REPO_DIR/skills/grill-me-architecture/SKILL.md" "$SKILLS_DIR/grill-me-architecture/SKILL.md"
 
 printf 'OpenCode files linked from %s\n' "$SCRIPT_DIR"
 printf 'Restart OpenCode to load agent, command, or instruction changes.\n'

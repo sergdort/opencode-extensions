@@ -27,8 +27,10 @@ The plan's architecture is binding; its provisional details are not. Developers 
 Agents in `agents/`:
 
 - `architect.md`: primary orchestrator, integrator, reviewer, and local committer
-- `developer.md`: Terra-high Developer for uncertain, cross-layer, stateful, debugging-heavy, or weakly verified phases
-- `developer-luna.md`: Luna-max Developer for bounded phases with stable behavior and direct automated verification
+- `developer.md`: Terra-high Developer for uncertain, cross-layer, stateful, debugging-heavy, or weakly verified work
+- `developer-luna.md`: Luna-max Developer for bounded work with stable behavior and direct automated verification
+
+Both Developers run in two modes: plan mode inside `/start-work`, where the plan's architecture rules bind them, and direct mode, where a self-contained brief is the contract. Direct mode supports follow-up sessions, QA findings, and ad hoc fixes dispatched from Architect or any other agent, with the same verdict protocol and Git limits.
 - `contrarian.md`: read-only adversarial review of one load-bearing decision
 
 Architect and both Developers use OpenCode's built-in Explore agent for focused read-only repository discovery.
@@ -72,18 +74,18 @@ Architect selects the next phase from the plan and current code. It chooses the 
 
 Every phase brief carries the architecture slice for the components in scope, not just the goal. After each phase, Architect runs an integration check that verifies architecture conformance against the diff, and confirms that no earlier proof regressed. Regression cadence is tiered: focused plus earlier proofs per phase, the affected module suite at milestones, the full suite at final review.
 
-Architect does not run a formal review or request user approval for every phase. The first runnable phase is a human checkpoint by default, as is any phase crossing a hard-to-reverse boundary. Full code review and QA begin after the required behavior works.
+Architect does not run a formal review or request user approval for a phase. The loop runs uninterrupted until the required behavior works, then full code review, QA, and final human acceptance begin. Mid-implementation, Architect asks the user only about a blocking product or hard-to-reverse decision, unrelated dirty worktree changes, an unusable review baseline, or evidence that the product intent itself is wrong.
 
 ## Workflow Profiles
 
 - **Small:** use the normal `build` agent directly. Do not create workflow artifacts.
-- **Standard:** use a decision brief and working plan. Build useful behavior early and treat that first runnable phase as a human checkpoint. Run full review, QA, and final human acceptance after implementation.
-- **High-risk:** add focused independent plan review and early human checkpoints only around security, persistence, migration, public API, broad refactor, or another hard-to-reverse boundary.
+- **Standard:** use a decision brief and working plan. Build useful behavior early, run the phase loop uninterrupted, then run full review, QA, and final human acceptance.
+- **High-risk:** add focused independent plan review before implementation, and widen final review and QA around security, persistence, migration, public API, broad refactor, or another hard-to-reverse boundary.
 
 ## Boundaries
 
 - Architect inspects the repository before asking design questions.
-- Architect may edit `decision-brief.md` and `plan.md`, but it does not write product code during the workflow.
+- Architect edits `decision-brief.md` and `plan.md` freely. Any other Architect file edit asks for user approval through the edit permission. Architect does not write product code.
 - Developers edit product code and tests but cannot stage, commit, push, rewrite history, or discard worktree changes.
 - Developers may adapt provisional details and must report them. A settled architecture rule they cannot meet is a `NEEDS_DECISION`, never a silent change or a workaround.
 - Every Developer report includes an architecture-conformance section naming real paths, which Architect verifies against the diff.
@@ -91,7 +93,9 @@ Architect does not run a formal review or request user approval for every phase.
 - There is no fixed correction-round limit. Architect changes strategy after repeated failure instead of forcing a requirements escalation.
 - Final human acceptance remains required before merge or release.
 
-These boundaries use prompts and OpenCode permissions. Architect can invoke named subagents and built-in Explore. Unlisted Task delegation still requires approval. Direct and RTK-wrapped Git operations that publish, rewrite history, switch branches, stash, or discard work remain denied.
+These boundaries use prompts and OpenCode permissions. Architect's edit permission allows only `plan.md` and `decision-brief.md` and asks for every other path. Architect can invoke named subagents and built-in Explore. Unlisted Task delegation still requires approval. Direct and RTK-wrapped Git operations that publish, rewrite history, switch branches, stash, or discard work remain denied.
+
+Loop mechanics live in the commands: `/plan-feature` carries the program-design rules and `/start-work` carries the delegation, integration, and review rules. The agent file stays minimal; to resume an interrupted implementation, re-run `/start-work`.
 
 ## Non-Goals
 
