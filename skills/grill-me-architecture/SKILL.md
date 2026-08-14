@@ -229,7 +229,7 @@ Questions worth asking near-verbatim when the branch fits:
 
 ## Phase 5: Convergence Gate
 
-Before producing a final plan, ADR, design doc, or backlog, check whether convergence is justified.
+Before returning the design to the caller, check whether convergence is justified.
 
 Summarize as a compact table — decision, status, confidence — not paragraphs:
 
@@ -241,25 +241,13 @@ Summarize as a compact table — decision, status, confidence — not paragraphs
 
 Then ask:
 
-> Do you want to keep exploring, run one more stress pass, or converge to a plan?
+> Do you want to keep exploring, run one more stress pass, or converge on the design?
 
 If a decision is low confidence and expensive to reverse, do not present it as settled. Convert it into a spike, prototype, benchmark, or investigation item.
 
-## Phase 6: Crystallize
+## Phase 6: Return The Design
 
-When convergence is justified, adapt the output to the user's next step.
-
-Ask:
-
-> What happens next? Are you exploring options, writing a design doc for review, or ready to start building?
-
-If exploring, produce an ADR with context, key decisions, alternatives considered, tradeoffs, confidence map, complexity hotspots, open questions, and recommendation.
-
-If ready for review, produce a technical design doc with overview, goals and non-goals, architecture, key decisions with rationale, data or contract changes, complexity analysis, risks, observability, verification, and open questions.
-
-If ready to build, produce the design doc plus a dependency-ordered backlog of small shippable work items. Separate spikes from implementation. Put risky assumptions early. Include verification criteria.
-
-Always include context gaps and the next concrete action.
+When convergence is justified, return control to the caller with a concise summary of settled decisions, rejected alternatives that matter, remaining risks, and context gaps. Do not choose or create a downstream artifact, implementation plan, or backlog. The caller owns the next step and its output format.
 
 ## Interviewing Style
 
