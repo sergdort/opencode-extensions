@@ -1,46 +1,66 @@
 ---
-description: Have Architect turn decision-brief.md and repository evidence into a program design and test strategy in plan.md
+description: Have Architect align with the user on program design and test strategy, then create plan.md
 agent: architect
 ---
-Create or update the implementation plan for the current feature.
-
-Command arguments are optional:
+Create the implementation plan for the current feature.
 
 `$ARGUMENTS`
 
-## Resolve The Plan File
+## Resolve The Plan
 
-- If command arguments name a Markdown file, accept it only when its basename is `plan.md`. Otherwise, ask for a directory or a `plan.md` path.
-- If command arguments name a directory, use `<directory>/plan.md`.
+- If the argument names a Markdown file, require its basename to be `plan.md` and use it.
+- If the argument names a directory, use `<directory>/plan.md`.
 - If no argument is provided, use `plan.md` in the current repository or working directory.
-- If any non-empty argument does not resolve to an existing directory or a valid `plan.md` path, report it and stop. Do not fall back to the default plan.
-- Read an existing target plan before updating it. Preserve its `Review baseline` and `Known gate failures at baseline` values exactly; `/start-work` owns those fields. Write both as the literal word `unset` in a new plan. Never write a placeholder that could be mistaken for a resolved value.
-- Require `decision-brief.md` next to the plan. It is the durable source for settled product intent and hard constraints. If missing, stop and tell the user to complete Architect's grilling first. Small work should use the normal `build` agent instead.
-- Do not require handoffs, ADRs, tickets, or other planning artifacts.
+- If a non-empty argument does not resolve to an existing directory or valid `plan.md` path, report it and stop.
+- Require the target `plan.md` not to exist. If it exists, report it as an artifact from an active or previous workflow and stop. Do not overwrite or update it.
+- Require `decision-brief.md` next to the plan. If missing, stop and tell the user to complete Architect's grilling first.
+- Create only `plan.md`. Set `Review baseline` and `Known gate failures at baseline` to the literal value `unset`; `/start-work` owns both fields.
+- Do not create tickets, ADRs, behavior files, or another planning artifact.
 
 ## Purpose
 
-Grilling settled the approach. Planning settles two things:
+Grilling settled the product direction, constraints, and important edge cases. Planning is a collaborative alignment exercise about:
 
-1. **Program design** - which components exist, what each one owns, what it must not own, which dependencies are allowed, where state lives, and which interfaces cross a boundary.
-2. **Test strategy** - which behavior must hold, at which level it is proven, and by which mode.
+1. **Program design**: component ownership, dependencies, contracts, state, flow, and high-level implementation shape.
+2. **Proof and delivery**: required behavior, verification level, implementation mode, and coherent implementation slices.
 
-Everything else is supporting detail.
+Do not silently choose the program design and present it only after writing the plan.
 
-## Planning Inputs
+## Alignment Loop
 
-- Use `decision-brief.md`, the current Architect conversation, and repository evidence.
-- Inspect enough code to make the design realistic and to follow existing conventions.
-- Do not invent product or hard-to-reverse architecture decisions. Ask the user when one remains unresolved.
-- Do not repeat the product narrative from the decision brief. Repeat only an implementation invariant that is needed to execute or review the design, with a short reference where useful.
+### 1. Show The Implementation Shape
 
-## Output Artifact
+Read the decision brief, inspect the relevant code, and follow repository conventions. Before writing `plan.md`, present a compact implementation board in the conversation:
 
-- Create or update exactly one artifact: the resolved `plan.md`.
-- Do not create tickets, behavior files, extra ADRs, or additional planning state.
-- Write the plan for a reader who skims. Prefer tables, real code, and diagrams over paragraphs.
+- The component and ownership table.
+- Crossing-boundary interface changes as real declarations or diffs.
+- A compact shape for each load-bearing relationship, flow, or state machine.
+- Open seams that affect implementation.
 
-Use this shape. Omit any section the feature does not need. The example below carries the maximum of three diagrams because this feature has three genuinely hard questions. Most features need fewer, and many need none.
+Prefer tables, code, diffs, call stacks, and diagrams over explanatory paragraphs. Do not repeat the product narrative from the decision brief.
+
+### 2. Resolve Program Decisions
+
+Discuss decisions that materially affect ownership, dependency direction, crossing-boundary contracts, state or concurrency ownership, persistence, migration, error behavior, cancellation, or module placement.
+
+Show the relevant shape before each important question. Ask one focused question at a time, give concrete options, and recommend one when repository evidence supports it. Do not ask the user to decide private names, helper signatures, fixtures, or other local implementation details.
+
+Classify each design fact:
+
+- **Settled**: a Developer must not change it silently because reversal cost or blast radius is material.
+- **Provisional**: a Developer may adapt it from repository evidence and report the adaptation.
+
+Resolve every blocking seam before finalizing. A reversible, non-blocking seam may remain provisional in the plan.
+
+### 3. Align On Proof And Delivery
+
+After program-design alignment, present the test strategy and implementation phases. Confirm that the behavior coverage, proof level, phase boundaries, and final quality assurance (QA) match the user's expectations.
+
+Write `plan.md` only after the architecture, proof strategy, and phases are aligned. Update the implementation board and repeat the relevant pass when feedback changes the design.
+
+## Plan Contract
+
+Use this shape. Omit optional sections that the feature does not need.
 
 ````md
 # Plan: <feature>
@@ -53,295 +73,97 @@ Known gate failures at baseline: unset
 
 ## Architecture
 
-Tables are normative. Diagrams are explanatory. A dependency that is not listed is forbidden.
+Tables and real interfaces are normative. Diagrams are explanatory.
 
 | Component | Module / file | Owns | Does not own | May depend on |
 |---|---|---|---|---|
-| `SyncCoordinator` | `Sync/` (new) | Scheduling, retry policy | Network transport, persistence | `APIClient`, `SyncStore` |
-| `SyncStore` | `Sync/` (new) | Local write, conflict resolution | Scheduling | `CoreDataStack` |
-| `FeedViewModel` | `Feed/` (modified) | Presentation state | Sync policy | `SyncCoordinating` |
+| `<name>` | `<location>` | <responsibility> | <explicit exclusion> | <closed allowlist or none> |
 
 ### Interfaces
 
-```swift
-// settled: crosses a module boundary
-protocol SyncCoordinating: Sendable {
-    func requestSync(reason: SyncReason) async
-    var state: AsyncStream<SyncState> { get }
-}
+<real declarations or diffs, each marked settled or provisional>
 
-// provisional: cases may grow during implementation
-enum SyncReason { case userPull, appForeground }
-```
+### Runtime Shape
 
-Fire-and-forget with a state stream because callers must not await network latency.
+<optional call stacks or diagrams, each headed by the question it answers>
 
-Apply the Diagram Selection procedure only after the table and interfaces are complete. Do not default to a flowchart. Give each diagram a heading that states its question.
+### State
 
-### Types: which implementations share the sync abstraction?
-
-```mermaid
-classDiagram
-  class SyncCoordinating {
-    <<protocol>>
-    +requestSync(reason) async
-  }
-  SyncCoordinating <|.. SyncCoordinator
-  SyncCoordinating <|.. StubSyncCoordinator
-  SyncCoordinator *-- BackoffPolicy
-  SyncCoordinator o-- APIClient
-  FeedViewModel --> SyncCoordinating
-```
-
-### Flow: where can a retry race a completed fetch?
-
-```mermaid
-sequenceDiagram
-  FeedViewModel->>SyncCoordinator: requestSync(.userPull)
-  SyncCoordinator->>APIClient: fetch(since:)
-  alt success
-    APIClient-->>SyncCoordinator: payload
-    SyncCoordinator->>SyncStore: merge(payload)
-  else transient failure
-    APIClient-->>SyncCoordinator: 503
-    SyncCoordinator->>SyncCoordinator: backoff, schedule retry
-  end
-```
-
-### State: `SyncCoordinator` - how does a failed sync recover?
-
-Transition owner: `SyncCoordinator`. Other components may send events; only the owner commits a transition or mutates the state.
-
-```mermaid
-stateDiagram-v2
-  [*] --> idle
-  idle --> loading: requestSync
-  loading --> loaded: success
-  loading --> backoff: transientError
-  loading --> failed: permanentError
-  backoff --> loading: timerFired
-```
+Transition owner: `<component>`
 
 | From | Event | To | Guard | Effect | Cancels |
 |---|---|---|---|---|---|
-| `idle` | `requestSync` | `loading` | - | start fetch task | - |
-| `loading` | `success` | `loaded` | - | publish payload | - |
-| `loading` | `transientError` | `backoff` | attempts < 5 | schedule timer 2^n | fetch task |
-| `loading` | `permanentError` | `failed` | - | emit `.failed` | fetch task |
-| `backoff` | `timerFired` | `loading` | - | start fetch task | backoff timer |
 
-Illegal, unrepresentable or asserted:
-
-- `idle -> loaded` without a completed fetch.
-- Leaving `loading` without cancelling the fetch task.
+Illegal, unrepresentable, or asserted: <important cases only>
 
 ### Open Seams
 
-| Seam | Option A | Option B | Recommend | Why |
-|---|---|---|---|---|
-| Conflict resolution | Last write wins | Per-field merge | A | No concurrent editors yet; B stays reversible |
+| Seam | Options | Recommendation | Status |
+|---|---|---|---|
 
 ## Test Strategy
 
 | ID | Behavior or invariant | Level | Mode | Proof |
 |---|---|---|---|---|
-| B1 | A 503 under the attempt cap enters backoff and retries once | unit | test-first | `SyncCoordinatorTests` |
-| B2 | Leaving `loading` cancels the in-flight fetch task | unit | test-first | cancellation test |
-| B3 | Pull to refresh shows the failure banner | manual | manual | device check |
-| B4 | A conflicting local edit resolves to the newer remote timestamp | unit | test-first | `SyncStoreTests` |
-
-```swift
-func test_transientFailure_entersBackoffAndRetries() async
-func test_leavingLoading_cancelsFetchTask() async
-```
+| B1 | <observable outcome> | <unit, integration, UI, or manual> | <mode> | <proof> |
 
 ## Phases
 
-| # | Phase | Components | Behaviors |
+| # | Coherent slice | Components | Behaviors |
 |---|---|---|---|
-| 1 | Tracer: stub API, state stream, banner renders | `SyncCoordinator`, `SyncStore`, `FeedViewModel` | B3 |
-| 2 | Real API and backoff | `SyncCoordinator` | B1, B2 |
-| 3 | Conflict resolution | `SyncStore` | B4 |
 
 ## Risks And QA
 
-- Migration risk: none.
-- Final QA: full relevant suite plus device pull to refresh before acceptance.
+- <material risk and mitigation, or none>
+- Final QA: <runtime and manual checks>
 ````
 
 ## Architecture Rules
 
-- Every component that is new or materially changed gets a row. Do not list untouched components.
-- `Owns` is one line. `Does not own` names the responsibility a reader would otherwise expect it to hold.
-- `May depend on` is a closed allowlist of the other components, modules, services, and material external packages this component may reach. A collaborator that is not listed is forbidden. Write `none` for an empty cell.
-- The allowlist governs component-level collaborators, not language primitives. It does not restrict the standard library, ambient platform frameworks, or the component's own private helpers. List the protocol when a component depends on an abstraction rather than a concrete type.
-- Give each interface a status. Use `settled` when a silent Developer change would be wrong, and `provisional` otherwise.
-- Write interfaces in the repository's real language, not invented pseudo-code.
-- Justify only a non-obvious choice, in at most two sentences, directly under the proposal.
-- Use `Open Seams` only where the choice is genuinely open. Do not manufacture alternatives for a settled decision.
+- Give every new or materially changed component one row. Do not list untouched components.
+- Keep `Owns` narrow. Use `Does not own` for a responsibility a reader could reasonably assign to the component by mistake.
+- Treat `May depend on` as a closed component-level allowlist. List an abstraction instead of its implementation when the boundary requires it.
+- Write crossing-boundary interfaces in the repository's real language. Mark each interface `settled` or `provisional`.
+- Treat responsibility, dependency direction, state ownership, public contract semantics, persistence, concurrency, errors, cancellation, and module placement as settled when reversal is costly.
+- Treat private helpers, exact internal names, local file placement, fixtures, and local dependency injection as provisional unless there is a specific reason not to.
+- Include a state section only for meaningful lifecycle, recovery, competing outcomes, or effects that require cancellation. Name one transition owner and record effects and cancellations.
+- Justify a non-obvious choice directly under its proposal in no more than two sentences.
 
-## Settled Versus Provisional
+Settled means no silent change, not immutable. `/start-work` updates the plan when implementation evidence disproves a settled rule.
 
-Classify by reversal cost and blast radius, not by artifact type.
+## Visual Rules
 
-Usually settled, so a Developer must not change it silently:
+Show a compact shape before asking a structural, contract, flow, or state question. Choose the smallest form that makes the hard relationship easy to scan:
 
-- Component responsibility and explicit exclusions.
-- Allowed dependency direction.
-- State transition authority, effects, and cancellation ownership.
-- Contract semantics that cross a module or public boundary.
-- Persistence and migration semantics.
-- Concurrency isolation, such as actor isolation, main-thread requirements, and sendability.
-- Error shape and failure behavior on a crossing-boundary API.
-- Module or target placement, because it controls visibility and dependency cycles.
+| Question | Preferred shape |
+|---|---|
+| What owns what, and which types share an abstraction? | Component table or `classDiagram` |
+| What contract changes? | Real declaration or `diff` |
+| Who calls whom, and in what order? | Call stack or `sequenceDiagram` |
+| How does lifecycle or recovery work? | `stateDiagram-v2` plus transition table |
+| How do stored entities relate? | `erDiagram` |
+| Which option should be selected? | Decision table |
 
-Usually provisional, so a Developer may adapt it and report the adaptation:
+- Use Mermaid only when a table, declaration, diff, or call stack does not show the relationship clearly.
+- Give each diagram a heading that states the question it answers.
+- Keep diagrams focused on load-bearing topology, ordering, lifecycle, or cardinality.
+- Do not put a settled fact only in a diagram. Record the fact in a normative table or interface.
+- Delete a diagram when removing it loses no review-relevant relationship.
 
-- Private helper signatures.
-- Exact type and method names.
-- File placement inside an already chosen module.
-- Test names, fixtures, and internal test structure.
-- Local dependency-injection mechanics.
+## Test And Phase Rules
 
-Settled means no silent change. It does not mean immutable. When implementation evidence disproves a settled rule, Architect updates `plan.md` before any later phase depends on the change.
+- Give each behavior a stable ID. State the expected outcome in the behavior cell.
+- Use the cheapest level that credibly proves the behavior.
+- Use `test-first`, `implementation-first`, `characterization`, or `manual` as the mode.
+- Require fail-before and pass-after evidence for bug fixes and practical `test-first` behavior.
+- Treat state transitions and cancellation effects as coverage obligations.
+- Order phases around runnable vertical slices or focused proofs of risky assumptions.
+- Keep each phase small enough for Architect to judge its architecture conformance in one pass.
+- Reference exact component names and behavior IDs. `/start-work` rejects unresolved references.
+- Do not assign Terra or Luna in the plan. Architect selects the route immediately before each phase.
 
-## State Machine Rules
+## Review And Handoff
 
-Include a state section only when a component has three or more states, or has effects that must be balanced or cancelled. Otherwise the interface already says enough.
+Self-review the plan once against the decision brief and repository evidence. Use `oracle` only for a focused hard-to-reverse risk. Use `contrarian` only for one uncertain, load-bearing claim. Incorporate material findings into the plan.
 
-- Name one transition owner per machine. A component may own several orthogonal machines. Other components may send events and observe state; only the owner commits a transition or mutates the state.
-- List every legal transition the machine governs. The table is normative, so a transition that appears only in a diagram has no defined effects, cancellations, or coverage obligation.
-- Always fill `Effect` and `Cancels`. A transition table without effects is not worth writing.
-- List the illegal transitions that matter. Prefer making them unrepresentable in the type system over asserting at runtime.
-- Test plausible or externally reachable illegal events. Do not enumerate every impossible pair.
-
-## Diagram Rules
-
-### Selection Procedure
-
-Follow this order. Do not start by drawing a diagram.
-
-1. Finish the normative component table and the interfaces first.
-2. List the design questions that remain materially hard to answer by reading them.
-3. Try a code-shaped text form first: a textual call stack for control flow, a `diff` block for a change to existing code. These cost less than diagrams and stay outside the budget. See Call Stacks And Diffs.
-4. Match each remaining question to one row of the selection table below.
-5. Keep a diagram only when removing it would hide a load-bearing topology, ordering, lifecycle, or cardinality relationship.
-6. Use `flowchart` only as a fallback, when no other row fits the question.
-7. Emit no diagram when no row qualifies. Zero diagrams is a valid answer, and three is a maximum, never a target.
-
-Give every diagram a heading that states its question, for example `### Flow: Where can cancellation race completion?`. A diagram whose question you cannot write in one line does not belong in the plan.
-
-### Selection Table
-
-| Design question | Diagram | Skip when |
-|---|---|---|
-| Which types share an abstraction, and what owns what lifetime? | `classDiagram` | The relationship graph has one obvious edge and no lifetime or cardinality question |
-| In what order do collaborators interact, and where can that ordering go wrong? | `sequenceDiagram` | A textual call stack already shows the path; keep the diagram for concurrency, reentrancy, and interleaving |
-| What states exist, and how does the machine move between them? | `stateDiagram-v2` | The transition table is short, linear, acyclic, and easy to scan |
-| What entities exist, and how do they relate? | `erDiagram` | No entity, relationship, cardinality, ownership, or deletion behavior changes |
-| How does data or control branch, route, or transform across components? | `flowchart` | Every edge is already clear from `May depend on`, or there is no branching, routing, transformation, or layer crossing |
-
-Keep a `classDiagram` for several concrete types implementing one abstraction, one type implementing several abstractions, decorator or adapter or composite structure, or load-bearing containment, cardinality, and lifetime ownership. Keep a `sequenceDiagram` for actor or queue hops, reentrant callbacks, delegate ordering, cancellation races, compensation and rollback, or concurrent interleaving. Keep a `stateDiagram-v2` for loops, recovery paths, competing terminal states, or reachability that is hard to trace in the table.
-
-### Diagrams Are Never The Contract
-
-A diagram must not introduce a settled fact that is absent from normative code or tables. Record settled conformance in real type declarations, and record lifetime or ownership requirements in the interface code or a table. A diagram may then visualize those facts when topology, ordering, cycles, fan-out, or cardinality remain materially hard to scan.
-
-Deletion test: if removing the diagram loses no review-relevant visual relationship, remove it.
-
-### Budget
-
-Three diagrams is the maximum. When over budget, cut in this order:
-
-1. Exact duplicates of a table, signature, or another diagram.
-2. Diagrams answering the lowest-risk question.
-3. Diagrams whose source facts are already easy to scan in normative material.
-4. Only then apply the default keep priority: `sequenceDiagram`, `classDiagram`, `stateDiagram-v2`, `erDiagram`, `flowchart`. Keep priority is a tie-breaker, not a ranking of value; lifecycle-heavy or schema-heavy work legitimately inverts it.
-
-### Syntax And Staleness
-
-- Use one `sequenceDiagram` with `alt` to cover the happy path and an important failure path together.
-- Keep 3 to 9 nodes. Split or cut a larger diagram.
-- Use only `flowchart`, `classDiagram`, `sequenceDiagram`, `stateDiagram-v2`, or `erDiagram`.
-- Use plain syntax. Avoid styling directives and exotic features, because a syntax error renders as a broken block.
-- In a `classDiagram`, show relationships and at most the one or two members that carry them. A full member listing is a worse duplicate of the interface block.
-- UML composition and aggregation mean exclusive part ownership versus an independent lifecycle. They do not mean Swift `strong`, `weak`, or `unowned`. When reference strength is load-bearing, state it in the interface code, not through an arrow.
-- Mermaid needs `Repository~Item~` for generics and breaks on punctuation inside names. Simplify or omit the generic parameter.
-- Prefer settled names in diagrams. A diagram built from provisional names goes stale without any settled boundary changing.
-- When a settled boundary changes, update or delete the affected diagram. Updating or deleting an explanatory diagram is housekeeping, not a program-design change.
-
-## Call Stacks And Diffs
-
-Two code-shaped text forms are allowed anywhere in the plan. Neither counts against the diagram budget.
-
-A textual call stack is the default for plain control flow. Reserve `sequenceDiagram` for concurrency, reentrancy, and interleaving:
-
-```text
-requestSync(reason)
-├─ guard state != .loading          → early return
-├─ APIClient.fetch(since:)
-│  ├─ ok      → SyncStore.merge(payload)
-│  └─ 503     → scheduleBackoff(attempt)   [cancels fetch task]
-└─ state.yield(.loaded | .backoff)
-```
-
-A `diff` block presents a change to an existing interface, signature, file layout, or call tree. When the feature modifies existing code, prefer the diff over restating the whole target:
-
-```diff
- protocol SyncCoordinating: Sendable {
-     func requestSync(reason: SyncReason) async
-+    func cancelSync() async
--    var state: AsyncStream<SyncState> { get }
-+    var state: AsyncStream<SyncPhase> { get }
- }
-```
-
-A diff against existing repository code may serve as the interface proposal itself; the post-change form is the normative fact and carries the `settled` or `provisional` status. A call stack follows the diagram rule: it must not introduce a settled fact absent from the tables or interface code.
-
-## Test Strategy Rules
-
-- Give every row a stable ID such as `B1`. Phases reference these IDs. Never reuse an ID for different behavior.
-- State the expected outcome inside the behavior cell, not just the topic.
-- `Level` is the cheapest level that can prove the behavior, such as unit, integration, UI, or manual.
-- `Mode` is `test-first`, `implementation-first`, `characterization`, or `manual`.
-- Prefer `test-first` for pure, local, risky, or easily asserted behavior. Prefer `implementation-first` for exploratory, UI-heavy, integration-heavy, or high-scaffolding work. Use `characterization` when changing existing behavior.
-- Require credible fail-before and pass-after evidence for a bug fix and for every `test-first` row when practical. Record why when a pre-change failure cannot be run safely or meaningfully.
-- Treat each state transition row as a coverage obligation, not as one test function. A table-driven test may cover many rows, and one guarded row may need several proofs.
-- A `Cancels` entry requires a cancellation test that proves no effect runs after cancellation. Add a lifetime or leak test only when object retention is a credible risk.
-- Add test skeletons only for load-bearing behavior. Routine skeletons become stale decoration.
-- Do not build elaborate test infrastructure only to satisfy the format.
-
-## Phase Rules
-
-- Order phases so the first one produces a runnable end-to-end path, or a focused technical proof that can cheaply disprove a risky assumption.
-- Size each phase as the smallest coherent slice whose diff Architect can judge for architecture conformance in one pass. Roughly 100 to 200 hand-written changed lines is a useful heuristic, not a limit.
-- Reference components by their exact name in the architecture table and behaviors by their exact ID in the test strategy. Every reference must resolve; `/start-work` rejects a plan whose phases name something undefined.
-- Do not schedule human review of a phase. The user reviews the feature once, after the required behavior works.
-- Do not assign `developer` or `developer-luna` in the plan. Architect chooses the route immediately before each phase.
-- Do not pre-cut phases into ticket files or pre-approved task lists.
-
-## Prose Budget
-
-The budget governs explanatory paragraphs. An explanatory paragraph appears only as justification directly under a proposal, only when the choice is non-obvious, and runs to two sentences maximum.
-
-Required structured content is exempt: header fields, table cells, illegal-transition lists, risk entries, and QA notes. Never restate the product narrative from the decision brief. Do not add a section only to make the plan look complete.
-
-## Plan Review
-
-- Self-review once against the decision brief, repository evidence, the architecture table, and the test strategy.
-- Use `oracle` for a focused independent plan review only when security, persistence, migration, public API, broad refactor, or another hard-to-reverse risk justifies it.
-- Use `contrarian` only when one uncertain, load-bearing claim needs pressure testing.
-- Use Plannotator when useful, but do not require it.
-- Incorporate material feedback into `plan.md`. Record a one-line note only when an independent review changed the design.
-- Do not create a separate approval or decomposition cycle. The user decides when to begin implementation.
-
-## Final Response
-
-Present the architecture and the test strategy for alignment. Reuse the plan's tables, call stacks, and diffs; do not rewrite them into a prose summary. Report:
-
-- The plan path, and whether the plan was created or updated.
-- The component and ownership table.
-- The test strategy table.
-- Open seams that still need a decision.
-- Material feedback that changed the design.
-- The next command: `/start-work` or `/start-work <plan-path>`.
+In the final response, reuse the plan's tables and shapes instead of writing a prose summary. Report the plan path, unresolved non-blocking seams, material review changes, and the next command: `/start-work` or `/start-work <plan-path>`.
