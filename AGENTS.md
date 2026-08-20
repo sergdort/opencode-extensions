@@ -1,13 +1,14 @@
 # Contributor Guidance
 
-This repo packages lightweight agent extensions for three harnesses — OpenCode (`opencode/`), Claude Code (`claude/`), and Codex (`codex/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the three configurations; package READMEs hold the per-package details.
+This repo packages lightweight agent extensions for four harnesses — OpenCode (`opencode/`), Claude Code (`claude/`), Codex (`codex/`), and The Last Harness (`tlh/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` at the root maps the packages and compares the three full workflow configurations; package READMEs hold the per-package details.
 
 ## Project Shape
 
-- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh` and `codex/link-global.sh` are opt-in helpers for global symlink setups.
+- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh`, `codex/link-global.sh`, and `tlh/link-global.sh` are opt-in helpers for global symlink setups.
 - Do not add plugins, installers, hidden config mutation, subprocess harnesses, automatic model routing, or runtime state machines unless the user explicitly chooses that direction.
-- Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code; `~/.agents/skills` + `~/.codex/agents` / project `.agents/skills` + `.codex/agents` for Codex).
-- The three trees are siblings, not mirrors: they share the architect-first, plan-artifact workflow idea, but each is written for its harness's native mechanisms. When changing shared concepts (e.g. the plan format or oracle's charter), check whether the counterpart trees need equivalent changes — and adapt rather than copy.
+- Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code; `~/.agents/skills` + `~/.codex/agents` / project `.agents/skills` + `.codex/agents` for Codex; `~/.the-last-harness/agent/prompts/` / project `.pi/prompts/` for The Last Harness).
+- The harness trees are siblings, not mirrors: `opencode/`, `claude/`, and `codex/` share the architect-first, plan-artifact workflow idea, but each is written for its harness's native mechanisms. When changing shared concepts (e.g. the plan format or oracle's charter), check whether the counterpart trees need equivalent changes — and adapt rather than copy.
+- `tlh/` is deliberately not a fourth workflow tree. The Last Harness ships its own architect, ticket loop, and subagents; that package only adds optional steps on top and must stay additive.
 
 ## Current Packages
 
@@ -30,6 +31,12 @@ The Codex package lives under `codex/`:
 - `codex/agents/`: custom Developer, Oracle, and Contrarian spawned-session profiles.
 - `codex/optional/librarian/`: optional GitHub research skill and custom agent.
 - `codex/README.md`: install, workflow, execution, permission limits, model defaults, and non-goals.
+
+The Last Harness package lives under `tlh/`:
+
+- `tlh/prompts/`: prompt templates installed into the isolated TLH profile as slash commands.
+- `tlh/link-global.sh`: opt-in symlink helper for those prompt templates.
+- `tlh/README.md`: what the package provides, non-goals, install, usage, and undo.
 
 Shared skills live under `skills/`:
 
@@ -69,6 +76,17 @@ Shared skills live under `skills/`:
 - Keep `codex/README.md` in sync when changing skills, custom agents, lifecycle rules, permissions, or model defaults.
 - Remind users to reload Codex after changing skills or custom agents.
 
+## File Conventions — The Last Harness (`tlh/`)
+
+- Prompt templates live in `tlh/prompts/*.md` and must stay flat; Pi's prompt discovery is not recursive.
+- Use only supported prompt template frontmatter: `description` and `argument-hint`. The filename becomes the slash command name.
+- Use the documented argument forms (`$1`, `$@`, `$ARGUMENTS`, `${@:-default}`) rather than inventing placeholders.
+- Do not add skills to this package. A skill's description is injected into every system prompt and invites model-initiated invocation, which would change TLH's default architect behavior; prompt templates run only when the user types them.
+- Keep the package out of profile-owned state: no `settings.json` edits, no agents, no extensions, no packages.
+- Keep `tlh/link-global.sh` limited to named prompt template symlinks into `$PI_CODING_AGENT_DIR/prompts` (default `~/.the-last-harness/agent/prompts`).
+- Prompt bodies should defer to TLH's own rules — architect's approval gate, `tk` ticket creation, and its consent-gated `oracle` and `contrarian` — rather than restating or overriding them.
+- Remind users to run `/reload` in TLH after changing prompt templates.
+
 ## OpenCode Config Rules
 
 - OpenCode config is strict; preserve `"$schema": "https://opencode.ai/config.json"` in example JSON files.
@@ -94,6 +112,7 @@ Shared skills live under `skills/`:
 - For new untracked files, use `git diff --check --no-index -- /dev/null <file>` and treat exit code `1` as normal for a no-index diff if there is no whitespace-error output.
 - Validate example JSON with `jq empty <file>`.
 - Validate Codex TOML and YAML with available parsers.
+- Check shell helpers with `bash -n <file>`, and `shellcheck` when it is available.
 - Re-read changed Markdown prompts before finalizing to catch stale command names, unsupported frontmatter, or copied instructions that do not fit the target harness.
 
 ## Git Hygiene

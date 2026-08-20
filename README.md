@@ -1,6 +1,6 @@
 # opencode-extensions
 
-File-based agent extensions for three coding harnesses: **OpenCode**, **Claude Code**, and **Codex**. Everything here is plain Markdown prompts, agent definitions, instruction files, example config snippets, and explicit opt-in global symlink helpers. There are no plugins or hidden config mutations; every installed file remains visible and reversible.
+File-based agent extensions for four coding harnesses: **OpenCode**, **Claude Code**, **Codex**, and **The Last Harness**. Everything here is plain Markdown prompts, agent definitions, instruction files, example config snippets, and explicit opt-in global symlink helpers. There are no plugins or hidden config mutations; every installed file remains visible and reversible.
 
 ## Repository Layout
 
@@ -22,6 +22,10 @@ codex/                  Codex package
   agents/               custom subagents (developer, oracle, contrarian)
   skills/               manual-only workflow skills ($architect, $plan-feature, $decompose, $start-work)
   optional/librarian/   optional GitHub research agent and skill
+
+tlh/                    The Last Harness package (additive only)
+  link-global.sh        opt-in symlink setup for the prompt templates
+  prompts/              prompt templates installed as slash commands (/plan-feature)
 
 skills/                 shared skills used by more than one harness
   grill-me-architecture/ visual-first architecture grilling skill (canonical copy)
@@ -47,11 +51,15 @@ All three trees use an architect-first workflow, adapted to each harness's nativ
 
 OpenCode uses a selectable primary Architect and keeps durable intent in `decision-brief.md` and `plan.md`. Git and the working tree show implementation progress. Claude Code and Codex install the Architect role into the active session or thread and use ticket queues with exact `Ticket:` commit trailers.
 
+The Last Harness is not in this table because `tlh/` is not a fourth workflow. That harness already ships its own architect, `tk` ticket loop, subagents, and review cadence; the package here only adds optional prompt templates on top of it. See `tlh/README.md`.
+
 ## How the Workflows Run
 
 **OpenCode** — switch to `architect`; it inspects the repository, grills the design, settles product intent and hard constraints, and writes `decision-brief.md`. `/plan-feature` settles the program design and test strategy in `plan.md`: a component table with owned, excluded, and allowed dependencies, settled interfaces, state ownership, and behavior IDs with proof modes. `/start-work` selects the next coherent phase, carries that architecture slice into every phase brief, routes Terra-high or Luna-max just in time, and checks conformance against the diff. Developers adapt provisional details and escalate a settled rule they cannot meet. After the required behavior works, Architect runs full review, QA, and final human acceptance. Outside the workflow, both Developers also accept direct fix briefs — follow-up sessions, QA findings, ad hoc fixes — with the same verdict protocol and Git limits. `oracle` and `github-librarian` are optional delegation targets.
 
 **Claude Code** — `/architect` settles product intent, system architecture, risk, and review cadence in `decision-brief.md`; `/plan-feature` turns the brief and repository evidence into `plan.md`; `/decompose` cuts a runnable tracer followed by dependency-ordered vertical slices; `/start-work` dispatches one ticket, reviews design fit, tests, correctness, and maintainability, pauses at planned human checkpoints, and commits on approval. Ticket completion is derived from `Ticket:` trailers, so a fresh session reconstructs queue state from the repository; ambiguous interrupted review rounds require user confirmation. See `claude/README.md` for the full mechanics.
+
+**The Last Harness** — the harness supplies the loop. `tlh/prompts/plan-feature.md` installs a `/plan-feature` slash command that you invoke by hand after the architect's discovery pass ends in your approval and before it creates `tk` tickets. It shows the component and ownership table, real crossing-boundary interfaces, and compact shapes for load-bearing flows; resolves program decisions one at a time; marks each design fact settled or provisional; then carries the settled facts into `tk create --design` and the behavior IDs into `--acceptance`. It is a prompt template rather than a skill precisely so the harness cannot invoke it on its own — if you never type it, the default architect loop is unchanged. See `tlh/README.md`.
 
 **Codex** — `$architect` establishes the main-thread role, requires the `grill-me-architecture` skill from this repository's `skills/` directory (linked by `opencode/link-global.sh` or copied manually), and writes the decision brief. `$plan-feature` records the reviewed program design. `$decompose` creates the tracer-first queue after user approval. `$start-work` dispatches a fresh custom Developer for each ticket, verifies that the Developer did not mutate Git state, applies the same four-axis review and human checkpoints, and creates local ticket commits. The artifacts stay uncommitted and temporary; the user removes them after the workflow. See `codex/README.md` for supported Codex surfaces, limitations, and install paths.
 
@@ -66,8 +74,9 @@ Pick a tree and installation style:
   `codex/link-global.sh --force` if existing differing copies or directories
   should be replaced. Add `--with-librarian` for the optional package. For a
   project-local setup, follow `codex/README.md`.
+- The Last Harness: run `tlh/link-global.sh --dry-run`, then `tlh/link-global.sh`. It links only prompt templates into the isolated profile's `prompts/` directory and changes no settings, skills, agents, or extensions. For a single project, copy the files into `.pi/prompts/` instead.
 
-Restart OpenCode after linking or changing files. Reload Codex after changing skills or custom agents.
+Restart OpenCode after linking or changing files. Reload Codex after changing skills or custom agents. Run `/reload` in The Last Harness after changing prompt templates.
 
 Packages are independent: you can install just `oracle`, just the librarian, or the full workflow.
 
