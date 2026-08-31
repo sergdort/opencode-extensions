@@ -1,5 +1,5 @@
 ---
-description: Have Architect align with the user on program design and test strategy, then create plan.md
+description: Have Architect draft plan.md immediately, then iterate on program design and test strategy with the user
 agent: architect
 ---
 Create the implementation plan for the current feature.
@@ -24,13 +24,15 @@ Grilling settled the product direction, constraints, and important edge cases. P
 1. **Program design**: component ownership, dependencies, contracts, state, flow, and high-level implementation shape.
 2. **Proof and delivery**: required behavior, verification level, implementation mode, and coherent implementation slices.
 
-Do not silently choose the program design and present it only after writing the plan.
+Draft `plan.md` first, then iterate on the file with the user. The draft is a proposal for review, not a decision record. Do not treat writing the draft as user approval of its settled facts.
 
 ## Alignment Loop
 
-### 1. Show The Implementation Shape
+### 1. Draft The Plan
 
-Read the decision brief, inspect the relevant code, and follow repository conventions. Before writing `plan.md`, present a compact implementation board in the conversation:
+Read the decision brief, inspect the relevant code, and follow repository conventions. Write a complete first `plan.md` using the Plan Contract before asking the user anything. In the draft, mark each design fact settled or provisional and record unresolved questions in `Open Seams`.
+
+Then present a compact implementation board in the conversation, drawn from the file:
 
 - The component and ownership table.
 - Crossing-boundary interface changes as real declarations or diffs.
@@ -43,7 +45,7 @@ Prefer tables, code, diffs, call stacks, and diagrams over explanatory paragraph
 
 Discuss decisions that materially affect ownership, dependency direction, crossing-boundary contracts, state or concurrency ownership, persistence, migration, error behavior, cancellation, or module placement.
 
-Show the relevant shape before each important question. Ask one focused question at a time, give concrete options, and recommend one when repository evidence supports it. Do not ask the user to decide private names, helper signatures, fixtures, or other local implementation details.
+Show the relevant shape before each important question. Ask one focused question at a time, give concrete options, and recommend one when repository evidence supports it. Update `plan.md` after each resolved decision so the file always reflects the current design. Do not ask the user to decide private names, helper signatures, fixtures, or other local implementation details.
 
 Classify each design fact:
 
@@ -54,9 +56,9 @@ Resolve every blocking seam before finalizing. A reversible, non-blocking seam m
 
 ### 3. Align On Proof And Delivery
 
-After program-design alignment, present the test strategy and implementation phases. Confirm that the behavior coverage, proof level, phase boundaries, and final quality assurance (QA) match the user's expectations.
+After program-design alignment, walk through the drafted test strategy and implementation phases. Confirm that the behavior coverage, proof level, phase boundaries, and final quality assurance (QA) match the user's expectations.
 
-Write `plan.md` only after the architecture, proof strategy, and phases are aligned. Update the implementation board and repeat the relevant pass when feedback changes the design.
+Keep `plan.md` current throughout the loop. The file is the single source of truth for the design under discussion; repeat the relevant pass when feedback changes the design.
 
 ## Plan Contract
 
@@ -164,6 +166,6 @@ Show a compact shape before asking a structural, contract, flow, or state questi
 
 ## Review And Handoff
 
-Self-review the plan once against the decision brief and repository evidence. Use `oracle` only for a focused hard-to-reverse risk. Use `contrarian` only for one uncertain, load-bearing claim. Incorporate material findings into the plan.
+After the user confirms the design, self-review the plan once against the decision brief and repository evidence. Then dispatch reviews: have `oracle` critique the whole plan, and use `contrarian` only for one uncertain, load-bearing claim. Incorporate material findings into `plan.md` and report them to the user.
 
 In the final response, reuse the plan's tables and shapes instead of writing a prose summary. Report the plan path, unresolved non-blocking seams, material review changes, and the next command: `/start-work` or `/start-work <plan-path>`.
