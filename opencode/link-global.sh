@@ -59,6 +59,11 @@ link_file() {
     exit 1
   fi
 
+  if [[ "$source_path" -ef "$destination_path" ]]; then
+    printf 'Current: %s\n' "$destination_path"
+    return
+  fi
+
   run mkdir -p "$(dirname -- "$destination_path")"
 
   if [[ -L "$destination_path" ]]; then

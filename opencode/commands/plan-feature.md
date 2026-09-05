@@ -12,7 +12,7 @@ Create the implementation plan for the current feature.
 - If the argument names a directory, use `<directory>/plan.md`.
 - If no argument is provided, use `plan.md` in the current repository or working directory.
 - If a non-empty argument does not resolve to an existing directory or valid `plan.md` path, report it and stop.
-- Require the target `plan.md` not to exist. If it exists, report it as an artifact from an active or previous workflow and stop. Do not overwrite or update it.
+- Require the target `plan.md` not to exist. If it exists, stop without overwriting it. Continue revisions directly with Architect; this command only creates the initial plan.
 - Require `decision-brief.md` next to the plan. If missing, stop and tell the user to complete Architect's grilling first.
 - Create only `plan.md`. Set `Review baseline` and `Known gate failures at baseline` to the literal value `unset`; `/start-work` owns both fields.
 - Do not create tickets, ADRs, behavior files, or another planning artifact.
@@ -118,6 +118,14 @@ Illegal, unrepresentable, or asserted: <important cases only>
 
 - <material risk and mitigation, or none>
 - Final QA: <runtime and manual checks>
+
+## Evidence
+
+| Scope / range | Result or pending work | Proof / reference |
+|---|---|---|
+
+<Record Oracle review here before handoff. During implementation, keep accepted ranges,
+checks and artifact paths, blockers, pending reviews, and historical fail-before evidence.>
 ````
 
 ## Architecture Rules
@@ -166,6 +174,10 @@ Show a compact shape before asking a structural, contract, flow, or state questi
 
 ## Review And Handoff
 
-After the user confirms the design, self-review the plan once against the decision brief and repository evidence. Then dispatch reviews: have `oracle` critique the whole plan, and use `contrarian` only for one uncertain, load-bearing claim. Incorporate material findings into `plan.md` and report them to the user.
+Before final approval, self-review against the brief and repository evidence. Have `oracle` critique every plan. If Oracle is unavailable, report the blocker; do not silently skip the review. Use `contrarian` only for one uncertain, load-bearing claim. Incorporate findings and resolve blocking seams.
+
+Record the design Oracle reviewed, its outcome, and the review reference in `Evidence`. If findings cause material changes to behavior, ownership, contracts, state rules, or proof strategy, obtain a focused follow-up review of those changes. Do not repeat Oracle for metadata or evidence-only edits.
+
+Present material review changes before asking for final approval or offering `/start-work`. Invoking `/start-work` approves the current disclosed plan, not unseen changes or an unresolved blocking decision. Existing plans can be revised directly with Architect without repeating this creation command.
 
 In the final response, reuse the plan's tables and shapes instead of writing a prose summary. Report the plan path, unresolved non-blocking seams, material review changes, and the next command: `/start-work` or `/start-work <plan-path>`.

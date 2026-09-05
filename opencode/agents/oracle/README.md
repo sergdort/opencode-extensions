@@ -50,7 +50,7 @@ No project config changes are needed for direct `@oracle` use. Without an explic
 
 Oracle allows file reads, local search, web fetching, and Bash diagnostics without repeated prompts. Direct and RTK-wrapped Git commands are denied by default, with common read-only inspection such as `git status`, `git diff`, and `git log` allowed afterward. Edits and nested Task delegation are denied.
 
-This is a workflow guardrail rather than a shell sandbox. If you broaden Bash access after copying the agent, keep the read-only prompt boundary in mind.
+This is a workflow guardrail, not a shell sandbox. Bash can mutate files through other commands, so the read-only prompt boundary remains necessary.
 
 ## Manual Use
 
