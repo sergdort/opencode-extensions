@@ -1,97 +1,103 @@
 # opencode-extensions
 
-File-based agent extensions for four coding harnesses: **OpenCode**, **Claude Code**, **Codex**, and **The Last Harness**. Everything here is plain Markdown prompts, agent definitions, instruction files, example config snippets, and explicit opt-in global symlink helpers. There are no plugins or hidden config mutations; every installed file remains visible and reversible.
+File-based agent workflows for OpenCode and Codex, plus independent Claude Code and The Last Harness packages.
 
-## Repository Layout
+> Migration status: implementation is not ready for installation. Codex 0.153.0 discovers symlinked custom-agent TOML files but rejects them when spawning. The identical regular-file control passes file loading, then the existing Oracle model `gpt-5.6` is rejected by this account. Native installation and model choices remain unresolved. Do not run the new link helpers yet. Legacy sources remain in place until migration is verified. See [runtime evidence](docs/core-generation-proof.md).
 
-```
-opencode/               OpenCode packages
-  link-global.sh         opt-in global symlink setup for the core package set
-  agents/               agent packages, each self-contained (README, instructions, example config)
-    architect/           primary orchestrator plus developer and contrarian
-    oracle/               read-only second-opinion subagent
-    librarian/            GitHub research subagent
-  commands/             reusable slash commands (/plan-feature, /start-work, ...)
+OpenCode and Codex share canonical procedures. Nunjucks templates generate complete native files. Agents do not need to follow a runtime `@file` reference to load the canonical procedure.
 
-claude/                 Claude Code package
-  agents/               subagents (developer, repo-scout, oracle, contrarian, github-librarian)
-  commands/             slash commands (/architect, /plan-feature, /decompose, /start-work, ...)
+## Layout
 
-codex/                  Codex package
-  link-global.sh        opt-in global symlink setup for the core package
-  agents/               custom subagents (developer, oracle, contrarian)
-  skills/               manual-only workflow skills ($architect, $plan-feature, $decompose, $start-work)
-  optional/librarian/   optional GitHub research agent and skill
-
-tlh/                    The Last Harness package (additive only)
-  link-global.sh        opt-in symlink setup for the prompt templates
-  prompts/              prompt templates installed as slash commands (/plan-feature)
-
-skills/                 shared skills used by more than one harness
-  grill-me-architecture/ visual-first architecture grilling skill (canonical copy)
+```text
+canonical/             shared workflow, role, and utility procedures
+templates/             OpenCode and Codex native adapters
+scripts/               renderer, output manifest, publication, link helpers
+generated/current/     generated native installation files (Git-ignored)
+tests/golden/          reviewed native output fixtures (tracked, not installed)
+skills/                canonical grill-me-architecture skill
+opencode/              documentation, example config, Librarian, scoped helper
+codex/                 documentation, optional Librarian, scoped helper
+claude/                unchanged independent Claude Code workflow
+tlh/                   unchanged additive prompt package
 ```
 
-Each package directory has its own README with install steps, config snippets, and usage. The OpenCode and Codex link helpers provide opt-in global setups when you want repository edits reflected without copying again.
+Edit `canonical/` for shared behavior. Edit `templates/` or `scripts/manifest.mjs` for native metadata, role names, models, and input mapping. Never edit generated output or install golden fixtures.
 
-## The Three Configurations
+## Install OpenCode And Codex
 
-All three trees use an architect-first workflow, adapted to each harness's native agent and command model. OpenCode uses a simpler plan-driven implementation loop. Claude Code and Codex retain ticket queues.
+Requires Node.js 22 or newer and npm. Run from this checkout:
 
-| | OpenCode (`opencode/`) | Claude Code (`claude/`) | Codex (`codex/`) |
-|---|---|---|---|
-| Architect role | Persistent `mode: primary` orchestrator you switch into | `/architect` installs the role in the current session | `$architect` installs the role in the current thread; Codex custom agents are spawned roles, not primary modes |
-| Role instructions | Agent definition plus agent-bound commands | Command bodies | Manual-only skills in the main thread |
-| Delegation | Explicit `permission.task` rules | Description-driven subagents | Named custom agents plus built-in `explorer` |
-| Workflow | Select Architect → `/plan-feature` → `/start-work` | `/architect` → `/plan-feature` → `/decompose` → `/start-work` | `$architect` → `$plan-feature` → `$decompose` → `$start-work` |
-| Implementation | Architect routes one coherent task at a time to Terra or Luna; Developers submit local commits after focused proof | `developer` writes one ticket; main session reviews and commits | Custom `developer` writes one ticket; main thread reviews and commits |
-| Review | Review each submission and correction, then combined review, final verification, QA, and human acceptance; optional `/review-work` | Inline review, human checkpoints, final human review; optional built-in `/review` | Inline review, human checkpoints, final human review; optional built-in `/review` |
-| Discovery and advice | Built-in Explore, focused Contrarian, mandatory Oracle plan review, optional Librarian | Repo Scout, Contrarian, Oracle, Librarian | Built-in `explorer`, custom Contrarian and Oracle, optional Librarian |
-| Recommended models | Sol for architect/oracle/contrarian; Terra for standard developer/explore/librarian; Luna max for bounded developer; configured in `opencode.json` | Sonnet for developer/librarian; Haiku for repo-scout; Fable for oracle/contrarian | Main model inherited; GPT-5.6 Terra for developer; GPT-5.6 for oracle/contrarian |
-| Install target | `~/.config/opencode/` or project `.opencode/` | `~/.claude/` or project `.claude/` | `~/.agents/skills` + `~/.codex/agents`, or project `.agents/skills` + `.codex/agents` |
+```bash
+npm ci
+./link-global.sh --dry-run
+./link-global.sh
+```
 
-OpenCode uses a selectable primary Architect and keeps durable intent in `decision-brief.md` and `plan.md`. Git and the working tree show implementation progress. Claude Code and Codex install the Architect role into the active session or thread and use ticket queues with exact `Ticket:` commit trailers.
+To link only one harness, use `./opencode/link-global.sh` or `./codex/link-global.sh`. Each accepts `--dry-run` and `--force`. The root helper also accepts `--harness opencode|codex|both`.
 
-The Last Harness is not in this table because `tlh/` is not a fourth workflow. That harness already ships its own architect, `tk` ticket loop, subagents, and review cadence; the package here only adds optional prompt templates on top of it. See `tlh/README.md`.
+All entry points regenerate **both** native payloads. Harness selection limits destination-link edits only. It also updates content used by the other harness if that harness already links to this checkout.
 
-## How the Workflows Run
+The scripts do not install dependencies, edit harness config, or change unrelated files. Add `--with-review` to link OpenCode's optional review command when a read-only `review` agent is installed. Add `--with-librarian` for Codex's optional Librarian. OpenCode preserves its existing Librarian links.
 
-**OpenCode:** switch to `architect`; it inspects the repository, grills the design, and writes `decision-brief.md`. `/plan-feature` creates the program design and proof strategy in `plan.md`, with mandatory Oracle review before final approval. Revise existing plans directly with Architect. `/start-work` approves the current disclosed plan, carries its architecture rules into task briefs, and routes Terra or Luna one task at a time. Developers submit local commits after focused proof. Architect reviews each submission and resumes the same Developer for corrections when available. After combined review and corrections, Architect owns final verification, QA, and human acceptance. The plan keeps compact evidence, not a second progress ledger. Both Developers also accept direct fix briefs under the same review and Git boundaries. GitHub Librarian is optional.
+After pulling updates or editing sources, rerun the appropriate link helper. Then restart OpenCode and reload Codex if they use this checkout. Source edits alone do not update generated instructions.
 
-**Claude Code** — `/architect` settles product intent, system architecture, risk, and review cadence in `decision-brief.md`; `/plan-feature` turns the brief and repository evidence into `plan.md`; `/decompose` cuts a runnable tracer followed by dependency-ordered vertical slices; `/start-work` dispatches one ticket, reviews design fit, tests, correctness, and maintainability, pauses at planned human checkpoints, and commits on approval. Ticket completion is derived from `Ticket:` trailers, so a fresh session reconstructs queue state from the repository; ambiguous interrupted review rounds require user confirmation. See `claude/README.md` for the full mechanics.
+For generation without global installation:
 
-**The Last Harness** — the harness supplies the loop. `tlh/prompts/plan-feature.md` installs a `/plan-feature` slash command that you invoke by hand after the architect's discovery pass ends in your approval and before it creates `tk` tickets. It shows the component and ownership table, real crossing-boundary interfaces, and compact shapes for load-bearing flows; resolves program decisions one at a time; marks each design fact settled or provisional; then carries the settled facts into `tk create --design` and the behavior IDs into `--acceptance`. It is a prompt template rather than a skill precisely so the harness cannot invoke it on its own — if you never type it, the default architect loop is unchanged. See `tlh/README.md`.
+```bash
+npm run generate
+```
 
-**Codex** — `$architect` establishes the main-thread role, requires the `grill-me-architecture` skill from this repository's `skills/` directory (linked by `opencode/link-global.sh` or copied manually), and writes the decision brief. `$plan-feature` records the reviewed program design. `$decompose` creates the tracer-first queue after user approval. `$start-work` dispatches a fresh custom Developer for each ticket, verifies that the Developer did not mutate Git state, applies the same four-axis review and human checkpoints, and creates local ticket commits. The artifacts stay uncommitted and temporary; the user removes them after the workflow. See `codex/README.md` for supported Codex surfaces, limitations, and install paths.
+You can copy selected files from `generated/current/` instead. These files are self-contained. Node.js and this checkout are not needed at runtime for copied native files. Install the shared grill skill separately. See the [OpenCode Architect guide](opencode/agents/architect/README.md) and [Codex guide](codex/README.md).
 
-## Install
+## Shared Workflow
 
-Pick a tree and installation style:
+| Stage | OpenCode | Codex |
+|---|---|---|
+| Establish Architect and decision brief | Select `architect` | `$architect` |
+| Program design and Oracle review | `/plan-feature` | `$plan-feature` |
+| Implement approved plan | `/start-work` | `$start-work` |
+| Plain-language restatement | `/bro` | `$bro` |
+| Handoff | `/handoff` | `$handoff` |
+| Independent implementation review | Optional `/review-work` via `review` | `$review-work` via `oracle` |
 
-- OpenCode package-by-package: follow the README under `opencode/agents/` or `opencode/commands/` and copy only the pieces you want.
-- OpenCode core global setup: run `opencode/link-global.sh --dry-run`, then `opencode/link-global.sh --force` if existing differing copies should be replaced. The script links repository-owned core agents, commands, instructions, and the shared `grill-me-architecture` skill into `~/.agents/skills`; it does not install the optional review command, edit `opencode.json`, or change unrelated files. Remove any previously installed `grill-me-architecture` copy before linking.
-- Claude Code: follow `claude/README.md` — copy `claude/agents/*.md` and `claude/commands/*.md` into `~/.claude/` (global) or `.claude/` (per project). No restart or JSON config needed.
-- Codex global setup: run `codex/link-global.sh --dry-run`, then
-  `codex/link-global.sh --force` if existing differing copies or directories
-  should be replaced. Add `--with-librarian` for the optional package. For a
-  project-local setup, follow `codex/README.md`.
-- The Last Harness: run `tlh/link-global.sh --dry-run`, then `tlh/link-global.sh`. It links only prompt templates into the isolated profile's `prompts/` directory and changes no settings, skills, agents, or extensions. For a single project, copy the files into `.pi/prompts/` instead.
+The shared workflow follows OpenCode's plan-driven model. It uses `decision-brief.md`, `plan.md`, Git, and the working tree. It has no tickets or decomposition stage.
 
-Restart OpenCode after linking or changing files. Reload Codex after changing skills or custom agents. Run `/reload` in The Last Harness after changing prompt templates.
+Architect routes one coherent task to the complex or bounded Developer. Developers run focused proof and submit task-owned local commits when authorized. Architect reviews each submission and correction, reuses valid evidence, and coordinates final verification and QA. Final human acceptance remains required. Repository and user restrictions remain authoritative.
 
-Packages are independent: you can install just `oracle`, just the librarian, or the full workflow.
+Native mechanisms still differ. OpenCode uses a persistent primary agent and command bindings. Codex uses manual-only skills in the main thread and custom spawned agents. Prompt rules are not universal permission enforcement. Shared text cannot guarantee identical model behavior.
 
-## Shared Principles
+## Migration And Recovery
 
-- **File-based and reversible.** Install by copying selected packages or using
-  the explicit OpenCode and Codex symlink helpers. No hidden config mutation,
-  subprocess harnesses, or runtime state machines.
-- **Externalized artifacts over hidden state.** Decisions and plans live in visible Markdown files. Claude Code and Codex also use visible ticket files. Each package defines its own lifecycle and Git treatment.
-- **Proportional process.** Small work can bypass the artifact flow; standard and high-risk work receive explicit design and review cadence.
-- **Runnable feedback early.** Start with a useful end-to-end path or focused technical proof instead of speculative layers.
-- **Program design before implementation.** Component responsibilities, allowed dependencies, and state ownership are settled in the plan and carried into every implementation dispatch, because a goal alone does not constrain structure.
-- **Humans own maintainability judgment.** Agent review raises the floor, but final review and acceptance remain human decisions. Claude Code and Codex also pause at selected mid-implementation checkpoints; OpenCode reviews each submission without routine human checkpoints.
-- **Additive.** No global enforcement hook is installed. Optional OpenCode routing instructions direct non-trivial design work to Architect; small work stays in the normal session.
+The helper recognizes exact legacy and generated links owned by this checkout, including dangling legacy links. It removes owned obsolete `decompose` links. It reports obsolete copies for manual inspection.
 
-## Contributing
+Existing regular files require explicit `--force` to replace. Directories and foreign links are never removed by force. Back up and move conflicting copies or links manually, then rerun. Old installed links to removed source paths need this migration before the next agent session.
 
-See `AGENTS.md` for contributor guidance: file conventions, harness config rules, verification steps, and git hygiene.
+Generation validates the full payload, publishes an immutable content-addressed release, and atomically switches `generated/current`. Failed rendering leaves the prior release active. A generation/link lock excludes competing runs. Remove a stale lock only after confirming no invocation is active.
+
+Installation across destination directories is not atomic. If it fails midway, inspect the reported changed and pending paths and rerun before reloading either harness. The scripts retain published releases and abandoned temporary entries. They report unpublished temporary entries for manual cleanup; they never prune releases automatically.
+
+To uninstall, inspect the named installed links and unlink only those owned by this checkout. Keep unrelated files and any manually configured settings.
+
+## Tests And Golden Files
+
+```bash
+npm test
+```
+
+Tests compare all output paths and file bytes with `tests/golden/`. They also check native syntax, manual-only Codex policy, literal serialization, failure behavior, publication, and isolated link migration. They never update fixtures or your installed configuration.
+
+After reviewing an intentional output change:
+
+```bash
+npm run snapshots:update
+npm test
+git diff -- tests/golden
+```
+
+Review the full fixture diff before committing it. Golden approval does not bypass independent policy checks or prove model compliance.
+
+## Independent Packages
+
+[Claude Code](claude/README.md) retains its existing ticket workflow. [The Last Harness](tlh/README.md) remains an additive prompt package. [OpenCode Librarian](opencode/agents/librarian/README.md) and [Codex Librarian](codex/optional/librarian/README.md) remain separately maintained native packages.
+
+See [AGENTS.md](AGENTS.md) for contributor rules.

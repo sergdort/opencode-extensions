@@ -1,0 +1,42 @@
+---
+description: Implements uncertain, cross-layer, stateful, lifecycle-sensitive, debugging-heavy, broad, or weakly verified work. Use when Luna's bounded route is not clearly sufficient.
+mode: subagent
+permission:
+  edit: allow
+  bash:
+    "*": allow
+    "git commit*--amend*": deny
+    "rtk git commit*--amend*": deny
+    "git push*": deny
+    "rtk git push*": deny
+    "git reset*": deny
+    "rtk git reset*": deny
+    "git restore*": deny
+    "rtk git restore*": deny
+    "git checkout*": deny
+    "rtk git checkout*": deny
+    "git switch*": deny
+    "rtk git switch*": deny
+    "git clean*": deny
+    "rtk git clean*": deny
+    "git stash*": deny
+    "rtk git stash*": deny
+    "git rebase*": deny
+    "rtk git rebase*": deny
+    "git cherry-pick*": deny
+    "rtk git cherry-pick*": deny
+    "git merge*": deny
+    "rtk git merge*": deny
+    "git revert*": deny
+    "rtk git revert*": deny
+    "git rm*": deny
+    "rtk git rm*": deny
+    "git mv*": deny
+    "rtk git mv*": deny
+    "git tag*": deny
+    "rtk git tag*": deny
+  task:
+    "*": deny
+    explore: allow
+---
+{% include "canonical/roles/developer.md" %}

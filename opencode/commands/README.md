@@ -1,6 +1,6 @@
 # OpenCode Commands
 
-Reusable OpenCode command files.
+Core commands are generated from canonical procedures. Librarian remains a native source prompt.
 
 ## Commands
 
@@ -13,26 +13,31 @@ Reusable OpenCode command files.
 
 ## Install
 
+Run `npm ci` and `npm run generate` from the checkout first. For a generated symlink setup, use `opencode/link-global.sh`; add `--with-review` only when the optional read-only `review` agent is installed. Rerun after source updates. Generation updates both payloads; restart OpenCode and reload any already-linked Codex installation.
+
+
 For global use:
 
 ```bash
-COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
+COMMANDS_DIR=/path/to/opencode-extensions/generated/current/opencode/commands
 mkdir -p ~/.config/opencode/commands
-cp "$COMMANDS_DIR"/{bro,handoff,github-librarian,plan-feature,start-work}.md ~/.config/opencode/commands/
+cp "$COMMANDS_DIR"/{bro,handoff,plan-feature,start-work}.md ~/.config/opencode/commands/
 ```
 
 For one project:
 
 ```bash
-COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
+COMMANDS_DIR=/path/to/opencode-extensions/generated/current/opencode/commands
 mkdir -p .opencode/commands
-cp "$COMMANDS_DIR"/{bro,handoff,github-librarian,plan-feature,start-work}.md .opencode/commands/
+cp "$COMMANDS_DIR"/{bro,handoff,plan-feature,start-work}.md .opencode/commands/
 ```
 
 When upgrading, inspect any installed `decompose.md`. Remove it only when it is the obsolete ticket command from this package. Restart OpenCode after copying command files.
+
+Install `opencode/commands/github-librarian.md` separately for copy-based setups; it is not generated. The core link helper preserves its existing installation.
 
 `github-librarian.md` assumes the `github-librarian` subagent is installed and task delegation is allowed from the `build` agent.
 
 `plan-feature.md` and `start-work.md` require the Architect package, its Developers, Oracle, and the shared grill skill. Both commands run under the persistent `architect` primary agent. `/plan-feature` creates the initial plan; revise an existing plan directly with Architect. `/start-work` approves the current disclosed plan and begins Developer submissions and Architect review.
 
-`review-work.md` assumes an optional read-only agent named `review`. The agent returns findings in its response and does not create workflow state. Edit the command frontmatter when the agent has a different name.
+`review-work.md` assumes an optional read-only agent named `review`. The agent returns findings in its response and does not create workflow state. Edit `templates/opencode/commands/review-work.md.njk` and regenerate when the agent has a different name.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "bro"
+policy:
+  allow_implicit_invocation: false

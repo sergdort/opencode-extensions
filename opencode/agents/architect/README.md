@@ -25,7 +25,7 @@ The plan's architecture is binding; its provisional details are not. Developers 
 
 ## What It Provides
 
-Agents in `agents/`:
+Generated agents in `generated/current/opencode/agents/`:
 
 - `architect.md`: primary orchestrator, integrator, and reviewer
 - `developer.md`: Terra-high Developer for uncertain, cross-layer, stateful, debugging-heavy, or weakly verified work
@@ -36,7 +36,7 @@ Both Developers run in two modes: plan mode inside `/start-work`, where the plan
 
 Architect and both Developers use OpenCode's built-in Explore agent for focused read-only repository discovery.
 
-Commands in `../../commands/`:
+Generated commands in `generated/current/opencode/commands/`:
 
 - `plan-feature.md`: turns the decision brief and repository evidence into a program design and test strategy
 - `start-work.md`: selects coherent phases, routes a Developer just in time, integrates results, and runs final review and QA
@@ -105,70 +105,43 @@ Loop mechanics live in the commands: `/plan-feature` carries the program-design 
 - No automatic model routing outside Architect's explicit phase-by-phase judgment
 - No requirement that GitHub Librarian, Review, or Plannotator is installed; Oracle and the grill skill are required
 
-## Global Install
+## Install
 
-For Architect, Oracle, Librarian, and the core command set, run `opencode/link-global.sh`. It creates global symlinks without changing `opencode.json`. Install `review-work.md` separately when a read-only `review` agent is available.
-
-To copy only this package:
+Requires Node.js 22 or newer. Run from the checkout:
 
 ```bash
-ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
-COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
-mkdir -p ~/.config/opencode/agents ~/.config/opencode/commands
-cp "$ARCHITECT_DIR"/agents/*.md ~/.config/opencode/agents/
-cp "$ARCHITECT_DIR/ARCHITECT_INSTRUCTIONS.md" ~/.config/opencode/ARCHITECT_INSTRUCTIONS.md
-cp "$COMMANDS_DIR/plan-feature.md" ~/.config/opencode/commands/plan-feature.md
-cp "$COMMANDS_DIR/start-work.md" ~/.config/opencode/commands/start-work.md
-cp "$ARCHITECT_DIR/../oracle/agents/oracle.md" ~/.config/opencode/agents/oracle.md
-mkdir -p ~/.agents/skills/grill-me-architecture
-cp "$ARCHITECT_DIR/../../../skills/grill-me-architecture/SKILL.md" ~/.agents/skills/grill-me-architecture/SKILL.md
+npm ci
+./opencode/link-global.sh --dry-run
+./opencode/link-global.sh
 ```
 
-Optionally copy `review-work.md` when a read-only `review` agent is installed:
+The helper generates both native payloads, then links OpenCode core agents, commands, routing instructions, Librarian, and the shared grill skill. It does not edit `opencode.json`. Add `--with-review` only when an optional read-only `review` agent is installed.
+
+After source updates, rerun the helper. Restart OpenCode and reload any Codex installation linked to this checkout. Selection limits link edits, not shared content publication.
+
+Destination overrides are `OPENCODE_CONFIG_DIR` (default `$XDG_CONFIG_HOME/opencode`, or `~/.config/opencode`) and `AGENTS_SKILLS_DIR` (default `~/.agents/skills`).
+
+See the root [migration and recovery rules](../../../README.md#migration-and-recovery) before replacing an existing installation. The helper migrates owned legacy links and removes owned obsolete decomposition links. It preserves foreign links and directories even with `--force`.
+
+### Copy Native Files
+
+Generate with `npm run generate` first. From the destination project, set the checkout path:
 
 ```bash
-cp "$COMMANDS_DIR/review-work.md" ~/.config/opencode/commands/review-work.md
+EXTENSIONS_DIR=/path/to/opencode-extensions
+NATIVE_DIR="$EXTENSIONS_DIR/generated/current/opencode"
+mkdir -p .opencode/agents .opencode/commands .agents/skills/grill-me-architecture
+cp "$NATIVE_DIR/agents/"*.md .opencode/agents/
+cp "$NATIVE_DIR/commands/"{bro,handoff,plan-feature,start-work}.md .opencode/commands/
+cp "$NATIVE_DIR/ARCHITECT_INSTRUCTIONS.md" .opencode/ARCHITECT_INSTRUCTIONS.md
+cp "$EXTENSIONS_DIR/skills/grill-me-architecture/SKILL.md" .agents/skills/grill-me-architecture/SKILL.md
 ```
 
-If you installed an older copy-based version, remove its obsolete command:
+Inspect destination conflicts before copying. For global copies, use `~/.config/opencode/` and `~/.agents/skills/` instead. Copy optional `review-work.md` only when its `review` agent is available. Install Librarian separately if needed.
 
-```bash
-rm -f ~/.config/opencode/commands/decompose.md
-```
+### Optional Routing Config
 
-Optionally append the routing policy to global `opencode.json`:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "instructions": ["/Users/you/.config/opencode/ARCHITECT_INSTRUCTIONS.md"]
-}
-```
-
-Use an absolute path globally and merge it with existing instructions.
-
-## Project Install
-
-```bash
-ARCHITECT_DIR=/path/to/opencode-extensions/opencode/agents/architect
-COMMANDS_DIR=/path/to/opencode-extensions/opencode/commands
-mkdir -p .opencode/agents .opencode/commands
-cp "$ARCHITECT_DIR"/agents/*.md .opencode/agents/
-cp "$ARCHITECT_DIR/ARCHITECT_INSTRUCTIONS.md" .opencode/ARCHITECT_INSTRUCTIONS.md
-cp "$COMMANDS_DIR/plan-feature.md" .opencode/commands/plan-feature.md
-cp "$COMMANDS_DIR/start-work.md" .opencode/commands/start-work.md
-cp "$ARCHITECT_DIR/../oracle/agents/oracle.md" .opencode/agents/oracle.md
-mkdir -p .opencode/skills/grill-me-architecture
-cp "$ARCHITECT_DIR/../../../skills/grill-me-architecture/SKILL.md" .opencode/skills/grill-me-architecture/SKILL.md
-```
-
-Optionally copy `review-work.md`:
-
-```bash
-cp "$COMMANDS_DIR/review-work.md" .opencode/commands/review-work.md
-```
-
-Optionally add the project routing instruction:
+Merge the instruction path into existing config. For a project:
 
 ```json
 {
@@ -176,6 +149,8 @@ Optionally add the project routing instruction:
   "instructions": [".opencode/ARCHITECT_INSTRUCTIONS.md"]
 }
 ```
+
+For global config, use an absolute path to the installed `ARCHITECT_INSTRUCTIONS.md`. The helper never changes these settings.
 
 ## Agent Dependencies
 

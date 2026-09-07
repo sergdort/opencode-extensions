@@ -1,0 +1,4 @@
+interface:
+  display_name: "review-work"
+policy:
+  allow_implicit_invocation: false

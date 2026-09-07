@@ -6,7 +6,7 @@ It is inspired by Pi Oracle, but the OpenCode version intentionally uses native 
 
 ## What It Provides
 
-- `agents/oracle.md`: the Oracle subagent definition
+- `generated/current/opencode/agents/oracle.md`: the generated Oracle definition
 
 ## What It Does Not Do
 
@@ -22,10 +22,10 @@ All setup is explicit and copy-based so changes are visible and reversible.
 
 Use this when you want Oracle available across projects on a machine.
 
-Run from any directory and set `ORACLE_DIR` to this package directory:
+Run `npm ci` and `npm run generate` from the checkout first. Then set `ORACLE_DIR` to its generated OpenCode payload:
 
 ```bash
-ORACLE_DIR=/path/to/opencode-extensions/opencode/agents/oracle
+ORACLE_DIR=/path/to/opencode-extensions/generated/current/opencode
 mkdir -p ~/.config/opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" ~/.config/opencode/agents/oracle.md
 ```
@@ -36,15 +36,19 @@ No `opencode.json` changes are needed for direct `@oracle` use. Without an expli
 
 Use this when you want Oracle available only in one repository.
 
-Run from the target project root and set `ORACLE_DIR` to this package directory:
+After generation, run from the target project root and set `ORACLE_DIR` to the generated payload:
 
 ```bash
-ORACLE_DIR=/path/to/opencode-extensions/opencode/agents/oracle
+ORACLE_DIR=/path/to/opencode-extensions/generated/current/opencode
 mkdir -p .opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" .opencode/agents/oracle.md
 ```
 
 No project config changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. Install the Architect package as well when you want scoped Oracle delegation during its workflow.
+
+The core helper `opencode/link-global.sh` generates and links Oracle with the workflow. Rerun it after source updates. Generation updates both payloads; restart OpenCode and reload any already-linked Codex installation. See the root README for migration and safety rules.
+
+Edit Oracle's shared charter in `canonical/roles/oracle.md` and its native frontmatter in `templates/opencode/agents/oracle.md.njk`. Regenerate after editing. Do not edit the generated file.
 
 ## Permissions
 

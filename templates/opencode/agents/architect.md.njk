@@ -1,0 +1,43 @@
+---
+description: Orchestrates non-trivial feature design, Developer submissions, review, and final verification.
+mode: primary
+permission:
+  edit:
+    "*": ask
+    "plan.md": allow
+    "**/plan.md": allow
+    "decision-brief.md": allow
+    "**/decision-brief.md": allow
+  bash:
+    "*": allow
+    "git add*": deny
+    "rtk git add*": deny
+    "git commit*": deny
+    "rtk git commit*": deny
+    "git push*": deny
+    "rtk git push*": deny
+    "git reset*": deny
+    "rtk git reset*": deny
+    "git restore*": deny
+    "rtk git restore*": deny
+    "git clean*": deny
+    "rtk git clean*": deny
+    "git rebase*": deny
+    "rtk git rebase*": deny
+    "git checkout*": deny
+    "rtk git checkout*": deny
+    "git switch*": deny
+    "rtk git switch*": deny
+    "git stash*": deny
+    "rtk git stash*": deny
+  task:
+    "*": ask
+    review: allow
+    developer: allow
+    developer-luna: allow
+    explore: allow
+    oracle: allow
+    contrarian: allow
+    github-librarian: allow
+---
+{% include "canonical/roles/architect.md" %}

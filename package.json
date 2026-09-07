@@ -1,0 +1,16 @@
+{
+  "name": "opencode-extensions",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "snapshots:update": "node scripts/update-snapshots.mjs"
+  },
+  "dependencies": {
+    "nunjucks": "3.2.4",
+    "smol-toml": "1.8.0",
+    "yaml": "2.9.0"
+  }
+}
