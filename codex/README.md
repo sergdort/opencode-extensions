@@ -14,7 +14,7 @@ npm ci
 ./codex/link-global.sh
 ```
 
-The helper links six skills into `~/.agents/skills` and four custom agents into `~/.codex/agents`. It also links the canonical `grill-me-architecture/SKILL.md` directly from `skills/`.
+The helper links five manual workflow and utility skills into `~/.agents/skills` and four custom agents into `~/.codex/agents`. It also links `show-me` and the standalone `grill-me-architecture` skill directly from `skills/`. Grilling is installed for optional use; the core workflow does not require it.
 
 Override destinations with `CODEX_SKILLS_DIR` and `CODEX_AGENTS_DIR`. Add `--with-librarian` for the unchanged optional Librarian package.
 
@@ -38,33 +38,34 @@ EXTENSIONS_DIR=/path/to/opencode-extensions
 mkdir -p .agents/skills .codex/agents
 cp -R "$EXTENSIONS_DIR/generated/current/codex/skills/." .agents/skills/
 cp "$EXTENSIONS_DIR/generated/current/codex/agents/"*.toml .codex/agents/
-mkdir -p .agents/skills/grill-me-architecture
-cp "$EXTENSIONS_DIR/skills/grill-me-architecture/SKILL.md" .agents/skills/grill-me-architecture/SKILL.md
+mkdir -p .agents/skills/show-me
+cp "$EXTENSIONS_DIR/skills/show-me/SKILL.md" .agents/skills/show-me/SKILL.md
 ```
 
-Inspect destination conflicts before copying. For global copies, use `~/.agents/skills` and `~/.codex/agents` instead. Copy-based installations require copying again after updates.
+For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.md` into `.agents/skills/grill-me-architecture/`. Inspect destination conflicts before copying. For global copies, use `~/.agents/skills` and `~/.codex/agents` instead. Copy-based installations require copying again after updates.
 
 ## Workflow
 
-1. Invoke `$architect` to inspect the repository, grill the design, and write `decision-brief.md`.
-2. Invoke `$plan-feature` to settle program design and proof strategy in `plan.md`. Oracle review is required.
-3. Review the current disclosed plan, then invoke `$start-work` to approve it and start implementation.
+1. Describe the feature and invoke `$plan-feature`. It inspects the repository, clarifies requirements, and uses `show-me` to explain meaningful choices.
+2. Refine the draft. Oracle reviews every plan before final approval. Contrarian challenges one consequential uncertain decision when warranted. The planning agent resolves findings and discloses material changes.
+3. Review the disclosed plan, leave native Plan mode if active, and invoke `$start-work` to approve the plan and begin execution. This skill establishes Architect in the main session.
 4. Architect routes one coherent task at a time to a Developer. It reviews every submission and correction.
 5. Complete combined review, final verification, QA, and human acceptance.
 
-Revise an existing plan with Architect rather than repeating initial planning. There is no `$decompose`, ticket queue, or `Ticket:` trailer protocol.
+Native Plan mode is optional for `$plan-feature`; the skill does not switch modes. In any mode, it plans without changing product code or dispatching Developers. When native restrictions prevent writing `plan.md`, keep the reviewed draft and review evidence in the conversation or the native plan file. `$start-work` saves that exact disclosed plan when writes are allowed. It does not bypass an active Plan mode.
+
+Use `$plan-feature` to revise an existing plan for the same feature. During implementation, Architect maintains the plan as evidence changes. A conversational approval alone does not start execution. There is no separate `$architect` entry, `$decompose`, ticket queue, or `Ticket:` trailer protocol. The helper removes only retired skill links owned by this checkout; inspect old copied skills manually.
 
 Developers may submit task-owned local commits after focused proof when repository policy and the user permit them. They preserve unrelated working-tree content and index entries. Architect reviews and directs corrections; it does not commit product changes. Development and verification run sequentially. The same Developer resumes corrections when available.
 
-The workflow uses `decision-brief.md`, `plan.md`, Git, and the working tree. It never removes planning artifacts automatically; cleanup belongs to the user.
+The workflow uses `plan.md`, Git, and the working tree. The plan contains product intent, constraints, design decisions, proof strategy, and execution evidence. No decision brief is required. It never removes planning artifacts automatically; cleanup belongs to the user.
 
 ## Skills And Agents
 
-All six bundled entry points have `policy.allow_implicit_invocation: false`:
+All five generated entry points have `policy.allow_implicit_invocation: false`:
 
-- `$architect`: establish the main-thread Architect role.
-- `$plan-feature [plan-path]`: create and review the program design.
-- `$start-work [plan-path]`: implement the approved plan.
+- `$plan-feature [plan-path]`: create or revise the feature plan with visual explanations and review.
+- `$start-work [plan-path]`: establish Architect and execute the approved plan.
 - `$bro`: restate the last response plainly.
 - `$handoff`: write repository-local handoff documents.
 - `$review-work [plan-path] [git-range]`: dispatch Oracle for independent implementation review.
@@ -82,7 +83,9 @@ Custom agents:
 
 The main thread keeps its selected model. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
 
-Architect requires the separate shared grill skill. Plan review requires Oracle. Missing required roles block their stage. Optional Librarian and repository verification tools do not become core dependencies.
+Planning uses the shared `show-me` skill and requires Oracle review. A warranted Contrarian challenge must be resolved before approval. Optional Librarian and repository verification tools do not become core dependencies.
+
+Invoke `$grill-me-architecture` separately when you want a deeper design interview. The planning agent may recommend it for a specific difficult decision, but does not invoke it automatically.
 
 ## Permissions And Limits
 

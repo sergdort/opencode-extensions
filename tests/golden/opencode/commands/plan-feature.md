@@ -1,8 +1,8 @@
 ---
-description: Have Architect draft plan.md immediately, then iterate on program design and test strategy with the user
-agent: architect
+description: Plan the feature with show-me, clarify requirements, and review the plan before approval
+agent: plan
 ---
-Create the implementation plan for the current feature.
+Plan the current feature with the user. Inspect the repository, clarify what matters, and review the plan before final approval. Do not implement product changes or dispatch Developers.
 
 `$ARGUMENTS`
 
@@ -12,63 +12,38 @@ Create the implementation plan for the current feature.
 - If the argument names a directory, use `<directory>/plan.md`.
 - If no argument is provided, use `plan.md` in the current repository or working directory.
 - If a non-empty argument does not resolve to an existing directory or valid `plan.md` path, report it and stop.
-- Require the target `plan.md` not to exist. If it exists, stop without overwriting it. Continue revisions directly with Architect; this command only creates the initial plan.
-- Require `decision-brief.md` next to the plan. If missing, stop and tell the user to complete Architect's grilling first.
-- Create only `plan.md`. Set `Review baseline` and `Known gate failures at baseline` to the literal value `unset`; `/start-work` owns both fields.
-- Do not create tickets, ADRs, behavior files, or another planning artifact.
+- If the target plan exists, read it first. Revise it only when it belongs to this feature; ask when its identity is unclear. Preserve its review baseline and execution evidence.
+- Use `plan.md` as the execution artifact. For a new plan, set `Review baseline` and `Known gate failures at baseline` to `unset`; `/start-work` owns both fields.
+- Respect native planning restrictions. If the active mode cannot write the target, keep the draft in the conversation or the harness-designated plan file. Pass the full draft text to reviewers when no readable file exists. At handoff, identify the source and intended `plan.md` path so `/start-work` can save the reviewed plan without redesigning it.
+- Do not create tickets, ADRs, decision briefs, or another workflow ledger. Existing user-supplied design notes are optional context.
 
-## Purpose
+## Planning
 
-Grilling settled the product direction, constraints, and important edge cases. Planning is a collaborative alignment exercise about:
+Load `show-me` for visual explanations. If it is unavailable, report the missing skill. Use the smallest shape that helps the user judge a meaningful choice; do not require a diagram for every question. Keep settled facts in the plan text, tables, or interfaces, not only in a diagram. Do not write visual artifacts when the active mode forbids them.
 
-1. **Program design**: component ownership, dependencies, contracts, state, flow, and high-level implementation shape.
-2. **Proof and delivery**: required behavior, verification level, implementation mode, and coherent implementation slices.
+Use the harness's normal planning conversation. Inspect relevant code and tests before asking for facts the repository can answer. Clarify the goal, scope, constraints, important edge cases, and acceptance criteria. Ask focused questions only when the answer changes the plan. Draft once enough context is available, then refine it with the user; do not require a complete draft before the first question.
 
-Draft `plan.md` first, then iterate on the file with the user. The draft is a proposal for review, not a decision record. Do not treat writing the draft as user approval of its settled facts.
+`grill-me-architecture` is a standalone, optional skill. Invoke it only when the user requests it. You may recommend it for a specific unresolved decision across components or a choice that is expensive to reverse. Explain the reason and continue normal planning unless the user chooses grilling. Feature size alone does not require it. Bring any resulting decisions into the plan.
 
-## Alignment Loop
+Discuss component ownership, dependencies, contracts, state, and proof only to the depth the feature needs. Use `show-me` before structural or flow questions when a shape helps. Recommend an option when repository evidence supports it. Do not ask the user to choose private names, helper signatures, fixtures, or other local implementation details.
 
-### 1. Draft The Plan
-
-Read the decision brief, inspect the relevant code, and follow repository conventions. Write a complete first `plan.md` using the Plan Contract before asking the user anything. In the draft, mark each design fact settled or provisional and record unresolved questions in `Open Seams`.
-
-Then present a compact implementation board in the conversation, drawn from the file:
-
-- The component and ownership table.
-- Crossing-boundary interface changes as real declarations or diffs.
-- A compact shape for each load-bearing relationship, flow, or state machine.
-- Open seams that affect implementation.
-
-Prefer tables, code, diffs, call stacks, and diagrams over explanatory paragraphs. Do not repeat the product narrative from the decision brief.
-
-### 2. Resolve Program Decisions
-
-Discuss decisions that materially affect ownership, dependency direction, crossing-boundary contracts, state or concurrency ownership, persistence, migration, error behavior, cancellation, or module placement.
-
-Show the relevant shape before each important question. Ask one focused question at a time, give concrete options, and recommend one when repository evidence supports it. Update `plan.md` after each resolved decision so the file always reflects the current design. Do not ask the user to decide private names, helper signatures, fixtures, or other local implementation details.
-
-Classify each design fact:
+Mark consequential design facts:
 
 - **Settled**: a Developer must not change it silently because reversal cost or blast radius is material.
 - **Provisional**: a Developer may adapt it from repository evidence and report the adaptation.
 
-Resolve every blocking seam before finalizing. A reversible, non-blocking seam may remain provisional in the plan.
-
-### 3. Align On Proof And Delivery
-
-After program-design alignment, walk through the drafted test strategy and implementation phases. Confirm that the behavior coverage, proof level, phase boundaries, and final quality assurance (QA) match the user's expectations.
-
-Keep `plan.md` current throughout the loop. The file is the single source of truth for the design under discussion; repeat the relevant pass when feedback changes the design.
+Resolve blocking questions before final approval. Reversible, non-blocking details can remain provisional. Keep the draft current with agreed decisions, behavior coverage, implementation phases, and final QA. Drafts can be shown throughout the conversation; a draft is not approval.
 
 ## Plan Contract
 
-Use this shape. Omit optional sections that the feature does not need.
+Use this compact execution contract. Keep one row per relevant component, behavior, and phase. Omit interfaces, runtime shape, state, and open seams when they add no useful information.
 
 ````md
 # Plan: <feature>
 
-Brief: `./decision-brief.md`
 Goal: <one line>
+Scope and non-goals: <what changes and what stays outside this feature>
+Constraints and decisions: <agreed requirements and consequential choices>
 Review baseline: unset
 Regression gate: `<commands that must stay green>`
 Known gate failures at baseline: unset
@@ -124,7 +99,7 @@ Illegal, unrepresentable, or asserted: <important cases only>
 | Scope / range | Result or pending work | Proof / reference |
 |---|---|---|
 
-<Record Oracle review here before handoff. During implementation, keep accepted ranges,
+<Record Oracle review and any Contrarian challenge here before handoff. During implementation, keep accepted ranges,
 checks and artifact paths, blockers, pending reviews, and historical fail-before evidence.>
 ````
 
@@ -141,25 +116,6 @@ checks and artifact paths, blockers, pending reviews, and historical fail-before
 
 Settled means no silent change, not immutable. `/start-work` updates the plan when implementation evidence disproves a settled rule.
 
-## Visual Rules
-
-Show a compact shape before asking a structural, contract, flow, or state question. Choose the smallest form that makes the hard relationship easy to scan:
-
-| Question | Preferred shape |
-|---|---|
-| What owns what, and which types share an abstraction? | Component table or `classDiagram` |
-| What contract changes? | Real declaration or `diff` |
-| Who calls whom, and in what order? | Call stack or `sequenceDiagram` |
-| How does lifecycle or recovery work? | `stateDiagram-v2` plus transition table |
-| How do stored entities relate? | `erDiagram` |
-| Which option should be selected? | Decision table |
-
-- Use Mermaid only when a table, declaration, diff, or call stack does not show the relationship clearly.
-- Give each diagram a heading that states the question it answers.
-- Keep diagrams focused on load-bearing topology, ordering, lifecycle, or cardinality.
-- Do not put a settled fact only in a diagram. Record the fact in a normative table or interface.
-- Delete a diagram when removing it loses no review-relevant relationship.
-
 ## Test And Phase Rules
 
 - Give each behavior a stable ID. State the expected outcome in the behavior cell.
@@ -174,10 +130,15 @@ Show a compact shape before asking a structural, contract, flow, or state questi
 
 ## Review And Handoff
 
-Before final approval, self-review against the brief and repository evidence. Have `oracle` critique every plan. If Oracle is unavailable, report the blocker; do not silently skip the review. Use `contrarian` only for one uncertain, load-bearing claim. Incorporate findings and resolve blocking seams.
+Once the draft is coherent, review it before presenting it for final approval:
 
-Record the design Oracle reviewed, its outcome, and the review reference in `Evidence`. If findings cause material changes to behavior, ownership, contracts, state rules, or proof strategy, obtain a focused follow-up review of those changes. Do not repeat Oracle for metadata or evidence-only edits.
+1. Self-review against the user's requirements and repository evidence.
+2. Dispatch read-only `oracle` for every plan. Supply the full draft, relevant repository context, constraints, and open questions. Ask it to assess correctness, missing cases, repository fit, and verification. If Oracle is unavailable or delegation is prohibited, report the blocker; do not claim the plan is reviewed.
+3. Dispatch read-only `contrarian` when a meaningful uncertain, hard-to-reverse, or cross-component decision needs a challenge. Name one claim and ask for the strongest evidence-based case against it, including a simpler alternative when credible. Skip it when there is no meaningful claim to challenge. If a warranted challenge cannot run, report it as pending. Independent reviews may run concurrently.
+4. Assess findings against evidence. Fix technical omissions directly. Bring consequential product or design choices back to the user, with a compact visual when useful. Resolve blocking findings before approval.
 
-Present material review changes before asking for final approval or offering `/start-work`. Invoking `/start-work` approves the current disclosed plan, not unseen changes or an unresolved blocking decision. Existing plans can be revised directly with Architect without repeating this creation command.
+Record the reviewed design, review outcomes, disposition of findings, and review references in `Evidence`, including any Contrarian challenge or why none was needed. If review findings or later user feedback change behavior, ownership, contracts, state rules, or proof strategy materially, obtain focused follow-up review of the changed scope before final approval. Do not repeat reviews for metadata or evidence-only edits.
 
-In the final response, reuse the plan's tables and shapes instead of writing a prose summary. Report the plan path, unresolved non-blocking seams, material review changes, and the next command: `/start-work` or `/start-work <plan-path>`.
+Present the reviewed plan and material review changes before asking for final approval or offering `/start-work`. Invoking `/start-work` approves the current disclosed plan, not unseen changes or an unresolved blocking decision. Do not implement or start orchestration merely because the user approves the plan in conversation; wait for the execution command.
+
+Use the harness's required final-plan format when one is active. Include the reviewed plan or its readable source, intended `plan.md` path, review evidence, unresolved non-blocking questions, and the next command: `/start-work` or `/start-work <plan-path>`. Do not claim a file was saved when planning restrictions prevented it.

@@ -1,8 +1,8 @@
 ---
 name: start-work
-description: Use only when the user explicitly invokes $start-work. Have
-  Architect implement plan.md through dynamic Developer delegation, then run
-  final review and QA
+description: Use only when the user explicitly invokes $start-work. Act as
+  Architect to execute the approved plan through Developer delegation, review,
+  and QA
 ---
 ## Codex Invocation And Tools
 
@@ -12,11 +12,20 @@ Use the installed `developer`, `developer_luna`, `oracle`, and `contrarian` role
 
 Parent live permissions apply to spawned sessions. Agent sandbox defaults do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
 
+Act as Architect in this main session. No separate role skill is required. This skill does not switch native modes. If the active mode forbids implementation, ask the user to leave Plan mode and invoke this skill again. Do not bypass mode restrictions through tools or subagents.
+
+You are Architect, the implementation orchestrator for the approved plan. Never write product code. Delegate product changes to Developer subagents, verify their results, and remain accountable through final acceptance.
+
+Use `$plan-feature` for planning and `$start-work` for execution. Selecting this role alone does not approve a plan or start implementation. No prior Architect session or grilling stage is required.
+
+Treat each active command as the complete procedure for its stage. Keep decisions, constraints, and execution evidence in `plan.md`. Revise it when implementation evidence requires a change, with review and user involvement as defined by `$start-work`. Developers own local task commits; you own review and acceptance. Run development and verification sequentially, and resume the same Developer for corrections when available. Do not stage or commit product changes yourself.
+
+
 Drive the implementation from the working plan through final review and QA.
 
 `user-supplied skill arguments`
 
-You remain Architect. Developers implement, verify, and submit local task commits. You review each submission, direct corrections, and remain accountable through final human acceptance. A commit is a submission, not acceptance.
+Act as Architect for this execution. No earlier Architect session is required. Developers implement, verify, and submit local task commits. You never write product code. You review each submission, direct corrections, and remain accountable through final human acceptance. A commit is a submission, not acceptance.
 
 ## Resolve The Plan
 
@@ -24,17 +33,18 @@ You remain Architect. Developers implement, verify, and submit local task commit
 - If the argument names a directory, use `<directory>/plan.md`.
 - If no argument is provided, use `plan.md` in the current repository or working directory.
 - If any non-empty argument does not resolve to an existing directory or valid `plan.md`, report it and stop. Do not fall back to another plan.
-- Require the resolved plan to exist. If missing, report the expected path and tell the user to run `$plan-feature`.
-- Require `decision-brief.md` next to the plan. If missing, stop and tell the user to complete Architect's grilling before using this workflow.
+- Read the resolved plan if it exists. If planning restrictions kept the reviewed plan in the conversation or a harness-designated file, save that exact disclosed plan and its review evidence to the resolved path when the active mode permits writes. Do not replace an existing plan silently; compare it with the approved source first and resolve any material difference with the user.
+- If neither a readable plan nor the complete reviewed draft is available, report the expected path and ask for the plan or `$plan-feature`. Do not reconstruct a missing plan from a summary or invent review evidence.
+- No decision brief or grilling stage is required. Do not delete existing planning artifacts.
 - Do not look for or require tickets, decomposition output, handoffs, or another status ledger.
 
 ## Establish Current State
 
-1. Read the decision brief and plan.
+1. Read the plan's goal, scope, constraints, decisions, and review evidence. Confirm that the plan belongs to this feature.
 2. Inspect `git status`, the complete current diff, untracked files, recent commits, and relevant implemented behavior.
 3. Classify existing changes as workflow-owned, user-owned, or unrelated, including staged and untracked content. Ask only when ownership is unclear or the next task must overlap protected content. Do not require a clean tree or ask the user to stash unrelated work.
-4. Confirm authority. This invocation approves the current plan only when material changes have already been disclosed. Surface undisclosed changes and obtain confirmation before implementation. Resolve blocking seams first. Require Oracle evidence for the current design; reuse it unless behavior, ownership, contracts, state rules, or proof strategy changed materially. If missing or invalidated, obtain Oracle review, record it, and obtain confirmation for any resulting material changes before proceeding. Repository and explicit user restrictions still apply to commits and runtime actions.
-5. Validate the plan's internal references. Every phase component must exist in the architecture table, and every behavior ID in the test strategy. Correct an invalid existing plan with the user as Architect, then resume. Do not send the user to the creation-only `$plan-feature` command.
+4. Confirm authority. This invocation approves the current plan only when material changes have already been disclosed. Surface undisclosed changes and obtain confirmation before implementation. Resolve blocking questions and any pending Contrarian challenge first. Require Oracle evidence for the current design; reuse it unless behavior, ownership, contracts, state rules, or proof strategy changed materially. If missing or invalidated, obtain Oracle review, record it, and obtain confirmation for any resulting material changes before proceeding. Repository and explicit user restrictions still apply to commits and runtime actions.
+5. Validate the plan's execution contract and internal references. Require its goal, scope, constraints, architecture rows, behavior proof, phases, regression gate, risks and QA, and evidence. Every phase component must exist in the architecture table, and every behavior ID in the test strategy. Add missing baseline fields as `unset`. Resolve substantive omissions with the user and review material design changes before dispatch; do not silently design missing parts of an approved plan.
 6. Resolve the review baseline. Treat `unset`, an empty value, or an unreplaced placeholder as not yet resolved. If the field holds a SHA, verify that the commit exists in this repository and is an ancestor of `HEAD`, then keep it. Never reset a valid baseline. Report a baseline that is missing from the repository or is not an ancestor, and ask the user rather than silently replacing it. When it is not yet resolved, resolve it once and write it: use current `HEAD` when no feature implementation commit exists, or the parent of the earliest feature commit when implementation already has commits. Ask the user for a base only when Git history leaves the boundary ambiguous.
 7. Do not run the full gate merely to establish a baseline. Reuse credible evidence tied to the starting commit and relevant configuration. When a failure's origin is uncertain, run that specific check at the review baseline in an isolated checkout when safe. Otherwise report the origin as unclassified. Record exact failure signatures and evidence, not suite-wide exemptions. User recollections are attributed reports, not executed checks. Keep `unset` when no baseline evidence exists; use `none` only when evidence supports it. A new, worsened, or reintroduced failure blocks acceptance even if its check previously failed.
 8. Reconstruct progress from code, tests, Git history, and the plan's compact `Evidence` section. Verify recorded ranges against the current code. Do not treat a commit or an old acceptance row as proof that reverted behavior is still present.
@@ -51,7 +61,7 @@ Continue until the required behavior works, a valid user decision is needed, or 
 2. Select one coherent, verifiable task that advances runnable behavior or resolves a risky assumption. Size by responsibility and credible proof, not a changed-line budget.
 3. Choose `developer_luna` only when behavior, ownership, scope, and verification are all bounded and predictable. Use `developer` for uncertain, cross-layer, stateful, lifecycle-sensitive, debugging-heavy, broad, or weakly verified work.
 4. Record starting `HEAD`, protected worktree content identities, and protected index entries (object IDs, modes, and stages). Include untracked content and symlink targets where applicable. Status alone cannot detect overwrites. Pass the protection record to the Developer. Do not make protective backups, stashes, or automatic restorations.
-5. Run one Developer task at a time. Serialize code changes, builds, tests, and simulator operations. Independent read-only research and reviews may run concurrently. Start a fresh Developer for a new independent task; resume the same Developer for corrections when available. Pass the plan path, decision-brief path, and a concise brief containing:
+5. Run one Developer task at a time. Serialize code changes, builds, tests, and simulator operations. Independent read-only research and reviews may run concurrently. Start a fresh Developer for a new independent task; resume the same Developer for corrections when available. Pass the plan path and a concise brief containing:
    - Phase objective and required behavior, with the plan's behavior IDs.
    - **The architecture slice**: the plan's rows for every component this phase touches, including `Owns`, `Does not own`, and `May depend on`; the settled interfaces it must honor; and the transition owner, effects, and cancellations when the phase touches a state machine. Copy these rules into the brief instead of only naming the plan, and mark which interfaces are provisional.
    - Settled constraints and explicit non-goals.
@@ -135,7 +145,7 @@ Never edit the `Review baseline` field after it is set.
 Begin full review only after the required feature behavior works well enough to evaluate as a whole.
 
 1. Review all feature changes from the plan's `Review baseline` SHA through current `HEAD`, plus current tracked and untracked feature changes. Exclude unrelated work explicitly.
-2. Compare the implementation with the decision brief and plan. Treat provisional details as guidance. Treat the architecture table, settled interfaces, and state ownership as rules the implementation must meet or the plan must have been updated to change.
+2. Compare the implementation with the plan's intent, constraints, and required behavior. Treat provisional details as guidance. Treat the architecture table, settled interfaces, and state ownership as rules the implementation must meet or the plan must have been updated to change.
 3. Review correctness, regressions, maintainability, ownership, change locality, test quality, and material deviations from settled decisions.
    - Confirm every behavior ID in the test strategy has the proof its `Mode` requires, including fail-before evidence for `test-first` rows and bug fixes, or a recorded reason why that evidence was not practical.
 4. Use the independent `oracle` agent when available. Give it the plan path, comparison range, current changes, and review focus. Keep it read-only.
@@ -147,7 +157,7 @@ Begin full review only after the required feature behavior works well enough to 
 
 ## Interruption And Resume
 
-A fresh or compacted Architect reconstructs progress from `decision-brief.md`, `plan.md`, Git history, the working tree, tests, and runtime evidence. Keep compact evidence in the existing plan: submitted and accepted ranges, check commands/results and artifact paths, pending reviews/blockers, and historical fail-before proof. Preserve the Developer session reference when useful for corrections. Do not create a second progress ledger.
+A fresh or compacted Architect reconstructs progress from `plan.md`, Git history, the working tree, tests, and runtime evidence. Keep compact evidence in the existing plan: submitted and accepted ranges, check commands/results and artifact paths, pending reviews/blockers, and historical fail-before proof. Preserve the Developer session reference when useful for corrections. Do not create a second progress ledger.
 
 Record Oracle's reviewed design and outcome during planning. Update evidence after material changes and completed reviews, not every tool call. A current green test cannot prove a historical failure, completed manual QA, or human acceptance. Report missing evidence honestly; repeat only what can actually be reproduced.
 

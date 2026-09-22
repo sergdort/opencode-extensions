@@ -1,5 +1,5 @@
 ---
-description: Use for deep read-only second opinions on architecture, debugging, code review, risky changes, security-sensitive work, large refactors, and high-stakes implementation plans.
+description: Review every feature plan before approval. Also use for read-only second opinions on architecture, debugging, code review, and risky changes.
 mode: subagent
 permission:
   read: allow

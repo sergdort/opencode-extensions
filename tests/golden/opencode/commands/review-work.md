@@ -19,7 +19,7 @@ Git range argument: `$2`
 - If `$1` is empty, use `plan.md` in the current repository or working directory.
 - Reject a non-empty `$1` that is not an existing directory or valid `plan.md`. Do not fall back to the default plan.
 - Require the resolved plan to exist. If missing, report the expected path and stop.
-- Require `decision-brief.md` next to the plan and read it before review.
+- Read the plan's goal, constraints, decisions, and review evidence before review.
 - If `$2` is provided, verify that it is a valid Git range. Reject an invalid range instead of guessing. An explicit range overrides the plan.
 - Without `$2`, use the plan's `Review baseline` SHA and review from that commit through `HEAD`. Verify that the SHA exists in this repository.
 - If the plan has no baseline and the worktree has changes, review current tracked and untracked changes.
@@ -31,7 +31,7 @@ Git range argument: `$2`
 ## Review Scope
 
 - Read the complete comparison and relevant touched files.
-- Compare product behavior and hard constraints with the decision brief.
+- Compare product behavior and hard constraints with the plan's goal, scope, and constraints.
 - Check the implementation against the plan's architecture table: component responsibilities, excluded responsibilities, allowed dependencies, settled interfaces, and state transition ownership. A dependency outside a component's allowlist, a component that absorbed work its `Does not own` cell excludes, or a second writer to an owned state machine is a finding.
 - Check each behavior ID in the test strategy for the proof its `Mode` requires.
 - Treat provisional details, predicted files, and phase boundaries as guidance. Flag unexplained harmful drift, not reasonable adaptation.

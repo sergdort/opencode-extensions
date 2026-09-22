@@ -1,5 +1,5 @@
 name = "oracle"
-description = "Deep read-only second opinion for an active Architect workflow or an explicit user request. Use for high-risk architecture, security, persistence, migrations, broad refactors, and high-stakes plans."
+description = "Read-only review of every feature plan before approval, or a second opinion during execution or an explicit user request. Check correctness, missing cases, repository fit, and verification."
 model = "gpt-5.6"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"

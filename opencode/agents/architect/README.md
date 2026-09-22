@@ -1,18 +1,19 @@
 # OpenCode Architect Orchestrator
 
-Architect is a persistent OpenCode primary agent for non-trivial feature work. It grills the design, records settled decisions, creates a working plan, and directs Developer subagents through implementation, final review, and QA.
+Architect is a persistent OpenCode primary agent that executes approved plans. The built-in Plan agent handles feature planning with `show-me`, Oracle review, and a focused Contrarian challenge when warranted. Architect directs Developer subagents through implementation, final review, and QA.
 
-Switch to the top-level `architect` agent once. There is no `/architect` command. Developers submit local task commits. Architect reviews them and resumes the same Developer for corrections when available.
+Use `/plan-feature` to select Plan, then `/start-work` to select Architect and execute the disclosed plan. No manual agent switch or `/architect` command is needed. Developers submit local task commits. Architect reviews them and resumes the same Developer for corrections when available.
 
 ## Workflow
 
 ```text
-select architect
-  -> inspect repository and grill the design
-  -> decision-brief.md
-  -> /plan-feature
-  -> plan.md
-  -> /start-work
+/plan-feature selects Plan
+  -> inspect repository, clarify requirements, and use show-me
+  -> draft and discuss the plan
+  -> Oracle review and focused Contrarian challenge when warranted
+  -> resolve findings and present the reviewed plan
+  -> /start-work approves the disclosed plan and selects Architect
+  -> save the reviewed plan to plan.md if needed
   -> choose next coherent phase
   -> route Terra or Luna just in time
   -> Developer focused proof and local task commit
@@ -31,27 +32,28 @@ Generated agents in `generated/current/opencode/agents/`:
 - `developer.md`: Terra-high Developer for uncertain, cross-layer, stateful, debugging-heavy, or weakly verified work
 - `developer-luna.md`: Luna-max Developer for bounded work with stable behavior and direct automated verification
 
-Both Developers run in two modes: plan mode inside `/start-work`, where the plan's architecture rules bind them, and direct mode, where a self-contained brief is the contract. Direct mode supports follow-up sessions, QA findings, and ad hoc fixes dispatched from Architect or any other agent, with the same verdict protocol and Git limits.
+Both Developers support plan-based implementation inside `/start-work`, where the plan's architecture rules bind them, and direct work, where a self-contained brief is the contract. Direct mode supports follow-up sessions, QA findings, and ad hoc fixes dispatched from Architect or any other agent, with the same verdict protocol and Git limits.
 - `contrarian.md`: read-only adversarial review of one load-bearing decision
 
 Architect and both Developers use OpenCode's built-in Explore agent for focused read-only repository discovery.
 
 Generated commands in `generated/current/opencode/commands/`:
 
-- `plan-feature.md`: turns the decision brief and repository evidence into a program design and test strategy
+- `plan-feature.md`: selects Plan, clarifies requirements, and creates or revises a reviewed feature plan
 - `start-work.md`: selects coherent phases, routes a Developer just in time, integrates results, and runs final review and QA
 - `review-work.md`: optional independent review of the completed implementation
 
-Oracle is required for plan review. GitHub Librarian is optional. The shared `grill-me-architecture` skill is required for design.
+Planning uses the shared `show-me` skill. Oracle reviews every plan before approval. Contrarian challenges a consequential uncertain decision when warranted; independent reviews can run concurrently. Technical omissions are corrected directly, while consequential product choices return to the user. Material revisions receive focused follow-up review.
+
+`grill-me-architecture` remains a standalone skill. Ask to use it when you want a deeper design interview. The planning agent can recommend it for a specific unresolved decision, but invokes it only at your request. GitHub Librarian is optional.
 
 ## Durable State
 
-- `decision-brief.md`: product intent, system boundaries, external constraints, hard-to-reverse decisions, risks, and review needs
-- `plan.md`: program design, proof strategy, review baseline, and compact execution evidence, including exact known baseline failures
+- `plan.md`: product intent, scope, constraints, design decisions, proof strategy, review baseline, and compact execution evidence, including exact known baseline failures
 - Git history: task submissions and correction commits; acceptance is recorded separately in the plan
 - Working tree: active implementation
 
-There is no ticket queue or separate progress ledger. A fresh or compacted Architect inspects the artifacts, Git, code, tests, and runtime evidence before selecting the next phase. The plan's `Review baseline` SHA survives compaction, so the final comparison range does not have to be re-derived.
+No decision brief is required. Existing planning artifacts are preserved. If native planning restrictions prevent writing `plan.md`, the draft stays in the conversation or native plan file. Reviewers receive the full draft. `/start-work` saves the exact reviewed plan and review evidence before dispatch. There is no ticket queue or separate progress ledger. A fresh or compacted Architect inspects the artifacts, Git, code, tests, and runtime evidence before selecting the next phase. The plan's `Review baseline` SHA survives compaction, so the final comparison range does not have to be re-derived.
 
 ## Program Design
 
@@ -80,13 +82,13 @@ Architect does not ask the user to approve each submission. It resolves combined
 ## Workflow Profiles
 
 - **Small:** use the normal `build` agent directly. Do not create workflow artifacts.
-- **Standard:** use a decision brief, an Oracle-reviewed plan, Developer submissions, combined review, final verification, and human acceptance.
+- **Standard:** use planning with `show-me`, an Oracle-reviewed plan, Developer submissions, combined review, final verification, and human acceptance.
 - **High-risk:** add focused Contrarian review of an uncertain load-bearing claim and widen proof around the actual risk.
 
 ## Boundaries
 
-- Architect inspects the repository before asking design questions.
-- Architect edits `decision-brief.md` and `plan.md` freely. Any other Architect file edit asks for user approval through the edit permission. Architect does not write product code.
+- The Plan agent inspects the repository before asking design questions and does not dispatch Developers. Approval in conversation does not begin implementation; `/start-work` is the execution trigger.
+- Architect edits `plan.md` freely. Any other Architect file edit asks for user approval through the edit permission. Architect does not write product code.
 - Developers submit task-only local commits after focused proof when repository policy permits. They preserve unrelated worktree content and staged entries.
 - Developers may adapt provisional details and must report them. A settled architecture rule they cannot meet is a `NEEDS_DECISION`, never a silent change or a workaround.
 - Every Developer report includes an architecture-conformance section naming real paths, which Architect verifies against the diff.
@@ -94,7 +96,7 @@ Architect does not ask the user to approve each submission. It resolves combined
 - There is no fixed correction-round limit. Architect changes strategy after repeated failure instead of forcing a requirements escalation.
 - Final human acceptance remains required before merge or release.
 
-These are prompt rules with partial permission guardrails, not a shell sandbox. Architect's edit tool allows `plan.md` and `decision-brief.md` and asks for other paths. Selected Git command forms are denied. Broad shell access still requires the agent to respect ownership and mutation rules; permission patterns do not prevent every alternate command form.
+These are prompt rules with partial permission guardrails, not a shell sandbox. Architect's edit tool allows `plan.md` and asks for other paths. Selected Git command forms are denied. Broad shell access still requires the agent to respect ownership and mutation rules; permission patterns do not prevent every alternate command form.
 
 Loop mechanics live in the commands: `/plan-feature` carries the program-design rules and `/start-work` carries the delegation, integration, and review rules. The agent file stays minimal; to resume an interrupted implementation, re-run `/start-work`.
 
@@ -103,7 +105,7 @@ Loop mechanics live in the commands: `/plan-feature` carries the program-design 
 - No tickets, dependency queue, workflow trailers, plugin, installer, hidden state, or runtime state machine
 - No automatic push, squash, history rewriting, or destructive worktree cleanup
 - No automatic model routing outside Architect's explicit phase-by-phase judgment
-- No requirement that GitHub Librarian, Review, or Plannotator is installed; Oracle and the grill skill are required
+- No requirement that GitHub Librarian, Review, Plannotator, or the grill skill is installed; planning uses `show-me` and requires Oracle review
 
 ## Install
 
@@ -115,7 +117,7 @@ npm ci
 ./opencode/link-global.sh
 ```
 
-The helper generates both native payloads, then links OpenCode core agents, commands, routing instructions, Librarian, and the shared grill skill. It does not edit `opencode.json`. Add `--with-review` only when an optional read-only `review` agent is installed.
+The helper generates both native payloads, then links OpenCode core agents, commands, routing instructions, Librarian, and the shared `show-me` and standalone grill skills. It does not edit `opencode.json`. Add `--with-review` only when an optional read-only `review` agent is installed.
 
 After source updates, rerun the helper. Restart OpenCode and reload any Codex installation linked to this checkout. Selection limits link edits, not shared content publication.
 
@@ -130,14 +132,14 @@ Generate with `npm run generate` first. From the destination project, set the ch
 ```bash
 EXTENSIONS_DIR=/path/to/opencode-extensions
 NATIVE_DIR="$EXTENSIONS_DIR/generated/current/opencode"
-mkdir -p .opencode/agents .opencode/commands .agents/skills/grill-me-architecture
+mkdir -p .opencode/agents .opencode/commands .agents/skills/show-me
 cp "$NATIVE_DIR/agents/"*.md .opencode/agents/
 cp "$NATIVE_DIR/commands/"{bro,handoff,plan-feature,start-work}.md .opencode/commands/
 cp "$NATIVE_DIR/ARCHITECT_INSTRUCTIONS.md" .opencode/ARCHITECT_INSTRUCTIONS.md
-cp "$EXTENSIONS_DIR/skills/grill-me-architecture/SKILL.md" .agents/skills/grill-me-architecture/SKILL.md
+cp "$EXTENSIONS_DIR/skills/show-me/SKILL.md" .agents/skills/show-me/SKILL.md
 ```
 
-Inspect destination conflicts before copying. For global copies, use `~/.config/opencode/` and `~/.agents/skills/` instead. Copy optional `review-work.md` only when its `review` agent is available. Install Librarian separately if needed.
+For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.md` into `.agents/skills/grill-me-architecture/`. Inspect destination conflicts before copying. For global copies, use `~/.config/opencode/` and `~/.agents/skills/` instead. Copy optional `review-work.md` only when its `review` agent is available. Install Librarian separately if needed.
 
 ### Optional Routing Config
 
@@ -152,13 +154,18 @@ Merge the instruction path into existing config. For a project:
 
 For global config, use an absolute path to the installed `ARCHITECT_INSTRUCTIONS.md`. The helper never changes these settings.
 
+### Plan Agent Config
+
+Merge `agent.plan.permission.task` from [the example config](opencode.architect.example.json) into the existing OpenCode config. It denies general delegation, then allows Explore, Oracle, Contrarian, and optional GitHub Librarian. Preserve the Plan agent's native file and shell restrictions; do not grant it implementation permissions. The link helper does not edit config.
+
 ## Agent Dependencies
 
-Install Oracle for mandatory plan review. Install Librarian if needed for GitHub research. Architect's Task policy allows both. Missing Oracle blocks plan completion; missing optional agents do not.
+Install Oracle for mandatory plan review and Contrarian for focused challenges. Missing Oracle or blocked review delegation prevents final approval. A warranted Contrarian challenge stays pending until resolved. Install Librarian only if needed for GitHub research.
 
 The Task allowlist is:
 
 ```text
+plan -> explore, oracle, contrarian, github-librarian
 architect -> developer, developer-luna, explore, contrarian, oracle, github-librarian
 architect -> review when an optional read-only review agent is installed
 developer -> explore
@@ -183,12 +190,11 @@ Architect chooses Luna only for a bounded immediate phase with direct verificati
 
 ## Usage
 
-1. Switch to the top-level `architect` agent.
-2. Describe the feature or decision. Architect inspects the repository before grilling the design.
-3. Agree on `decision-brief.md`.
-4. Run `/plan-feature`.
-5. Review disclosed plan changes, then run `/start-work` to approve the current plan and begin implementation. Revise existing plans directly with Architect, not by repeating `/plan-feature`.
-6. Complete final review, QA, and human acceptance before merge or release.
+1. Describe the feature and run `/plan-feature`. The command selects the built-in Plan agent. An optional argument selects a `plan.md` path or directory.
+2. Discuss requirements and the draft with visual explanations. The agent resolves Oracle findings and any warranted Contrarian challenge before final approval.
+3. Review the disclosed plan and run `/start-work`, with the same path if one was supplied. The command selects Architect and starts implementation.
+4. Use `/plan-feature` to revise the same feature plan before execution. During execution, Architect maintains the plan as evidence changes.
+5. Complete final review, QA, and human acceptance before merge or release.
 
 ## Restart Required
 

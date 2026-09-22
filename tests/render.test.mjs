@@ -6,12 +6,12 @@ import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import YAML from 'yaml';
 import * as TOML from 'smol-toml';
-import { render, validatePayload } from '../scripts/lib/render.mjs';
+import { render, validatePayload, frontmatter } from '../scripts/lib/render.mjs';
 import { entries, mappings } from '../scripts/manifest.mjs';
 import { readTree, writeTree, assertTree } from '../scripts/lib/files.mjs';
 import { repository, fixture, put } from './helpers.mjs';
 
-const skills = ['architect', 'bro', 'handoff', 'plan-feature', 'review-work', 'start-work'];
+const skills = ['bro', 'handoff', 'plan-feature', 'review-work', 'start-work'];
 const expectedNames = [
   ...['bro', 'handoff', 'plan-feature', 'review-work', 'start-work'].map(n => `opencode/commands/${n}.md`),
   ...['architect', 'developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
@@ -46,6 +46,27 @@ test('complete native inventory, deterministic rendering and policy invariants',
   assert.match(workflow, /Oracle evidence/);
   assert.doesNotMatch(workflow, /\$decompose|Ticket:|`developer-luna`|\/start-work|\/plan-feature/);
   assert.match(files['codex/skills/review-work/SKILL.md'], /read-only `oracle`/);
+  assert.equal(frontmatter(files['opencode/commands/plan-feature.md']).agent, 'plan');
+  assert.equal(frontmatter(files['opencode/commands/start-work.md']).agent, 'architect');
+  assert.match(files['codex/skills/plan-feature/SKILL.md'], /Native Plan mode is optional/);
+  assert.match(workflow, /Act as Architect in this main session/);
+  assert.match(workflow, /leave Plan mode/);
+  for (const harness of ['opencode', 'codex']) {
+    const plan = files[harness === 'opencode' ? 'opencode/commands/plan-feature.md' : 'codex/skills/plan-feature/SKILL.md'];
+    assert.match(plan, /Load `show-me`/);
+    assert.match(plan, /Invoke it only when the user requests it/);
+    assert.match(plan, /before presenting it for final approval/);
+    assert.match(plan, /Dispatch read-only `oracle` for every plan/);
+    assert.match(plan, /Pass the full draft text to reviewers/);
+    assert.match(plan, /wait for the execution command/);
+  }
+  for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect/);
+  const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));
+  const tasks = example.agent.plan.permission.task;
+  assert.equal(Object.keys(tasks)[0], '*');
+  assert.equal(tasks['*'], 'deny');
+  for (const role of ['explore', 'oracle', 'contrarian']) assert.equal(tasks[role], 'allow');
+  assert.equal(tasks.developer, undefined);
 });
 
 test('golden files match complete payload; tests never update fixtures', t => {

@@ -1,5 +1,5 @@
 name = "contrarian"
-description = "Read-only adversarial stress-test for one specific decision in an active Architect workflow or an explicit user request. Use sparingly before an uncertain, hard-to-reverse, or broad-blast-radius claim becomes the program-design baseline."
+description = "Read-only adversarial stress-test for one specific decision during feature planning, execution, or an explicit user request. Use when an uncertain, hard-to-reverse, or cross-component claim needs a challenge."
 model = "gpt-5.6"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"

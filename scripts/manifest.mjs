@@ -119,7 +119,7 @@ export const entries = [
     "template": "templates/codex/skills/plan-feature.md.njk",
     "metadata": {
       "name": "plan-feature",
-      "description": "Use only when the user explicitly invokes $plan-feature. Have Architect draft plan.md immediately, then iterate on program design and test strategy with the user"
+      "description": "Use only when the user explicitly invokes $plan-feature. Plan with show-me, clarify requirements, and review the plan before approval. Native Plan mode is optional"
     },
     "legacy": "codex/skills/plan-feature"
   },
@@ -143,7 +143,7 @@ export const entries = [
     "template": "templates/codex/skills/start-work.md.njk",
     "metadata": {
       "name": "start-work",
-      "description": "Use only when the user explicitly invokes $start-work. Have Architect implement plan.md through dynamic Developer delegation, then run final review and QA"
+      "description": "Use only when the user explicitly invokes $start-work. Act as Architect to execute the approved plan through Developer delegation, review, and QA"
     },
     "legacy": "codex/skills/start-work"
   },
@@ -162,24 +162,6 @@ export const entries = [
     "context": {},
     "legacy": "opencode/agents/architect/agents/architect.md",
     "required": []
-  },
-  {
-    "harness": "codex",
-    "output": "codex/skills/architect/SKILL.md",
-    "template": "templates/codex/skills/architect.md.njk",
-    "metadata": {
-      "name": "architect",
-      "description": "Use only when the user explicitly invokes $architect. Settle feature intent and architecture before planning."
-    },
-    "legacy": "codex/skills/architect"
-  },
-  {
-    "harness": "codex",
-    "output": "codex/skills/architect/agents/openai.yaml",
-    "template": "templates/codex/openai.yaml.njk",
-    "context": {
-      "name": "architect"
-    }
   },
   {
     "harness": "opencode",
@@ -260,7 +242,7 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "contrarian",
-      "description": "Read-only adversarial stress-test for one specific decision in an active Architect workflow or an explicit user request. Use sparingly before an uncertain, hard-to-reverse, or broad-blast-radius claim becomes the program-design baseline.",
+      "description": "Read-only adversarial stress-test for one specific decision during feature planning, execution, or an explicit user request. Use when an uncertain, hard-to-reverse, or cross-component claim needs a challenge.",
       "model": "gpt-5.6",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
@@ -284,7 +266,7 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "oracle",
-      "description": "Deep read-only second opinion for an active Architect workflow or an explicit user request. Use for high-risk architecture, security, persistence, migrations, broad refactors, and high-stakes plans.",
+      "description": "Read-only review of every feature plan before approval, or a second opinion during execution or an explicit user request. Check correctness, missing cases, repository fit, and verification.",
       "model": "gpt-5.6",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
@@ -304,4 +286,5 @@ export const entries = [
 export const retired = [
   { harness: 'opencode', destination: 'commands/decompose.md', legacy: 'opencode/commands/decompose.md' },
   { harness: 'codex', destination: 'skills/decompose', legacy: 'codex/skills/decompose' },
+  { harness: 'codex', destination: 'skills/architect', legacy: 'codex/skills/architect' },
 ];

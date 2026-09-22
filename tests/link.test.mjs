@@ -36,11 +36,45 @@ test('isolated installation, current and dangling legacy links, retired links, a
   assert.equal(fs.readFileSync(userFile, 'utf8'), 'preserve');
   const grill = path.join(env.CODEX_SKILLS_DIR, 'grill-me-architecture/SKILL.md');
   assert.equal(fs.realpathSync(grill), path.join(root, 'skills/grill-me-architecture/SKILL.md'));
+  const showMe = path.join(env.CODEX_SKILLS_DIR, 'show-me/SKILL.md');
+  assert.equal(fs.realpathSync(showMe), path.join(root, 'skills/show-me/SKILL.md'));
   const inode = fs.lstatSync(developer).ino;
   generateAndLink(root, { withLibrarian: true, withReview: true }, env, quiet);
   assert.equal(fs.lstatSync(developer).ino, inode);
   assert.ok(fs.existsSync(path.join(env.CODEX_AGENTS_DIR, 'github_librarian.toml')));
   assert.ok(fs.existsSync(path.join(env.OPENCODE_CONFIG_DIR, 'commands/review-work.md')));
+});
+
+test('retired Architect links are removed only when owned by this checkout', t => {
+  const { root, env, base } = fixture(t);
+  const destination = path.join(env.CODEX_SKILLS_DIR, 'architect');
+  for (const source of ['codex/skills/architect', 'generated/current/codex/skills/architect']) {
+    symlink(path.join(root, source), destination);
+    generateAndLink(root, { harness: 'codex' }, env, quiet);
+    assert.equal(fs.lstatSync(destination, { throwIfNoEntry: false }), undefined);
+  }
+  const foreign = path.join(base, 'foreign/architect');
+  symlink(foreign, destination);
+  generateAndLink(root, { harness: 'codex', force: true }, env, quiet);
+  assert.equal(fs.readlinkSync(destination), foreign);
+  fs.unlinkSync(destination);
+  put(path.join(destination, 'SKILL.md'), 'user-owned skill');
+  generateAndLink(root, { harness: 'codex', force: true }, env, quiet);
+  assert.equal(fs.readFileSync(path.join(destination, 'SKILL.md'), 'utf8'), 'user-owned skill');
+});
+
+test('shared show-me conflicts are preserved before publication', t => {
+  const { root, env, base } = fixture(t);
+  const destination = path.join(env.CODEX_SKILLS_DIR, 'show-me/SKILL.md');
+  put(destination, 'personal show-me');
+  assert.throws(() => generateAndLink(root, {}, env, quiet), /conflicting destination/);
+  assert.equal(fs.readFileSync(destination, 'utf8'), 'personal show-me');
+  assert.equal(fs.existsSync(path.join(root, 'generated/current')), false);
+  fs.unlinkSync(destination);
+  const foreign = path.join(base, 'personal/SKILL.md');
+  symlink(foreign, destination);
+  assert.throws(() => generateAndLink(root, { force: true }, env, quiet), /conflicting destination/);
+  assert.equal(fs.readlinkSync(destination), foreign);
 });
 
 test('dry run, conflicts and missing sources leave current output and destinations unchanged', t => {

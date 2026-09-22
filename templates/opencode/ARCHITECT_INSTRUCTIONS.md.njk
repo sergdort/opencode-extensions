@@ -1,5 +1,7 @@
 # Architect Routing Instructions
 
-For non-trivial feature work, broad refactors, or architecture decisions that need design before implementation, tell the user to switch to the top-level `architect` agent with the concrete goal. Architect is a primary agent; never invoke it through Task or look for an `/architect` command.
+For feature work that needs a reviewed plan, suggest `{{ commands.plan }}`. It selects the built-in Plan agent, uses `show-me`, and reviews the plan before approval. Grilling is optional and starts only when the user requests it.
+
+After the reviewed plan is disclosed, the user invokes `{{ commands.start }}` to approve it and begin implementation. That command selects the top-level `architect` agent. Architect is a primary agent; never invoke it through Task or look for an `/architect` command. Selecting Architect alone does not approve or execute a plan.
 
 Keep small, obvious edits and simple bug fixes with the normal agent. Do not reroute work that is already in implementation or review unless its direction is materially wrong.

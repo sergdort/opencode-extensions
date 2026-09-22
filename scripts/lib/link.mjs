@@ -62,7 +62,7 @@ export function installation(root, options = {}, environment = process.env) {
   const bases = {};
   if (oc) {
     bases.opencode = destinationRoot(environment.OPENCODE_CONFIG_DIR || path.join(environment.XDG_CONFIG_HOME || path.join(home, '.config'), 'opencode'), root, home);
-    bases.grillOpenCode = destinationRoot(environment.AGENTS_SKILLS_DIR || path.join(home, '.agents/skills'), root, home);
+    bases.sharedOpenCode = destinationRoot(environment.AGENTS_SKILLS_DIR || path.join(home, '.agents/skills'), root, home);
   }
   if (cx) {
     bases.skills = destinationRoot(environment.CODEX_SKILLS_DIR || path.join(home, '.agents/skills'), root, home);
@@ -94,10 +94,12 @@ export function installation(root, options = {}, environment = process.env) {
     const relative = item.harness === 'opencode' ? item.destination : item.destination.replace(/^skills\//, '');
     add(base, relative, path.join(root, 'generated/current', item.harness, item.destination), [item.legacy], true);
   }
-  const grill = path.join(root, 'skills/grill-me-architecture/SKILL.md');
-  if (!stat(grill)?.isFile()) throw new Error(`Missing required shared skill: ${grill}`);
-  if (oc) add(bases.grillOpenCode, 'grill-me-architecture/SKILL.md', grill);
-  if (cx) add(bases.skills, 'grill-me-architecture/SKILL.md', grill);
+  for (const name of ['show-me', 'grill-me-architecture']) {
+    const source = path.join(root, 'skills', name, 'SKILL.md');
+    if (!stat(source)?.isFile()) throw new Error(`Missing bundled shared skill: ${source}`);
+    if (oc) add(bases.sharedOpenCode, `${name}/SKILL.md`, source);
+    if (cx) add(bases.skills, `${name}/SKILL.md`, source);
+  }
   // Preserve the existing optional-package install behavior; do not generate its sources.
   if (oc) {
     add(bases.opencode, 'agents/github-librarian.md', path.join(root, 'opencode/agents/librarian/agents/github-librarian.md'));

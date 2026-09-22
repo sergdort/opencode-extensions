@@ -7,7 +7,7 @@ Core commands are generated from canonical procedures. Librarian remains a nativ
 - `bro.md`: restate the last response plainly and concisely
 - `handoff.md`: create repository-local handoff documents for a fresh agent
 - `github-librarian.md`: investigate GitHub repositories with the `github-librarian` subagent
-- `plan-feature.md`: have Architect settle the program design and test strategy in `plan.md`
+- `plan-feature.md`: select the built-in Plan agent, use `show-me`, and review the feature plan before approval
 - `start-work.md`: have Architect route coherent implementation phases dynamically, check architecture conformance, and run final review and QA
 - `review-work.md`: optionally review the completed implementation with an independent agent; this does not replace human QA or acceptance
 
@@ -38,6 +38,8 @@ Install `opencode/commands/github-librarian.md` separately for copy-based setups
 
 `github-librarian.md` assumes the `github-librarian` subagent is installed and task delegation is allowed from the `build` agent.
 
-`plan-feature.md` and `start-work.md` require the Architect package, its Developers, Oracle, and the shared grill skill. Both commands run under the persistent `architect` primary agent. `/plan-feature` creates the initial plan; revise an existing plan directly with Architect. `/start-work` approves the current disclosed plan and begins Developer submissions and Architect review.
+`plan-feature.md` selects the built-in `plan` agent. Install `show-me`, Oracle, and Contrarian, and merge the Plan-agent Task permissions from the [Architect guide](../agents/architect/README.md#plan-agent-config). The command creates or revises the plan and runs review before approval. Grilling is optional.
+
+`start-work.md` selects the persistent `architect` primary agent. It approves the current disclosed plan and begins Developer submissions and Architect review. If planning restrictions prevented saving `plan.md`, Architect saves the exact reviewed draft first. Install Architect and its Developers before execution.
 
 `review-work.md` assumes an optional read-only agent named `review`. The agent returns findings in its response and does not create workflow state. Edit `templates/opencode/commands/review-work.md.njk` and regenerate when the agent has a different name.

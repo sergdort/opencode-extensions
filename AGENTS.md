@@ -27,7 +27,7 @@ The Claude Code package lives under `claude/`:
 The Codex package lives under `codex/`:
 
 - `codex/link-global.sh`: opt-in global symlink helper for the core Codex setup, with an explicit optional Librarian flag.
-- `generated/current/codex/skills/`: six manual-only workflow and utility skills.
+- `generated/current/codex/skills/`: five manual-only workflow and utility skills.
 - `generated/current/codex/agents/`: complex and bounded Developer, Oracle, and Contrarian profiles.
 - `codex/optional/librarian/`: optional GitHub research skill and custom agent.
 - `codex/README.md`: install, workflow, execution, permission limits, model defaults, and non-goals.
@@ -40,7 +40,8 @@ The Last Harness package lives under `tlh/`:
 
 Shared skills live under `skills/`:
 
-- `skills/grill-me-architecture/`: the canonical copy of the visual-first architecture grilling skill, consumed by OpenCode's Architect, Claude Code's `/architect`, and Codex's `$architect`. Both core link helpers link it into `~/.agents/skills/grill-me-architecture/`.
+- `skills/show-me/`: the shared visual explanation skill used by feature planning.
+- `skills/grill-me-architecture/`: the standalone architecture grilling skill. Grilling is optional in the shared OpenCode/Codex workflow; Claude Code keeps its independent `/architect` integration. Both core link helpers link these shared skills directly into `~/.agents/skills/`.
 
 ## Generated Core Conventions
 
@@ -50,7 +51,7 @@ Shared skills live under `skills/`:
 - Publish a complete immutable release and atomically switch `generated/current`. Share one generation/link lock. Never silently repair or prune published releases.
 - Link helpers preflight selected named destinations before publication. Preserve foreign links, directories, and unrelated files. Force applies only to regular-file conflicts. Retired links require exact ownership in this checkout.
 - Every entry point regenerates both payloads. Harness selection limits link edits only. Tell users to rerun after source updates, then restart OpenCode and reload Codex if linked.
-- Keep `skills/grill-me-architecture/` as the sole shared source and link it directly. Keep optional packages outside generation.
+- Keep `skills/show-me/` and `skills/grill-me-architecture/` as the shared sources and link them directly. Keep optional packages outside generation.
 
 ## File Conventions — Shared Skills (`skills/`)
 
@@ -79,9 +80,9 @@ Shared skills live under `skills/`:
 - Core skills are generated into `generated/current/codex/skills/<skill>/SKILL.md` and use valid skill frontmatter. Each bundled workflow skill has `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
 - Keep skill descriptions explicit about manual invocation and scope. Do not add an implicit router in `AGENTS.md`.
 - Use Codex's built-in `explorer` for routine discovery instead of adding a duplicate Repo Scout.
-- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$architect` requires the separately installed `grill-me-architecture` skill; this repository's `skills/` directory is its canonical source.
+- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$plan-feature` uses `show-me` and Oracle review. `grill-me-architecture` is standalone and runs only at the user's request; `skills/` holds both shared sources.
 - Keep `codex/link-global.sh` a scoped wrapper around the common generation/link implementation. It must not install dependencies, edit config, or change unrelated files.
-- The shared workflow uses `decision-brief.md`, `plan.md`, Git, and the working tree. Do not add tickets or a decomposition stage. The workflow never removes planning artifacts; cleanup belongs to the user.
+- The shared workflow uses `plan.md`, Git, and the working tree. `plan-feature` plans and reviews; `start-work` establishes Architect and executes. Respect native Plan mode restrictions and preserve the exact reviewed draft at handoff. Do not add tickets or a decomposition stage. The workflow never removes planning artifacts; cleanup belongs to the user.
 - Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the prompt contract and Architect's pre/post Git invariant checks aligned.
 - Keep `codex/README.md` in sync when changing skills, custom agents, lifecycle rules, permissions, or model defaults.
 - Remind users to reload Codex after changing skills or custom agents.
