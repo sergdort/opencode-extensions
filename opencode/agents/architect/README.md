@@ -15,7 +15,7 @@ Use `/plan-feature` to select Plan, then `/start-work` to select Architect and e
   -> /start-work approves the disclosed plan and selects Architect
   -> save the reviewed plan to plan.md if needed
   -> choose next coherent phase
-  -> route Terra or Luna just in time
+  -> route the complex or bounded Developer just in time
   -> Developer focused proof and local task commit
   -> Architect submission review, corrections, and acceptance
   -> full review and QA
@@ -29,7 +29,7 @@ The plan's architecture is binding; its provisional details are not. Developers 
 Generated agents in `generated/current/opencode/agents/`:
 
 - `architect.md`: primary orchestrator, integrator, and reviewer
-- `developer.md`: Terra-high Developer for uncertain, cross-layer, stateful, debugging-heavy, or weakly verified work
+- `developer.md`: Sol-high Developer for unresolved design, uncertain debugging, and verified working patterns
 - `developer-luna.md`: Luna-max Developer for bounded work with stable behavior and direct automated verification
 
 Both Developers support plan-based implementation inside `/start-work`, where the plan's architecture rules bind them, and direct work, where a self-contained brief is the contract. Direct mode supports follow-up sessions, QA findings, and ad hoc fixes dispatched from Architect or any other agent, with the same verdict protocol and Git limits.
@@ -70,9 +70,11 @@ Settled means no silent change, not immutable. When implementation evidence disp
 Architect selects the next phase from the plan and current code. It chooses the Developer immediately before dispatch:
 
 - Use Luna only when behavior, ownership, scope, and verification are bounded and predictable.
-- Use Terra when any boundary is uncertain or the work needs broad reasoning.
+- Use the complex Developer when contracts, ownership, state transitions, integration, or verification need implementation decisions.
+- When useful, have the complex Developer establish and verify a small working slice. After accepting it, give Luna the reference paths, constraints, remaining behavior, and check commands.
+- Send already bounded work directly to Luna. Work across layers can qualify when the pattern is proven. An existing scaffold alone does not qualify; reassess before every task.
 - If either Developer returns retryable `INCOMPLETE`, Architect changes the brief, strategy, or tool path without creating workflow state. Architect stops and reports a non-retryable technical blocker after one credible alternate path fails.
-- If Luna returns `NEEDS_TERRA`, Architect sends the evidence directly to Terra.
+- If Luna returns `NEEDS_COMPLEX`, Architect sends the evidence directly to the complex Developer.
 - If a Developer returns `NEEDS_DECISION`, Architect validates that a real user decision is required.
 
 Every task brief carries the architecture slice, not just the goal. Developers run focused proof and affected regression checks. Architect reviews correctness, tests, and design for every submission, then reviews corrections incrementally. Development, builds, tests, and runtime actions run sequentially. Independent read-only research and reviews may run concurrently.
@@ -156,7 +158,7 @@ For global config, use an absolute path to the installed `ARCHITECT_INSTRUCTIONS
 
 ### Plan Agent Config
 
-Merge `agent.plan.permission.task` from [the example config](opencode.architect.example.json) into the existing OpenCode config. It denies general delegation, then allows Explore, Oracle, Contrarian, and optional GitHub Librarian. Preserve the Plan agent's native file and shell restrictions; do not grant it implementation permissions. The link helper does not edit config.
+Merge the Plan model, variant, and `agent.plan.permission.task` from [the example config](opencode.architect.example.json) into the existing OpenCode config. It denies general delegation, then allows Explore, Oracle, Contrarian, and optional GitHub Librarian. Preserve the Plan agent's native file and shell restrictions; do not grant it implementation permissions. The link helper does not edit config.
 
 ## Agent Dependencies
 
@@ -178,15 +180,15 @@ Agent definitions omit `model` and `variant`. Configure role routing in global `
 
 Recommended routes:
 
-- Architect: `openai/gpt-5.6-sol`, `high`
-- Terra Developer: `openai/gpt-5.6-terra`, `high`
-- Luna Developer: `openai/gpt-5.6-luna`, `max`
+- Plan and Architect: `openai/gpt-6-sol`, `high`
+- Complex Developer: `openai/gpt-6-sol`, `high`
+- Luna Developer: `openai/gpt-6-luna`, `max`
 - Explore: OpenCode built-in, with `openai/gpt-5.6-terra`, `low` as the recommended override
-- Contrarian: `openai/gpt-5.6-sol`, `xhigh`
+- Oracle and Contrarian: `openai/gpt-6-astra`, `xhigh`
 
 Merge the `agent` block from `opencode.architect.example.json` into your global or project config. Edit routes to match available models and variants.
 
-Architect chooses Luna only for a bounded immediate phase with direct verification. Terra remains the default when evidence is incomplete. Routing is not fixed in `plan.md` and can change between phases.
+Architect chooses Luna only for a bounded immediate task with direct verification. The complex Developer remains the default when evidence is incomplete. Routing is not fixed in `plan.md` and can change between tasks.
 
 ## Usage
 

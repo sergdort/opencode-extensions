@@ -182,8 +182,8 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "developer",
-      "description": "Implement one coherent task or focused fix. Submit task-only local commits when authorized.",
-      "model": "gpt-5.6-terra",
+      "description": "Resolve uncertain implementation and establish verified working patterns. Submit task-only local commits when authorized.",
+      "model": "gpt-6-sol",
       "model_reasoning_effort": "high",
       "sandbox_mode": "workspace-write"
     },
@@ -214,7 +214,7 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "developer_luna",
-      "model": "gpt-5.6-luna",
+      "model": "gpt-6-luna",
       "model_reasoning_effort": "max",
       "sandbox_mode": "workspace-write",
       "description": "Implement one bounded, directly verifiable task. Escalate uncertain work to the complex Developer."
@@ -243,7 +243,7 @@ export const entries = [
     "metadata": {
       "name": "contrarian",
       "description": "Read-only adversarial stress-test for one specific decision during feature planning, execution, or an explicit user request. Use when an uncertain, hard-to-reverse, or cross-component claim needs a challenge.",
-      "model": "gpt-5.6",
+      "model": "gpt-6-astra",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
     },
@@ -267,7 +267,7 @@ export const entries = [
     "metadata": {
       "name": "oracle",
       "description": "Read-only review of every feature plan before approval, or a second opinion during execution or an explicit user request. Check correctness, missing cases, repository fit, and verification.",
-      "model": "gpt-5.6",
+      "model": "gpt-6-astra",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
     },

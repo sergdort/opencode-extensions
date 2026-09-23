@@ -56,14 +56,14 @@ A controlled replacement in the temporary project copies the identical Oracle TO
 The 'gpt-5.6' model is not supported when using Codex with a ChatGPT account.
 ```
 
-Trace: `codex-regular-oracle.jsonl`. No other role or model is substituted. This separates the symlink loading failure from the account/model limitation. The production model defaults remain unchanged pending a user decision.
+Trace: `codex-regular-oracle.jsonl`. No other role or model is substituted. This separates the symlink loading failure from the account/model limitation. At the time of this check, production model defaults remained unchanged pending a user decision.
 
 The [official custom-agent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents) specifies standalone TOML files and their required fields. The [configuration documentation](https://learn.chatgpt.com/docs/config-file/config-basic) states that project configuration layers require trust. These documents do not establish that symlinked role files work at spawn time. The OpenAI Docs skill guided the native configuration checks; runtime observations above determine the remaining limitation.
 
 ## Remaining Work
 
 - Decide how to install generated Codex agent TOML files without the failing file symlinks. Regular generated files are a demonstrated loading alternative, not yet an approved installation change.
-- Resolve Oracle and Contrarian model availability. Both retain the old `gpt-5.6` default; only Oracle's runtime failure was exercised.
+- Recheck Oracle and Contrarian model availability. The September 23 update selects `gpt-6-astra` / xhigh for both; the runtime evidence above covers only Oracle with the former `gpt-5.6` default. Also verify the new Sol and Luna Developer defaults.
 - Run successful Oracle review, a small disposable phase workflow, task-only Developer submissions, protected-index checks, and correction/resume proof. B5, B6, and the remaining B7 success path are not proven.
 - Recheck installation ownership and update behavior for any revised native installation method.
 - Remove legacy executable sources only after native migration is verified.

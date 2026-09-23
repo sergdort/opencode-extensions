@@ -16,7 +16,7 @@ OpenCode packages live under `opencode/`:
 
 - `opencode/link-global.sh`: opt-in global symlink helper for the core OpenCode setup.
 - `opencode/commands/`: command documentation and the unchanged Librarian prompt. Core commands are generated into `generated/current/opencode/commands/`.
-- `opencode/agents/architect/`: persistent primary orchestrator plus Terra and Luna developer profiles and a contrarian agent for plan-driven feature work; local discovery uses OpenCode's built-in Explore agent.
+- `opencode/agents/architect/`: persistent primary orchestrator plus complex and bounded Developer profiles and a contrarian agent for plan-driven feature work; local discovery uses OpenCode's built-in Explore agent.
 - `opencode/agents/oracle/`: read-only second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
 

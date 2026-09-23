@@ -1,6 +1,6 @@
 # Codex Workflow
 
-> Migration is pending a native installation decision. The tested CLI rejects symlinked agent TOML files at spawn time. The regular-file control then rejects the existing Oracle model `gpt-5.6`. Do not run the new link helper until these checks pass. See [runtime evidence](../docs/core-generation-proof.md).
+> Migration is pending a native installation decision. The tested CLI rejects symlinked agent TOML files at spawn time. The regular-file control rejected the former Oracle model `gpt-5.6`. The GPT-6 defaults below still need a fresh runtime check. Do not run the new link helper until these checks pass. See [runtime evidence](../docs/core-generation-proof.md).
 
 Codex uses the same canonical procedures as OpenCode. Native templates provide manual-only skills and custom spawned agents. Generated native files contain the complete procedure; there is no runtime canonical-file include.
 
@@ -56,6 +56,8 @@ Native Plan mode is optional for `$plan-feature`; the skill does not switch mode
 
 Use `$plan-feature` to revise an existing plan for the same feature. During implementation, Architect maintains the plan as evidence changes. A conversational approval alone does not start execution. There is no separate `$architect` entry, `$decompose`, ticket queue, or `Ticket:` trailer protocol. The helper removes only retired skill links owned by this checkout; inspect old copied skills manually.
 
+Architect routes by unresolved decisions and credible verification. The complex Developer can establish a small working slice with focused proof, then the bounded Developer extends the accepted pattern. Its brief includes reference paths, constraints, remaining behavior, and check commands. Already bounded work goes directly to the bounded Developer. Work across layers can qualify when the pattern is proven; scaffolding alone is not enough. Luna returns `NEEDS_COMPLEX` when design or debugging becomes uncertain. Architect reassesses before each task.
+
 Developers may submit task-owned local commits after focused proof when repository policy and the user permit them. They preserve unrelated working-tree content and index entries. Architect reviews and directs corrections; it does not commit product changes. Development and verification run sequentially. The same Developer resumes corrections when available.
 
 The workflow uses `plan.md`, Git, and the working tree. The plan contains product intent, constraints, design decisions, proof strategy, and execution evidence. No decision brief is required. It never removes planning artifacts automatically; cleanup belongs to the user.
@@ -76,12 +78,12 @@ Custom agents:
 
 | Name | Purpose | Default model / effort |
 |---|---|---|
-| `developer` | Complex or uncertain implementation | `gpt-5.6-terra` / high |
-| `developer_luna` | Bounded, directly verifiable implementation | `gpt-5.6-luna` / max |
-| `oracle` | Read-only plan and implementation advice | `gpt-5.6` / xhigh |
-| `contrarian` | Focused read-only challenge to a design decision | `gpt-5.6` / xhigh |
+| `developer` | Complex or uncertain implementation | `gpt-6-sol` / high |
+| `developer_luna` | Bounded, directly verifiable implementation | `gpt-6-luna` / max |
+| `oracle` | Read-only plan and implementation advice | `gpt-6-astra` / xhigh |
+| `contrarian` | Focused read-only challenge to a design decision | `gpt-6-astra` / xhigh |
 
-The main thread keeps its selected model. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
+Select `gpt-6-sol` with `high` reasoning for planning and Architect execution. The main thread keeps its selected model; skills do not switch it. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
 
 Planning uses the shared `show-me` skill and requires Oracle review. A warranted Contrarian challenge must be resolved before approval. Optional Librarian and repository verification tools do not become core dependencies.
 

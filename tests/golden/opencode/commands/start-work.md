@@ -40,20 +40,25 @@ Continue until the required behavior works, a valid user decision is needed, or 
 
 1. Select the next coherent phase from the plan and current repository evidence. Do not pre-cut the remaining plan into tasks.
 2. Select one coherent, verifiable task that advances runnable behavior or resolves a risky assumption. Size by responsibility and credible proof, not a changed-line budget.
-3. Choose `developer-luna` only when behavior, ownership, scope, and verification are all bounded and predictable. Use `developer` for uncertain, cross-layer, stateful, lifecycle-sensitive, debugging-heavy, broad, or weakly verified work.
+3. Select the Developer by unresolved decisions and credible verification, not file count or position in the phase:
+   - Use `developer` when implementation must establish contracts, ownership, state transitions, or an unfamiliar integration, or requires uncertain debugging or proof design.
+   - When useful, assign `developer` the smallest working slice that resolves those uncertainties and provides a verified reference for follow-up work. Empty interfaces and TODOs alone do not establish the pattern.
+   - After accepting that submission, use `developer-luna` for follow-up tasks whose behavior, boundaries, implementation pattern, and verification are established. Extending a proven pattern across layers can qualify.
+   - Send already bounded, predictable, directly verifiable work to `developer-luna` immediately. Do not require a preliminary complex-Developer task.
+   - Reassess before every task. An existing scaffold alone does not qualify work for the bounded Developer. Return to `developer` when new evidence requires design changes or uncertain debugging.
 4. Record starting `HEAD`, protected worktree content identities, and protected index entries (object IDs, modes, and stages). Include untracked content and symlink targets where applicable. Status alone cannot detect overwrites. Pass the protection record to the Developer. Do not make protective backups, stashes, or automatic restorations.
 5. Run one Developer task at a time. Serialize code changes, builds, tests, and simulator operations. Independent read-only research and reviews may run concurrently. Start a fresh Developer for a new independent task; resume the same Developer for corrections when available. Pass the plan path and a concise brief containing:
    - Phase objective and required behavior, with the plan's behavior IDs.
    - **The architecture slice**: the plan's rows for every component this phase touches, including `Owns`, `Does not own`, and `May depend on`; the settled interfaces it must honor; and the transition owner, effects, and cancellations when the phase touches a state machine. Copy these rules into the brief instead of only naming the plan, and mark which interfaces are provisional.
    - Settled constraints and explicit non-goals.
-   - Likely starting paths or symbols.
+   - Likely starting paths or symbols. For a handoff to the bounded Developer, include the accepted reference implementation, constraints it must preserve, remaining behavior, and focused check commands. Do not leave unresolved design decisions in a completion brief.
    - Expected focused proof and affected earlier checks, with commands. Reuse evidence whose relevant source, configuration, dependencies, and environment are unchanged. Do not assign the final full gate to the Developer.
    - Workflow-owned changes the task may correct, protected worktree and index content, and local task-commit authority subject to repository policy.
 6. After return, inspect every submitted commit from starting `HEAD`, plus remaining tracked and untracked changes. Compare protected content and index entries with the protection record. Stop on unexpected changes or unclear ownership. Report affected paths without automatically restoring, unstaging, stashing, or resetting anything.
 7. Process the verdict:
    - `DONE`: treat the result as submitted. Run the submission review before accepting it.
    - `INCOMPLETE`: inspect the failure class, retryability, worktree disposition, and next action. Continue with a corrected brief, changed strategy, or different tool path when retryable. When a non-retryable technical or environment blocker remains after a credible alternate path, stop and report the evidence without inventing a product decision.
-   - `NEEDS_TERRA`: inspect which partial changes are valid, then dispatch `developer` directly with the same objective and new evidence. Do not return to planning.
+   - `NEEDS_COMPLEX`: inspect which partial changes are valid, then dispatch `developer` directly with the same objective and new evidence. Do not return to planning.
    - `NEEDS_DECISION`: require one exact decision question, then classify it.
      - A settled architecture rule the phase cannot meet, or a material change to a component with no architecture row: judge the evidence. When it is sound and the change stays internal and reversible, update `plan.md` yourself and redispatch with the corrected architecture slice. When the change touches product behavior or a hard-to-reverse boundary, ask the user. When the evidence does not hold, send a correction brief that restates the rule. Never redispatch an unchanged brief against a rule the Developer just reported as blocking.
      - A product conflict, hard-to-reverse decision, material scope change, or safety risk: ask the user.

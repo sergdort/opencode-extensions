@@ -138,7 +138,7 @@ Settled means no silent change, not immutable. `$start-work` updates the plan wh
 - Order phases around runnable vertical slices or focused proofs of risky assumptions.
 - Keep each phase small enough for Architect to judge its architecture conformance in one pass.
 - Reference exact component names and behavior IDs. `$start-work` rejects unresolved references.
-- Do not assign the complex or bounded Developer in the plan. Architect selects the route immediately before each phase.
+- Do not assign the complex or bounded Developer in the plan. Architect selects the route immediately before each task.
 
 ## Review And Handoff
 

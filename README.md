@@ -2,7 +2,7 @@
 
 File-based agent workflows for OpenCode and Codex, plus independent Claude Code and The Last Harness packages.
 
-> Migration status: implementation is not ready for installation. Codex 0.153.0 discovers symlinked custom-agent TOML files but rejects them when spawning. The identical regular-file control passes file loading, then the existing Oracle model `gpt-5.6` is rejected by this account. Native installation and model choices remain unresolved. Do not run the new link helpers yet. Legacy sources remain in place until migration is verified. See [runtime evidence](docs/core-generation-proof.md).
+> Migration status: implementation is not ready for installation. Codex 0.153.0 discovers symlinked custom-agent TOML files but rejects them when spawning. The identical regular-file control passes file loading, then the former Oracle model `gpt-5.6` is rejected by this account. GPT-6 defaults are now selected; native installation and fresh model runtime checks remain unresolved. Do not run the new link helpers yet. Legacy sources remain in place until migration is verified. See [runtime evidence](docs/core-generation-proof.md).
 
 OpenCode and Codex share canonical procedures. Nunjucks templates generate complete native files. Agents do not need to follow a runtime `@file` reference to load the canonical procedure.
 

@@ -75,7 +75,7 @@ The agent definition intentionally omits `model` and `variant`. To use the recom
   "$schema": "https://opencode.ai/config.json",
   "agent": {
     "oracle": {
-      "model": "openai/gpt-5.6-sol",
+      "model": "openai/gpt-6-astra",
       "variant": "xhigh"
     }
   }
