@@ -2,7 +2,7 @@
 
 File-based agent workflows for OpenCode and Codex, plus independent Claude Code and The Last Harness packages.
 
-> Migration status: implementation is not ready for installation. Codex 0.153.0 discovers symlinked custom-agent TOML files but rejects them when spawning. The identical regular-file control passes file loading, then the former Oracle model `gpt-5.6` is rejected by this account. GPT-6 defaults are now selected; native installation and fresh model runtime checks remain unresolved. Do not run the new link helpers yet. Legacy sources remain in place until migration is verified. See [runtime evidence](docs/core-generation-proof.md).
+> Codex installs custom-agent TOML files as managed regular copies because symlinked agent files fail at spawn time. All four core roles passed a spawn smoke test with the GPT-6 defaults. Full workflow verification remains separate. See [runtime evidence](docs/core-generation-proof.md).
 
 OpenCode and Codex share canonical procedures. Nunjucks templates generate complete native files. Agents do not need to follow a runtime `@file` reference to load the canonical procedure.
 
@@ -35,7 +35,7 @@ npm ci
 
 To link only one harness, use `./opencode/link-global.sh` or `./codex/link-global.sh`. Each accepts `--dry-run` and `--force`. The root helper also accepts `--harness opencode|codex|both`.
 
-All entry points regenerate **both** native payloads. Harness selection limits destination-link edits only. It also updates content used by the other harness if that harness already links to this checkout.
+All entry points regenerate **both** native payloads. Harness selection limits destination installation edits. Generation also updates content used by existing links in the other harness. Codex agent copies update only when Codex is selected; generation alone or an OpenCode-only run does not refresh them.
 
 The scripts do not install dependencies, edit harness config, or change unrelated files. Add `--with-review` to link OpenCode's optional review command when a read-only `review` agent is installed. Add `--with-librarian` for Codex's optional Librarian. OpenCode preserves its existing Librarian links.
 
@@ -71,13 +71,15 @@ Native mechanisms still differ. OpenCode uses a persistent primary agent and com
 
 The helper recognizes exact legacy and generated links owned by this checkout, including dangling legacy links. It removes owned obsolete `decompose` links and the retired Codex `architect` skill link. It reports obsolete copies for manual inspection.
 
-The helpers link both shared skills directly from `skills/`. An existing personal `show-me` skill is a named conflict and is preserved by default. Existing regular files require explicit `--force` to replace. Directories and foreign links are never removed by force. Back up and move conflicting copies or links manually, then rerun. Old installed links to removed source paths need this migration before the next agent session.
+The helpers link both shared skill directories directly from `skills/`. Codex discovers directory links but skips a symlinked `SKILL.md`. For an older install with a real skill directory containing a `SKILL.md` link, move that directory outside all skill search paths, then rerun the helper. The helper preserves those directories, including with `--force`. An existing personal `show-me` skill is a named conflict and is preserved by default. Unmanaged or edited regular files require explicit `--force` to replace. Directories and foreign links are never removed by force. Back up and move conflicting copies or links manually, then rerun. Old installed links to removed source paths need this migration before the next agent session.
+
+Codex agent files include TOML comments with their source path and content hash. The helper updates unchanged copies owned by this checkout and migrates owned agent symlinks to copies. It preserves edited copies and files owned by another checkout unless `--force` explicitly permits regular-file replacement. Skill directories remain symlinks.
 
 Generation validates the full payload, publishes an immutable content-addressed release, and atomically switches `generated/current`. Failed rendering leaves the prior release active. A generation/link lock excludes competing runs. Remove a stale lock only after confirming no invocation is active.
 
 Installation across destination directories is not atomic. If it fails midway, inspect the reported changed and pending paths and rerun before reloading either harness. The scripts retain published releases and abandoned temporary entries. They report unpublished temporary entries for manual cleanup; they never prune releases automatically.
 
-To uninstall, inspect the named installed links and unlink only those owned by this checkout. Keep unrelated files and any manually configured settings.
+To uninstall, inspect the named installed links and unlink only those owned by this checkout. For Codex agent copies, check the source comment and preserve any edits before removing the named files. Keep unrelated files and any manually configured settings.
 
 ## Tests And Golden Files
 

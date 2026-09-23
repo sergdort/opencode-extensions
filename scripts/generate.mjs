@@ -8,7 +8,7 @@ try {
   const root = fs.realpathSync(fileURLToPath(new URL('..', import.meta.url)));
   const hash = withLock(root, () => publish(root, render(root)));
   console.log(`Generated both harnesses: ${hash}`);
-  console.log('Restart OpenCode and reload Codex if linked to this checkout.');
+  console.log('Rerun the Codex helper to refresh installed agent copies. Restart OpenCode and reload Codex after updates.');
 } catch (error) {
   console.error(error.code === 'ERR_MODULE_NOT_FOUND' ? 'Missing dependencies. Run npm ci in the repository, then retry.' : error.message);
   process.exitCode = 1;

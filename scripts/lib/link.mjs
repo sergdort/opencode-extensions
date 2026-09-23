@@ -53,7 +53,24 @@ function owned(action) {
   return action.owners.some(owner => target === owner || physical(target) === physical(owner));
 }
 
-export function installation(root, options = {}, environment = process.env) {
+const digest = content => createHash('sha256').update(content).digest('hex');
+
+// Keep ownership and the last installed content hash in TOML comments, not a sidecar.
+function managedCopy(source, body) {
+  return `# Managed by opencode-extensions
+# Source: ${JSON.stringify(source)}
+# Content-SHA256: ${digest(body)}
+
+${body}`;
+}
+
+function unchangedCopy(action) {
+  const text = fs.readFileSync(action.destination, 'utf8');
+  const match = /^# Managed by opencode-extensions\n# Source: (.+)\n# Content-SHA256: ([a-f0-9]{64})\n\n([\s\S]*)$/.exec(text);
+  return Boolean(match && match[1] === JSON.stringify(action.source) && digest(match[3]) === match[2]);
+}
+
+export function installation(root, options = {}, environment = process.env, files = render(root)) {
   const home = environment.HOME || os.homedir();
   const selected = options.harness ?? 'both';
   if (!['both', 'opencode', 'codex'].includes(selected)) throw new Error(`Unknown harness: ${selected}`);
@@ -69,10 +86,10 @@ export function installation(root, options = {}, environment = process.env) {
     bases.agents = destinationRoot(environment.CODEX_AGENTS_DIR || path.join(home, '.codex/agents'), root, home);
   }
   const actions = new Map();
-  function add(base, relative, source, legacy = [], remove = false) {
+  function add(base, relative, source, legacy = [], remove = false, body) {
     const destination = path.join(base, relative);
     const owners = [source, ...legacy.map(p => path.join(root, p))];
-    const action = { base, destination, source, owners, remove };
+    const action = { base, destination, source, owners, remove, content: body === undefined ? undefined : managedCopy(source, body) };
     const existing = actions.get(destination);
     if (existing && existing.source !== source) throw new Error(`Conflicting install destinations: ${destination}`);
     actions.set(destination, action);
@@ -86,7 +103,8 @@ export function installation(root, options = {}, environment = process.env) {
     if (relative.endsWith('/SKILL.md')) { relative = relative.replace(/\/SKILL.md$/, ''); output = output.replace(/\/SKILL.md$/, ''); }
     const base = entry.harness === 'opencode' ? bases.opencode : relative.startsWith('skills/') ? bases.skills : bases.agents;
     if (entry.harness === 'codex') relative = relative.replace(/^(skills|agents)\//, '');
-    add(base, relative, path.join(root, 'generated/current', output), entry.legacy ? [entry.legacy] : []);
+    add(base, relative, path.join(root, 'generated/current', output), entry.legacy ? [entry.legacy] : [], false,
+      entry.harness === 'codex' && output.startsWith('codex/agents/') ? files[output] : undefined);
   }
   for (const item of retired) {
     if ((item.harness === 'opencode' && !oc) || (item.harness === 'codex' && !cx)) continue;
@@ -95,19 +113,20 @@ export function installation(root, options = {}, environment = process.env) {
     add(base, relative, path.join(root, 'generated/current', item.harness, item.destination), [item.legacy], true);
   }
   for (const name of ['show-me', 'grill-me-architecture']) {
-    const source = path.join(root, 'skills', name, 'SKILL.md');
-    if (!stat(source)?.isFile()) throw new Error(`Missing bundled shared skill: ${source}`);
-    if (oc) add(bases.sharedOpenCode, `${name}/SKILL.md`, source);
-    if (cx) add(bases.skills, `${name}/SKILL.md`, source);
+    const source = path.join(root, 'skills', name);
+    if (!stat(path.join(source, 'SKILL.md'))?.isFile()) throw new Error(`Missing bundled shared skill: ${source}/SKILL.md`);
+    if (oc) add(bases.sharedOpenCode, name, source);
+    if (cx) add(bases.skills, name, source);
   }
-  // Preserve the existing optional-package install behavior; do not generate its sources.
+  // Optional-package sources remain independent of generation.
   if (oc) {
     add(bases.opencode, 'agents/github-librarian.md', path.join(root, 'opencode/agents/librarian/agents/github-librarian.md'));
     add(bases.opencode, 'commands/github-librarian.md', path.join(root, 'opencode/commands/github-librarian.md'));
   }
   if (cx && options.withLibrarian) {
     add(bases.skills, 'github-librarian', path.join(root, 'codex/optional/librarian/skills/github-librarian'));
-    add(bases.agents, 'github_librarian.toml', path.join(root, 'codex/optional/librarian/agents/github_librarian.toml'));
+    const source = path.join(root, 'codex/optional/librarian/agents/github_librarian.toml');
+    add(bases.agents, 'github_librarian.toml', source, [], false, fs.readFileSync(source, 'utf8'));
   }
   const list = [...actions.values()];
   for (const action of list) {
@@ -119,13 +138,16 @@ export function installation(root, options = {}, environment = process.env) {
     inspectParents(action);
     action.identity = identity(action.destination);
     const info = stat(action.destination);
+    const write = action.content === undefined ? 'link' : 'copy';
     if (action.remove) {
       action.operation = !info ? 'skip' : owned(action) ? 'remove' : 'report';
-    } else if (!info) action.operation = 'link';
+    } else if (!info) action.operation = write;
     else if (owned(action)) {
       const target = path.resolve(path.dirname(action.destination), fs.readlinkSync(action.destination));
-      action.operation = target === action.source ? 'current' : 'link';
-    } else if (info.isFile() && options.force) action.operation = 'link';
+      action.operation = write === 'copy' ? 'copy' : target === action.source ? 'current' : 'link';
+    } else if (info.isFile() && write === 'copy' && unchangedCopy(action)) {
+      action.operation = fs.readFileSync(action.destination, 'utf8') === action.content ? 'current' : 'copy';
+    } else if (info.isFile() && options.force) action.operation = write;
     else throw new Error(`Preserve conflicting destination: ${action.destination}. Regular files require --force; directories and foreign links require explicit manual migration.`);
     if (!action.remove && !inside(path.join(root, 'generated/current'), action.source) && !stat(action.source)) {
       throw new Error(`Missing optional source: ${action.source}`);
@@ -149,15 +171,16 @@ export function applyInstallation(actions, checkpoint = () => {}, report = conso
         directory(path.dirname(action.destination));
         const temporary = path.join(path.dirname(action.destination), `.agent-link-${randomUUID()}`);
         try {
-          fs.symlinkSync(action.source, temporary);
+          if (action.operation === 'copy') fs.writeFileSync(temporary, action.content, { flag: 'wx', mode: 0o600 });
+          else fs.symlinkSync(action.source, temporary);
           fs.renameSync(temporary, action.destination);
         } finally { if (stat(temporary)) fs.unlinkSync(temporary); }
       }
       changed.push(action.destination);
-      report(`${action.operation === 'remove' ? 'Removed owned obsolete link' : 'Linked'}: ${action.destination}`);
+      report(`${action.operation === 'remove' ? 'Removed owned obsolete link' : action.operation === 'copy' ? 'Copied' : 'Linked'}: ${action.destination}`);
     }
   } catch (error) {
-    const pending = actions.filter(a => ['link', 'remove'].includes(a.operation) && !changed.includes(a.destination)).map(a => a.destination);
+    const pending = actions.filter(a => ['link', 'copy', 'remove'].includes(a.operation) && !changed.includes(a.destination)).map(a => a.destination);
     throw new Error(`${error.message}\nInstallation incomplete. Changed: ${changed.join(', ') || 'none'}. Pending: ${pending.join(', ') || 'none'}. Rerun before reloading either harness.`);
   }
   return changed;
@@ -168,15 +191,15 @@ export function generateAndLink(root, options = {}, environment = process.env, r
   const run = () => {
     checkPublicationRoot(root);
     const files = render(root);
-    const actions = installation(root, options, environment);
+    const actions = installation(root, options, environment, files);
     if (options.dryRun) {
-      report('Dry run: validate and regenerate BOTH payloads; selection limits global link edits only.');
+      report('Dry run: validate and regenerate BOTH payloads; selection limits global installation edits only.');
       for (const action of actions) report(`${action.operation}: ${action.destination} -> ${action.source}`);
     } else {
       publish(root, files);
       applyInstallation(actions, undefined, report);
     }
-    report('Generation updates BOTH payloads. Restart OpenCode and reload Codex if already linked to this checkout.');
+    report('Generation updates BOTH payloads. Rerun the Codex helper after source updates to refresh agent copies. Restart OpenCode and reload Codex after installation.');
     return { files, actions };
   };
   // A dry run neither publishes output nor creates a lock or destination directory.

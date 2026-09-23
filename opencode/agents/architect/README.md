@@ -121,7 +121,7 @@ npm ci
 
 The helper generates both native payloads, then links OpenCode core agents, commands, routing instructions, Librarian, and the shared `show-me` and standalone grill skills. It does not edit `opencode.json`. Add `--with-review` only when an optional read-only `review` agent is installed.
 
-After source updates, rerun the helper. Restart OpenCode and reload any Codex installation linked to this checkout. Selection limits link edits, not shared content publication.
+After source updates, rerun the helper. If Codex is also installed, rerun its helper to refresh agent copies. Restart OpenCode and reload Codex. Selection limits installation edits, not shared content publication.
 
 Destination overrides are `OPENCODE_CONFIG_DIR` (default `$XDG_CONFIG_HOME/opencode`, or `~/.config/opencode`) and `AGENTS_SKILLS_DIR` (default `~/.agents/skills`).
 

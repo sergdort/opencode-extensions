@@ -46,7 +46,7 @@ cp "$ORACLE_DIR/agents/oracle.md" .opencode/agents/oracle.md
 
 No project config changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. Install the Architect package as well when you want scoped Oracle delegation during its workflow.
 
-The core helper `opencode/link-global.sh` generates and links Oracle with the workflow. Rerun it after source updates. Generation updates both payloads; restart OpenCode and reload any already-linked Codex installation. See the root README for migration and safety rules.
+The core helper `opencode/link-global.sh` generates and links Oracle with the workflow. Rerun it after source updates. Generation updates both payloads. For an existing Codex installation, rerun its helper to refresh agent copies. Then restart OpenCode and reload Codex. See the root README for migration and safety rules.
 
 Edit Oracle's shared charter in `canonical/roles/oracle.md` and its native frontmatter in `templates/opencode/agents/oracle.md.njk`. Regenerate after editing. Do not edit the generated file.
 

@@ -4,7 +4,7 @@ This repo packages lightweight agent extensions for four harnesses — OpenCode 
 
 ## Project Shape
 
-- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh`, `codex/link-global.sh`, and `tlh/link-global.sh` are opt-in helpers for global symlink setups.
+- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh`, `codex/link-global.sh`, and `tlh/link-global.sh` are opt-in helpers for global setups. OpenCode and TLH use symlinks; Codex uses skill-directory symlinks and managed regular agent copies.
 - Do not add plugins, installers, hidden config mutation, subprocess harnesses, automatic model routing, or runtime state machines unless the user explicitly chooses that direction.
 - Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code; `~/.agents/skills` + `~/.codex/agents` / project `.agents/skills` + `.codex/agents` for Codex; `~/.the-last-harness/agent/prompts/` / project `.pi/prompts/` for The Last Harness).
 - OpenCode and Codex share `canonical/` procedure bodies. Native templates and `scripts/manifest.mjs` adapt commands, skill metadata, role names, models, permissions, and inputs. Claude Code, TLH, and Librarian sources remain independent; do not migrate them as part of core unification.
@@ -26,7 +26,7 @@ The Claude Code package lives under `claude/`:
 
 The Codex package lives under `codex/`:
 
-- `codex/link-global.sh`: opt-in global symlink helper for the core Codex setup, with an explicit optional Librarian flag.
+- `codex/link-global.sh`: opt-in global setup helper for the core Codex setup, with an explicit optional Librarian flag.
 - `generated/current/codex/skills/`: five manual-only workflow and utility skills.
 - `generated/current/codex/agents/`: complex and bounded Developer, Oracle, and Contrarian profiles.
 - `codex/optional/librarian/`: optional GitHub research skill and custom agent.
@@ -50,8 +50,9 @@ Shared skills live under `skills/`:
 - Validate missing inputs, mappings, native syntax, and manual-only policy before publishing. Serialize Codex instructions with the TOML library and test the round trip.
 - Publish a complete immutable release and atomically switch `generated/current`. Share one generation/link lock. Never silently repair or prune published releases.
 - Link helpers preflight selected named destinations before publication. Preserve foreign links, directories, and unrelated files. Force applies only to regular-file conflicts. Retired links require exact ownership in this checkout.
-- Every entry point regenerates both payloads. Harness selection limits link edits only. Tell users to rerun after source updates, then restart OpenCode and reload Codex if linked.
-- Keep `skills/show-me/` and `skills/grill-me-architecture/` as the shared sources and link them directly. Keep optional packages outside generation.
+- Every entry point regenerates both payloads. Harness selection limits installation edits. Codex agent copies refresh only when Codex is selected. Tell users to rerun after source updates, then restart OpenCode and reload Codex.
+- Codex agent copies include source-path and content-hash comments. Update only unchanged copies owned by this checkout; require explicit force for edited or unmanaged regular files. Migrate owned agent symlinks to copies.
+- Keep `skills/show-me/` and `skills/grill-me-architecture/` as the shared sources and link their directories directly. Keep optional packages outside generation.
 
 ## File Conventions — Shared Skills (`skills/`)
 

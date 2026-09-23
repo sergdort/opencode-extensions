@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url';
 
 const usage = `Usage: link-global.sh [--harness both|opencode|codex] [--dry-run] [--force] [--with-review] [--with-librarian]
 
-Generate BOTH core payloads and link the selected harness destinations.
-Selection limits link edits, not updates to already-linked generated content.
+Generate BOTH core payloads and install the selected harness destinations.
+Selection limits installation edits, not updates to already-linked generated content.
+Codex agents are managed regular copies; rerun with Codex selected to refresh them.
 Run npm ci explicitly first. No dependency installation or config editing occurs.
 --force replaces conflicting regular files only, never directories or foreign links.
 --with-review links OpenCode review-work (requires an existing read-only review agent).

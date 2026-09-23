@@ -2,7 +2,7 @@
 
 Date: 2026-09-06
 Behavior baseline: `8162c928aabe5da27e7e491748d608cf32152fb6`
-Status: generator verified; native Codex installation blocked; final acceptance pending
+Historical status on September 6: generator verified; native Codex installation blocked; final acceptance pending. See the September 23 update below.
 
 ## Automated Checks
 
@@ -60,11 +60,27 @@ Trace: `codex-regular-oracle.jsonl`. No other role or model is substituted. This
 
 The [official custom-agent documentation](https://learn.chatgpt.com/docs/agent-configuration/subagents) specifies standalone TOML files and their required fields. The [configuration documentation](https://learn.chatgpt.com/docs/config-file/config-basic) states that project configuration layers require trust. These documents do not establish that symlinked role files work at spawn time. The OpenAI Docs skill guided the native configuration checks; runtime observations above determine the remaining limitation.
 
+## September 23 Installation And Spawn Verification
+
+The user approved regular-file installation after a controlled Oracle test: the installed symlink failed, while identical TOML contents in a regular file spawned and returned successfully. The control restored the original link before the permanent fix.
+
+The Codex helper now installs managed regular TOML copies and retains directory symlinks for skills. Source-path and content-hash comments identify unchanged copies from this checkout. Existing owned agent symlinks migrate automatically. Edited copies, foreign links, and directories remain protected; explicit force applies only to regular files.
+
+The production helper migrated all four installed core agent links. Each named role then spawned and returned the requested acknowledgement without tools or file edits:
+
+| Role | Installed model / effort | Result |
+|---|---|---|
+| `developer` | `gpt-6-sol` / high | `developer spawn OK.` |
+| `developer_luna` | `gpt-6-luna` / max | `developer_luna spawn OK.` |
+| `oracle` | `gpt-6-astra` / xhigh | `oracle spawn OK.` |
+| `contrarian` | `gpt-6-astra` / xhigh | `contrarian spawn OK.` |
+
+Codex skill discovery also returned enabled `show-me` and `grill-me-architecture` after migration to directory links. A symlinked `SKILL.md` inside a real directory was not discovered.
+
+`npm ci` and all 20 automated tests pass. Tests cover copy migration, unchanged reruns, source updates, user-edit protection, foreign ownership, dry runs, partial-install recovery, and optional Librarian copies. Generation alone or an OpenCode-only run leaves installed Codex agent copies unchanged; rerun the Codex helper to update them. These smoke tests establish loading and response success, not full workflow correctness.
+
 ## Remaining Work
 
-- Decide how to install generated Codex agent TOML files without the failing file symlinks. Regular generated files are a demonstrated loading alternative, not yet an approved installation change.
-- Recheck Oracle and Contrarian model availability. The September 23 update selects `gpt-6-astra` / xhigh for both; the runtime evidence above covers only Oracle with the former `gpt-5.6` default. Also verify the new Sol and Luna Developer defaults.
 - Run successful Oracle review, a small disposable phase workflow, task-only Developer submissions, protected-index checks, and correction/resume proof. B5, B6, and the remaining B7 success path are not proven.
-- Recheck installation ownership and update behavior for any revised native installation method.
 - Remove legacy executable sources only after native migration is verified.
-- Obtain final human acceptance. No repository commit was created, and no user-installed link or configuration was changed.
+- Obtain final human acceptance for the full workflow. No repository commit was created. The September 23 installation changed the named skill links and core agent files; harness config was not edited.

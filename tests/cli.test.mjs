@@ -46,6 +46,8 @@ test('scoped helpers share validation and never install dependencies', t => {
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(env.OPENCODE_CONFIG_DIR), false);
   assert.equal(fs.lstatSync(path.join(env.CODEX_SKILLS_DIR, 'bro')).isSymbolicLink(), true);
+  assert.equal(fs.lstatSync(path.join(env.CODEX_AGENTS_DIR, 'developer.toml')).isFile(), true);
+  assert.match(result.stdout, /Copied:/);
   fs.unlinkSync(path.join(root, 'node_modules'));
   const missing = run('link-global.sh', ['--dry-run']);
   assert.equal(missing.status, 1);

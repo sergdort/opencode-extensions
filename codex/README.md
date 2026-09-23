@@ -1,6 +1,6 @@
 # Codex Workflow
 
-> Migration is pending a native installation decision. The tested CLI rejects symlinked agent TOML files at spawn time. The regular-file control rejected the former Oracle model `gpt-5.6`. The GPT-6 defaults below still need a fresh runtime check. Do not run the new link helper until these checks pass. See [runtime evidence](../docs/core-generation-proof.md).
+> All four core custom agents passed a spawn smoke test with the GPT-6 defaults after installation as regular files. Skill discovery also passed. Full phase execution and correction/resume verification remain separate. See [runtime evidence](../docs/core-generation-proof.md).
 
 Codex uses the same canonical procedures as OpenCode. Native templates provide manual-only skills and custom spawned agents. Generated native files contain the complete procedure; there is no runtime canonical-file include.
 
@@ -14,11 +14,13 @@ npm ci
 ./codex/link-global.sh
 ```
 
-The helper links five manual workflow and utility skills into `~/.agents/skills` and four custom agents into `~/.codex/agents`. It also links `show-me` and the standalone `grill-me-architecture` skill directly from `skills/`. Grilling is installed for optional use; the core workflow does not require it.
+The helper links five manual workflow and utility skills into `~/.agents/skills` and copies four custom-agent TOML files into `~/.codex/agents`. It also links the `show-me` and standalone `grill-me-architecture` directories directly from `skills/`. For symlink installations, Codex requires a directory link; it skips a symlinked `SKILL.md` inside a real directory. Grilling is installed for optional use; the core workflow does not require it.
 
 Override destinations with `CODEX_SKILLS_DIR` and `CODEX_AGENTS_DIR`. Add `--with-librarian` for the unchanged optional Librarian package.
 
-After source updates, rerun the helper. It regenerates both payloads, even when only Codex links are selected. Reload Codex and restart any OpenCode installation linked to this checkout.
+After source updates, rerun the helper. It regenerates both payloads and refreshes the selected Codex agent copies. Generation alone or an OpenCode-only helper run does not update those copies. Reload Codex and restart any OpenCode installation linked to this checkout.
+
+Agent copies carry source and content-hash comments. Reruns preserve unchanged files or update them when the source changes. Edited or unmanaged files stop installation unless `--force` is supplied. Owned agent symlinks migrate to regular files automatically.
 
 The helper does not install dependencies or edit Codex config. Use `--force` only to replace conflicting regular files. Directories and links owned by another checkout require manual migration. See the root [migration and recovery rules](../README.md#migration-and-recovery).
 
