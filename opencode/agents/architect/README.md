@@ -1,113 +1,89 @@
 # OpenCode Architect Orchestrator
 
-Architect is a persistent OpenCode primary agent that executes approved plans. The built-in Plan agent handles feature planning with `show-me`, Oracle review, and a focused Contrarian challenge when warranted. Architect directs Developer subagents through implementation, final review, and QA.
+Architect is a persistent OpenCode primary agent that executes the agreed outcome. The built-in Plan agent handles planning: clarify the outcome, constraints, and what would demonstrate success, then identify a useful next step. Architect directs Developer subagents through implementation, verification, and honest handoff.
 
-Use `/plan-feature` to select Plan, then `/start-work` to select Architect and execute the disclosed plan. No manual agent switch or `/architect` command is needed. Developers submit local task commits. Architect reviews them and resumes the same Developer for corrections when available.
+Use `/plan-feature` for planning only, then `/start-work` to select Architect and execute. No manual agent switch or `/architect` command is needed. Developers submit local task commits when authorized. Architect reviews results and resumes the same Developer for corrections when available.
 
 ## Workflow
 
 ```text
 /plan-feature selects Plan
-  -> inspect repository, clarify requirements, and use show-me
-  -> draft and discuss the plan
-  -> Oracle review and focused Contrarian challenge when warranted
-  -> resolve findings and present the reviewed plan
-  -> /start-work approves the disclosed plan and selects Architect
-  -> save the reviewed plan to plan.md if needed
-  -> choose next coherent phase
-  -> route the complex or bounded Developer just in time
-  -> Developer focused proof and local task commit
-  -> Architect submission review, corrections, and acceptance
-  -> full review and QA
-  -> final human acceptance
+  -> inspect the repository and clarify outcome, constraints, success criteria
+  -> identify a useful next step (visuals and grilling only when they help)
+  -> /start-work selects Architect and executes
+  -> pick the next step from evidence and delegate to a Developer
+  -> Developer builds, adapts, verifies with the smallest credible checks
+  -> Architect reviews, directs corrections, decides when to stop
+  -> honest handoff and human acceptance
 ```
 
-The plan's architecture is binding; its provisional details are not. Developers adapt provisional details when repository evidence disagrees with the predicted implementation, and escalate a settled rule they cannot meet. Architect returns to the user only for product conflicts, hard-to-reverse decisions, material scope changes, or safety risks.
+The agreed outcome and real constraints bind the work; the implementation route is discovered by building and integrating. Developers may revise implementation choices as they learn, within user intent and safety constraints. Architect asks the user only when discovery changes desired behavior or requires a consequential trade-off, not merely because the original approach changed.
 
 ## What It Provides
 
 Generated agents in `generated/current/opencode/agents/`:
 
-- `architect.md`: primary orchestrator, integrator, and reviewer
-- `developer.md`: Sol-high Developer for unresolved design, uncertain debugging, and verified working patterns
-- `developer-luna.md`: Luna-max Developer for bounded work with stable behavior and direct automated verification
+- `architect.md`: primary orchestrator; owns intent and delegates product code
+- `developer.md`: Sol-high Developer for work with unresolved design, unfamiliar integration, or uncertain debugging
+- `developer-luna.md`: Luna-max Developer for bounded, predictable, directly verifiable work that follows an established pattern
 
-Both Developers support plan-based implementation inside `/start-work`, where the plan's architecture rules bind them, and direct work, where a self-contained brief is the contract. Direct mode supports follow-up sessions, QA findings, and ad hoc fixes dispatched from Architect or any other agent, with the same verdict protocol and Git limits.
-- `contrarian.md`: read-only adversarial review of one load-bearing decision
+Both Developers work from briefs inside `/start-work` and from self-contained direct briefs, which cover follow-up sessions, QA findings, and ad hoc fixes.
+- `contrarian.md`: read-only adversarial challenge to one decision
 
 Architect and both Developers use OpenCode's built-in Explore agent for focused read-only repository discovery.
 
 Generated commands in `generated/current/opencode/commands/`:
 
-- `plan-feature.md`: selects Plan, clarifies requirements, and creates or revises a reviewed feature plan
-- `start-work.md`: selects coherent phases, routes a Developer just in time, integrates results, and runs final review and QA
-- `review-work.md`: optional independent review of the completed implementation
+- `plan-feature.md`: planning only; clarifies the outcome and picks a useful next step
+- `start-work.md`: explicit execution through Developer delegation, verification, and honest reporting
+- `review-work.md`: optional independent review of the implementation
 
-Planning uses the shared `show-me` skill. Oracle reviews every plan before approval. Contrarian challenges a consequential uncertain decision when warranted; independent reviews can run concurrently. Technical omissions are corrected directly, while consequential product choices return to the user. Material revisions receive focused follow-up review.
-
-`grill-me-architecture` remains a standalone skill. Ask to use it when you want a deeper design interview. The planning agent can recommend it for a specific unresolved decision, but invokes it only at your request. GitHub Librarian is optional.
+Planning uses the shared `show-me` skill when a visual helps. Independent Oracle or Contrarian review is a judgment call based on uncertainty and impact, not a required step; no findings is a valid outcome. `grill-me-architecture` remains a standalone skill invoked only at your request. GitHub Librarian is optional.
 
 ## Durable State
 
-- `plan.md`: product intent, scope, constraints, design decisions, proof strategy, review baseline, and compact execution evidence, including exact known baseline failures
-- Git history: task submissions and correction commits; acceptance is recorded separately in the plan
+- `plan.md`: a lightweight durable note for continuity: outcome, constraints, decisions worth keeping, what would demonstrate success, the next step, and honest evidence. No template or ledger.
+- Git history: task submissions and correction commits
 - Working tree: active implementation
 
-No decision brief is required. Existing planning artifacts are preserved. If native planning restrictions prevent writing `plan.md`, the draft stays in the conversation or native plan file. Reviewers receive the full draft. `/start-work` saves the exact reviewed plan and review evidence before dispatch. There is no ticket queue or separate progress ledger. A fresh or compacted Architect inspects the artifacts, Git, code, tests, and runtime evidence before selecting the next phase. The plan's `Review baseline` SHA survives compaction, so the final comparison range does not have to be re-derived.
-
-## Program Design
-
-`plan.md` uses tables, real interfaces, and diagrams only where they explain a necessary relationship. Tables are normative and diagrams are explanatory.
-
-The core artifact is a component table with `Owns`, `Does not own`, and a closed `May depend on` allowlist, plus settled interfaces, state transition ownership with effects and cancellations, and a test strategy table keyed by stable behavior IDs.
-
-What is **settled** binds Developers: component responsibility, allowed dependencies, transition and effect ownership, crossing-boundary contract semantics, persistence and migration behavior, concurrency isolation, error shape, and module placement. What is **provisional** may be adapted and reported: private helper signatures, internal names, file placement inside a chosen module, test names and fixtures, and local dependency-injection mechanics.
-
-Settled means no silent change, not immutable. When implementation evidence disproves a settled rule, Architect updates the plan before any later phase depends on it.
+Existing planning artifacts are preserved. If native planning restrictions prevent writing `plan.md`, the note stays in the conversation. An outcome already agreed in the conversation is enough to execute; do not retrofit plan metadata. A fresh or compacted Architect reads the note, the diff, and Git history before choosing the next step, and keeps recorded evidence honest and minimal.
 
 ## Implementation Loop
 
-Architect selects the next phase from the plan and current code. It chooses the Developer immediately before dispatch:
+Architect picks the next useful step from current evidence, not an up-front task breakdown. There is no minimum slice size or count; a small feature may be a single dispatch.
 
-- Use Luna only when behavior, ownership, scope, and verification are bounded and predictable.
-- Use the complex Developer when contracts, ownership, state transitions, integration, or verification need implementation decisions.
-- When useful, have the complex Developer establish and verify a small working slice. After accepting it, give Luna the reference paths, constraints, remaining behavior, and check commands.
-- Send already bounded work directly to Luna. Work across layers can qualify when the pattern is proven. An existing scaffold alone does not qualify; reassess before every task.
-- If either Developer returns retryable `INCOMPLETE`, Architect changes the brief, strategy, or tool path without creating workflow state. Architect stops and reports a non-retryable technical blocker after one credible alternate path fails.
-- If Luna returns `NEEDS_COMPLEX`, Architect sends the evidence directly to the complex Developer.
-- If a Developer returns `NEEDS_DECISION`, Architect validates that a real user decision is required.
+- Use the complex Developer when design, integration, or debugging is unresolved, and Luna for predictable, directly verifiable work that follows an established pattern. Routing is judgment, not choreography; reassess when evidence changes the route.
+- Give each dispatch the outcome, constraints, relevant paths, and the proof expected. Keep briefs short; Developers explore and adapt internally. Resume the same Developer for corrections when available.
+- If a strategy fails twice, change it instead of repeating the prompt. Bring product conflicts, consequential trade-offs, or safety risks to the user.
 
-Every task brief carries the architecture slice, not just the goal. Developers run focused proof and affected regression checks. Architect reviews correctness, tests, and design for every submission, then reviews corrections incrementally. Development, builds, tests, and runtime actions run sequentially. Independent read-only research and reviews may run concurrently.
+When user judgment can prevent substantial rework, Architect shows a concrete intermediate result and asks for focused feedback, especially on appearance or interaction. This is not a required approval step. Independent work continues while work that depends on the answer waits.
 
-Architect does not ask the user to approve each submission. It resolves combined-review findings before delegating the final full gate to the repository verifier when available. Valid evidence is reused while relevant inputs remain unchanged. Gate or QA failures return to the correction and review loop. Blocking user questions concern product decisions, protected-content conflicts, or an unusable baseline, not ordinary implementation failures.
+Verification demonstrates intended behavior or a real failure risk with the smallest credible checks, and reuses evidence while its inputs are unchanged. Do not invent helper APIs or tests that merely pin your own styling or math to satisfy a gate. There are no automatic full gates or repeated reviews; run independent review when uncertainty or impact justifies it.
 
 ## Workflow Profiles
 
 - **Small:** use the normal `build` agent directly. Do not create workflow artifacts.
-- **Standard:** use planning with `show-me`, an Oracle-reviewed plan, Developer submissions, combined review, final verification, and human acceptance.
-- **High-risk:** add focused Contrarian review of an uncertain load-bearing claim and widen proof around the actual risk.
+- **Standard:** plan with `/plan-feature`, execute with `/start-work`.
+- **High-risk:** add an independent Oracle or Contrarian look and widen proof around the actual risk.
 
 ## Boundaries
 
-- The Plan agent inspects the repository before asking design questions and does not dispatch Developers. Approval in conversation does not begin implementation; `/start-work` is the execution trigger.
+- The Plan agent inspects the repository before asking design questions and does not implement. Approval in conversation does not begin implementation; `/start-work` is the execution trigger.
 - Architect edits `plan.md` freely. Any other Architect file edit asks for user approval through the edit permission. Architect does not write product code.
-- Developers submit task-only local commits after focused proof when repository policy permits. They preserve unrelated worktree content and staged entries.
-- Developers may adapt provisional details and must report them. A settled architecture rule they cannot meet is a `NEEDS_DECISION`, never a silent change or a workaround.
-- Every Developer report includes an architecture-conformance section naming real paths, which Architect verifies against the diff.
-- Architect reviews submissions and directs fixes. It never stages or commits product changes.
-- There is no fixed correction-round limit. Architect changes strategy after repeated failure instead of forcing a requirements escalation.
-- Final human acceptance remains required before merge or release.
+- Developers submit task-only local commits after focused proof when repository policy permits. They preserve user work and staged entries.
+- Runtime QA respects repository and user authority; nothing launches the app or erases data without permission. Final human acceptance remains required before merge or release.
 
 These are prompt rules with partial permission guardrails, not a shell sandbox. Architect's edit tool allows `plan.md` and asks for other paths. Selected Git command forms are denied. Broad shell access still requires the agent to respect ownership and mutation rules; permission patterns do not prevent every alternate command form.
 
-Loop mechanics live in the commands: `/plan-feature` carries the program-design rules and `/start-work` carries the delegation, integration, and review rules. The agent file stays minimal; to resume an interrupted implementation, re-run `/start-work`.
+Loop mechanics live in the commands: `/plan-feature` carries the planning rules and `/start-work` carries the execution, delegation, and verification rules. The agent file stays minimal; to resume an interrupted implementation, re-run `/start-work`.
 
 ## Non-Goals
 
 - No tickets, dependency queue, workflow trailers, plugin, installer, hidden state, or runtime state machine
+- No required plan template, architecture tables, behavior IDs, verdict schemas, or acceptance ledgers
 - No automatic push, squash, history rewriting, or destructive worktree cleanup
-- No automatic model routing outside Architect's explicit phase-by-phase judgment
-- No requirement that GitHub Librarian, Review, Plannotator, or the grill skill is installed; planning uses `show-me` and requires Oracle review
+- No automatic model routing outside Architect's explicit judgment
+- No requirement that GitHub Librarian, Review, Plannotator, or the grill skill is installed
 
 ## Install
 
@@ -162,7 +138,7 @@ Merge the Plan model, variant, and `agent.plan.permission.task` from [the exampl
 
 ## Agent Dependencies
 
-Install Oracle for mandatory plan review and Contrarian for focused challenges. Missing Oracle or blocked review delegation prevents final approval. A warranted Contrarian challenge stays pending until resolved. Install Librarian only if needed for GitHub research.
+Install Oracle and Contrarian when you want optional independent review. A missing reviewer does not block execution by default; if Architect judges a review necessary, or you request one and none is available, expect an honest gap report instead of a substitute. Install Librarian only if needed for GitHub research.
 
 The Task allowlist is:
 
@@ -188,15 +164,15 @@ Recommended routes:
 
 Merge the `agent` block from `opencode.architect.example.json` into your global or project config. Edit routes to match available models and variants.
 
-Architect chooses Luna only for a bounded immediate task with direct verification. The complex Developer remains the default when evidence is incomplete. Routing is not fixed in `plan.md` and can change between tasks.
+Architect picks the route per task from the work at hand; `plan.md` does not fix it.
 
 ## Usage
 
-1. Describe the feature and run `/plan-feature`. The command selects the built-in Plan agent. An optional argument selects a `plan.md` path or directory.
-2. Discuss requirements and the draft with visual explanations. The agent resolves Oracle findings and any warranted Contrarian challenge before final approval.
-3. Review the disclosed plan and run `/start-work`, with the same path if one was supplied. The command selects Architect and starts implementation.
-4. Use `/plan-feature` to revise the same feature plan before execution. During execution, Architect maintains the plan as evidence changes.
-5. Complete final review, QA, and human acceptance before merge or release.
+1. Describe the feature and run `/plan-feature`. The command selects the built-in Plan agent. An optional argument selects a `plan.md` path or directory; a supplied path is respected and never silently replaced.
+2. Clarify the outcome, constraints, and what would demonstrate success. Add `show-me` visuals or grilling only when they help.
+3. When you are ready to build, run `/start-work` with the same path if one was supplied. The command selects Architect and executes; an outcome already agreed in the conversation is enough.
+4. Use `/plan-feature` to revise the note before execution. During execution, Architect keeps it current when a decision changes.
+5. Finish with an honest handoff and human acceptance before merge or release.
 
 ## Restart Required
 

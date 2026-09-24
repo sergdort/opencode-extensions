@@ -53,17 +53,21 @@ You can copy selected files from `generated/current/` instead. These files are s
 
 | Stage | OpenCode | Codex |
 |---|---|---|
-| Plan with show-me and review before approval | `/plan-feature` selects Plan | `$plan-feature` in the main session |
-| Execute the disclosed plan through Architect | `/start-work` selects Architect | `$start-work` establishes the role |
+| Clarify the outcome and pick a useful next step (planning only) | `/plan-feature` selects Plan | `$plan-feature` in the main session |
+| Execute the agreed outcome through Architect | `/start-work` selects Architect | `$start-work` establishes the role |
 | Plain-language restatement | `/bro` | `$bro` |
 | Handoff | `/handoff` | `$handoff` |
 | Independent implementation review | Optional `/review-work` via `review` | `$review-work` via `oracle` |
 
-Planning uses the native conversation with `show-me`. Oracle reviews every plan before final approval. Contrarian challenges a consequential uncertain decision when warranted. Grilling is a standalone skill invoked only at the user's request. The workflow uses `plan.md`, Git, and the working tree. It requires no decision brief, tickets, or decomposition stage.
+Planning clarifies the outcome, the constraints, and what would demonstrate success, then identifies a useful next step. `show-me` visuals help when they help, and grilling runs only at the user's request. Independent Oracle or Contrarian review happens when uncertainty or impact justifies it, not by default. The workflow uses `plan.md` as a lightweight durable note, Git, and the working tree. It requires no template, decision brief, tickets, or decomposition stage.
 
-Codex native Plan mode is optional. Planning respects the active mode's write restrictions. If the reviewed draft remains in chat or a native plan file, `start-work` saves that exact plan and its review evidence to `plan.md` before dispatch. Leave Codex Plan mode before execution. OpenCode's Plan agent needs the review permissions described in its package guide.
+Codex native Plan mode is optional. Planning respects the active mode's write restrictions, and a supplied plan path is respected rather than silently replaced. Execution can start from a `plan.md` note or from an outcome already agreed in the conversation. Leave Codex Plan mode before execution. OpenCode's Plan agent needs the task permissions described in its package guide for optional review delegation.
 
-Architect routes one coherent task to the complex or bounded Developer. Developers run focused proof and submit task-owned local commits when authorized. Architect reviews each submission and correction, reuses valid evidence, and coordinates final verification and QA. Final human acceptance remains required. Repository and user restrictions remain authoritative.
+Architect owns intent and delegates product code to the complex or bounded Developer, choosing the route by the work at hand rather than fixed choreography. Developers discover the implementation route by building and integrating, verify with the smallest credible checks, and submit task-owned local commits when authorized. Review and verification stay proportional to real uncertainty and impact; nothing runs automatic full gates or repeated reviews. Final human acceptance remains required. Repository and user restrictions remain authoritative.
+
+## Rationale
+
+The shared workflow plans just enough to choose a useful next step and lets the route emerge from building and integrating: [responding to change over following a plan](https://agilemanifesto.org/principles.html), [YAGNI](https://martinfowler.com/bliki/Yagni.html), and [getting one piece done](https://basecamp.com/shapeup/3.2-chapter-11) instead of prescribing the whole solution up front. Ceremony earns its place only when uncertainty or blast radius justifies it.
 
 Native mechanisms still differ. OpenCode uses a persistent primary agent and command bindings. Codex uses manual-only skills in the main thread and custom spawned agents. Prompt rules are not universal permission enforcement. Shared text cannot guarantee identical model behavior.
 

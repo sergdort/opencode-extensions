@@ -14,10 +14,10 @@ Requirements:
 - If the user explicitly asks for a temporary-file handoff, save it in the OS temp directory instead and still report the full path.
 - If the user asks for multiple handoffs, create one focused document per requested thread.
 - Name files clearly using lowercase kebab-case, for example `handoffs/payments-refactor.md`.
-- Include a `Suggested Skills` section in every handoff with specific available skills the next agent should invoke and why.
+- Include a short `Suggested Skills` section when useful, naming available skills the next agent should invoke and why.
 - Do not duplicate content already captured in durable artifacts such as PRDs, plans, ADRs, GitHub issues, commits, or diffs. Reference those artifacts by path, commit hash, or URL.
 - Redact sensitive information, including API keys, passwords, tokens, secrets, private credentials, and personally identifiable information.
-- Summarise only what a fresh agent needs: goal, current state, key decisions, constraints, known blockers, validation already run, suggested next steps, and references.
+- Keep it minimal. Summarise only what a fresh agent needs: goal, current state, key decisions, constraints, known blockers, checks already run and their evidence, suggested next steps, and references. A lightweight `plan.md` note is context, not a template to fill in.
 - If the requested handoff should be paired with a GitHub issue, create the issue with `gh issue create`, put detailed findings there, and have the handoff reference the issue URL instead of duplicating it.
 - Do not stage, commit, or push unless the user explicitly asks.
 

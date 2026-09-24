@@ -38,12 +38,14 @@ test('complete native inventory, deterministic rendering and policy invariants',
     assert.equal(role.name, name);
     assert.match(role.developer_instructions, /task-owned local commits/);
     assert.match(role.developer_instructions, /protected worktree content and index entries/);
+    assert.match(role.developer_instructions, /Work toward the agreed outcome through implementation and feedback/);
+    assert.match(role.developer_instructions, /smallest credible checks/);
     assert.doesNotMatch(role.developer_instructions, /never stage or commit/i);
   }
   const workflow = files['codex/skills/start-work/SKILL.md'];
-  assert.match(workflow, /submission review/i);
+  assert.match(workflow, /Work toward the agreed outcome through implementation and feedback/);
   assert.match(workflow, /same Developer/);
-  assert.match(workflow, /Oracle evidence/);
+  assert.match(workflow, /smallest credible checks/);
   assert.doesNotMatch(workflow, /\$decompose|Ticket:|`developer-luna`|\/start-work|\/plan-feature/);
   assert.match(files['codex/skills/review-work/SKILL.md'], /read-only `oracle`/);
   assert.equal(frontmatter(files['opencode/commands/plan-feature.md']).agent, 'plan');
@@ -53,12 +55,15 @@ test('complete native inventory, deterministic rendering and policy invariants',
   assert.match(workflow, /leave Plan mode/);
   for (const harness of ['opencode', 'codex']) {
     const plan = files[harness === 'opencode' ? 'opencode/commands/plan-feature.md' : 'codex/skills/plan-feature/SKILL.md'];
-    assert.match(plan, /Load `show-me`/);
-    assert.match(plan, /Invoke it only when the user requests it/);
-    assert.match(plan, /before presenting it for final approval/);
-    assert.match(plan, /Dispatch read-only `oracle` for every plan/);
-    assert.match(plan, /Pass the full draft text to reviewers/);
+    assert.match(plan, /useful next step/);
+    assert.match(plan, /only when the user requests it/);
+    assert.match(plan, /No findings is a valid outcome/);
+    assert.match(plan, /never silently fall back/i);
     assert.match(plan, /wait for the execution command/);
+    assert.doesNotMatch(plan, /architecture table|behavior ID|acceptance ledger|settled|provisional|Review baseline/i);
+  }
+  for (const name of ['opencode/agents/oracle.md', 'opencode/agents/contrarian.md']) {
+    assert.match(files[name], /No findings is a valid outcome/);
   }
   for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect/);
   const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));

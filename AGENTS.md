@@ -81,10 +81,10 @@ Shared skills live under `skills/`:
 - Core skills are generated into `generated/current/codex/skills/<skill>/SKILL.md` and use valid skill frontmatter. Each bundled workflow skill has `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
 - Keep skill descriptions explicit about manual invocation and scope. Do not add an implicit router in `AGENTS.md`.
 - Use Codex's built-in `explorer` for routine discovery instead of adding a duplicate Repo Scout.
-- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$plan-feature` uses `show-me` and Oracle review. `grill-me-architecture` is standalone and runs only at the user's request; `skills/` holds both shared sources.
+- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `$plan-feature` uses `show-me` when a visual helps and independent review only when warranted. `grill-me-architecture` is standalone and runs only at the user's request; `skills/` holds both shared sources.
 - Keep `codex/link-global.sh` a scoped wrapper around the common generation/link implementation. It must not install dependencies, edit config, or change unrelated files.
-- The shared workflow uses `plan.md`, Git, and the working tree. `plan-feature` plans and reviews; `start-work` establishes Architect and executes. Respect native Plan mode restrictions and preserve the exact reviewed draft at handoff. Do not add tickets or a decomposition stage. The workflow never removes planning artifacts; cleanup belongs to the user.
-- Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the prompt contract and Architect's pre/post Git invariant checks aligned.
+- The shared workflow uses `plan.md`, Git, and the working tree. `plan-feature` plans only; `start-work` establishes Architect and executes. `plan.md` is a lightweight durable note with no required template, and an outcome agreed in the conversation can be enough to execute. Respect native Plan mode restrictions and respect a supplied plan path instead of silently falling back. Do not add tickets or a decomposition stage. The workflow never removes planning artifacts; cleanup belongs to the user.
+- Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the prompt contract and Architect's Git safety rules aligned.
 - Keep `codex/README.md` in sync when changing skills, custom agents, lifecycle rules, permissions, or model defaults.
 - Remind users to reload Codex after changing skills or custom agents.
 
@@ -111,7 +111,7 @@ Shared skills live under `skills/`:
 
 - Make the smallest correct change.
 - Preserve the repo's copy-based, reversible setup style.
-- Keep prompts direct, operational, and scoped to what the agent or command owns.
+- Keep prompts direct, operational, and scoped to what the agent or command owns. The shared OpenCode/Codex workflow is intentionally lightweight: plan enough to choose a useful next step, discover the implementation route by building and integrating, and keep review and verification proportional to real uncertainty and impact. Do not reintroduce required plan templates, architecture tables, behavior IDs, verdict schemas, acceptance ledgers, or automatic review gates.
 - Do not add backward-compatibility layers unless there is a concrete need.
 - Avoid duplicating detailed package docs in multiple places; use root guidance for repo-wide rules and package READMEs for package-specific details.
 - Keep files ASCII unless an existing file already needs non-ASCII.

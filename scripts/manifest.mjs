@@ -95,7 +95,7 @@ export const entries = [
     "template": "templates/codex/skills/review-work.md.njk",
     "metadata": {
       "name": "review-work",
-      "description": "Use only when the user explicitly invokes $review-work. Optional independent review of the completed plan implementation; does not replace human QA or acceptance"
+      "description": "Use only when the user explicitly invokes $review-work. Optional independent review of the implementation; does not replace human QA or acceptance"
     },
     "legacy": null
   },
@@ -119,7 +119,7 @@ export const entries = [
     "template": "templates/codex/skills/plan-feature.md.njk",
     "metadata": {
       "name": "plan-feature",
-      "description": "Use only when the user explicitly invokes $plan-feature. Plan with show-me, clarify requirements, and review the plan before approval. Native Plan mode is optional"
+      "description": "Use only when the user explicitly invokes $plan-feature. Clarify the outcome, constraints, and what would demonstrate success, then pick a useful next step. Planning only. Native Plan mode is optional"
     },
     "legacy": "codex/skills/plan-feature"
   },
@@ -143,7 +143,7 @@ export const entries = [
     "template": "templates/codex/skills/start-work.md.njk",
     "metadata": {
       "name": "start-work",
-      "description": "Use only when the user explicitly invokes $start-work. Act as Architect to execute the approved plan through Developer delegation, review, and QA"
+      "description": "Use only when the user explicitly invokes $start-work. Act as Architect to execute the agreed outcome through Developer delegation and focused verification"
     },
     "legacy": "codex/skills/start-work"
   },
@@ -182,7 +182,7 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "developer",
-      "description": "Resolve uncertain implementation and establish verified working patterns. Submit task-only local commits when authorized.",
+      "description": "Implement product code under uncertainty, exploring and adapting as evidence emerges. Submit task-only local commits when authorized.",
       "model": "gpt-6-sol",
       "model_reasoning_effort": "high",
       "sandbox_mode": "workspace-write"
@@ -217,7 +217,7 @@ export const entries = [
       "model": "gpt-6-luna",
       "model_reasoning_effort": "max",
       "sandbox_mode": "workspace-write",
-      "description": "Implement one bounded, directly verifiable task. Escalate uncertain work to the complex Developer."
+      "description": "Implement bounded, predictable, directly verifiable work that follows an established pattern. Hand unresolved design or uncertain debugging back."
     },
     "context": {
       "bounded": true
@@ -242,7 +242,7 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "contrarian",
-      "description": "Read-only adversarial stress-test for one specific decision during feature planning, execution, or an explicit user request. Use when an uncertain, hard-to-reverse, or cross-component claim needs a challenge.",
+      "description": "Read-only adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted.",
       "model": "gpt-6-astra",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
@@ -266,7 +266,7 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "oracle",
-      "description": "Read-only review of every feature plan before approval, or a second opinion during execution or an explicit user request. Check correctness, missing cases, repository fit, and verification.",
+      "description": "Read-only second opinion during planning or execution, or an explicit user request. Considers consequential defects and excess scope, complexity, or tests.",
       "model": "gpt-6-astra",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
