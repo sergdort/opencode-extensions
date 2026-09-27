@@ -53,21 +53,21 @@ You can copy selected files from `generated/current/` instead. These files are s
 
 | Stage | OpenCode | Codex |
 |---|---|---|
-| Clarify the outcome and pick a useful next step (planning only) | `/plan-feature` selects Plan | `$plan-feature` in the main session |
+| Develop a program design with show-me (planning only) | `/plan-feature` selects Architect | `$plan-feature` establishes Architect in the main session |
 | Execute the agreed outcome through Architect | `/start-work` selects Architect | `$start-work` establishes the role |
 | Plain-language restatement | `/bro` | `$bro` |
 | Handoff | `/handoff` | `$handoff` |
 | Independent implementation review | Optional `/review-work` via `review` | `$review-work` via `oracle` |
 
-Planning clarifies the outcome, the constraints, and what would demonstrate success, then identifies a useful next step. `show-me` visuals help when they help, and grilling runs only at the user's request. Independent Oracle or Contrarian review happens when uncertainty or impact justifies it, not by default. The workflow uses `plan.md` as a lightweight durable note, Git, and the working tree. It requires no template, decision brief, tickets, or decomposition stage.
+Planning builds on the conversation, prototypes, and current code. Architect uses `show-me` to explain a concrete program design, important choices, and assumptions before implementation. The design can change as implementation provides new evidence. Grilling runs only at the user's request. Independent Oracle or Contrarian review happens when uncertainty or impact justifies it, not by default. The workflow uses `plan.md` as a lightweight durable note, Git, and the working tree. It requires no template, decision brief, tickets, or decomposition stage.
 
-Codex native Plan mode is optional. Planning respects the active mode's write restrictions, and a supplied plan path is respected rather than silently replaced. Execution can start from a `plan.md` note or from an outcome already agreed in the conversation. Leave Codex Plan mode before execution. OpenCode's Plan agent needs the task permissions described in its package guide for optional review delegation.
+Codex native Plan mode is optional. Planning respects the active mode's write restrictions, and a supplied plan path is respected rather than silently replaced. Invoke `start-work` directly for work agreed in the conversation, including spikes and prototypes. No plan file or prior `plan-feature` invocation is required; exploratory work uses the same Developer delegation and review loop. Leave Codex Plan mode before execution. OpenCode uses Architect for both planning and execution; the command defines which work is authorized.
 
 Architect owns intent and delegates product code to the complex or bounded Developer, choosing the route by the work at hand rather than fixed choreography. Developers discover the implementation route by building and integrating, verify with the smallest credible checks, and submit task-owned local commits when authorized. Review and verification stay proportional to real uncertainty and impact; nothing runs automatic full gates or repeated reviews. Final human acceptance remains required. Repository and user restrictions remain authoritative.
 
 ## Rationale
 
-The shared workflow plans just enough to choose a useful next step and lets the route emerge from building and integrating: [responding to change over following a plan](https://agilemanifesto.org/principles.html), [YAGNI](https://martinfowler.com/bliki/Yagni.html), and [getting one piece done](https://basecamp.com/shapeup/3.2-chapter-11) instead of prescribing the whole solution up front. Ceremony earns its place only when uncertainty or blast radius justifies it.
+The shared workflow develops a program design from available evidence and revises the route through building and integrating: [responding to change over following a plan](https://agilemanifesto.org/principles.html), [YAGNI](https://martinfowler.com/bliki/Yagni.html), and [getting one piece done](https://basecamp.com/shapeup/3.2-chapter-11) instead of prescribing the whole solution up front. Ceremony earns its place only when uncertainty or blast radius justifies it.
 
 Native mechanisms still differ. OpenCode uses a persistent primary agent and command bindings. Codex uses manual-only skills in the main thread and custom spawned agents. Prompt rules are not universal permission enforcement. Shared text cannot guarantee identical model behavior.
 

@@ -119,7 +119,7 @@ export const entries = [
     "template": "templates/codex/skills/plan-feature.md.njk",
     "metadata": {
       "name": "plan-feature",
-      "description": "Use only when the user explicitly invokes $plan-feature. Clarify the outcome, constraints, and what would demonstrate success, then pick a useful next step. Planning only. Native Plan mode is optional"
+      "description": "Use only when the user explicitly invokes $plan-feature. Develop a program design as Architect from the conversation, prototypes, and code using show-me. Planning only. Native Plan mode is optional"
     },
     "legacy": "codex/skills/plan-feature"
   },
@@ -143,7 +143,7 @@ export const entries = [
     "template": "templates/codex/skills/start-work.md.njk",
     "metadata": {
       "name": "start-work",
-      "description": "Use only when the user explicitly invokes $start-work. Act as Architect to execute the agreed outcome through Developer delegation and focused verification"
+      "description": "Use only when the user explicitly invokes $start-work. Act as Architect to delegate and verify agreed work, including spikes and prototypes. No plan required"
     },
     "legacy": "codex/skills/start-work"
   },

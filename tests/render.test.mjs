@@ -48,14 +48,18 @@ test('complete native inventory, deterministic rendering and policy invariants',
   assert.match(workflow, /smallest credible checks/);
   assert.doesNotMatch(workflow, /\$decompose|Ticket:|`developer-luna`|\/start-work|\/plan-feature/);
   assert.match(files['codex/skills/review-work/SKILL.md'], /read-only `oracle`/);
-  assert.equal(frontmatter(files['opencode/commands/plan-feature.md']).agent, 'plan');
+  assert.equal(frontmatter(files['opencode/commands/plan-feature.md']).agent, 'architect');
   assert.equal(frontmatter(files['opencode/commands/start-work.md']).agent, 'architect');
   assert.match(files['codex/skills/plan-feature/SKILL.md'], /Native Plan mode is optional/);
+  assert.match(files['codex/skills/plan-feature/SKILL.md'], /Act as Architect in this main session/);
   assert.match(workflow, /Act as Architect in this main session/);
   assert.match(workflow, /leave Plan mode/);
   for (const harness of ['opencode', 'codex']) {
     const plan = files[harness === 'opencode' ? 'opencode/commands/plan-feature.md' : 'codex/skills/plan-feature/SKILL.md'];
     assert.match(plan, /useful next step/);
+    assert.match(plan, /Load `show-me`/);
+    assert.match(plan, /conversation, prototypes, and current code/);
+    assert.match(plan, /Planning only: do not implement product changes or dispatch Developers/);
     assert.match(plan, /only when the user requests it/);
     assert.match(plan, /No findings is a valid outcome/);
     assert.match(plan, /never silently fall back/i);
@@ -67,11 +71,12 @@ test('complete native inventory, deterministic rendering and policy invariants',
   }
   for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect/);
   const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));
-  const tasks = example.agent.plan.permission.task;
+  assert.equal(example.agent.plan, undefined);
+  assert.ok(example.agent.architect.model);
+  const tasks = frontmatter(files['opencode/agents/architect.md']).permission.task;
   assert.equal(Object.keys(tasks)[0], '*');
-  assert.equal(tasks['*'], 'deny');
-  for (const role of ['explore', 'oracle', 'contrarian']) assert.equal(tasks[role], 'allow');
-  assert.equal(tasks.developer, undefined);
+  assert.equal(tasks['*'], 'ask');
+  for (const role of ['explore', 'oracle', 'contrarian', 'developer', 'developer-luna']) assert.equal(tasks[role], 'allow');
 });
 
 test('golden files match complete payload; tests never update fixtures', t => {

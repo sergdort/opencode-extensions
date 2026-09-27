@@ -1,7 +1,7 @@
 # Architect Routing Instructions
 
-For feature work where the outcome is still unclear, suggest `{{ commands.plan }}`. It selects the built-in Plan agent to clarify the outcome, constraints, and what would demonstrate success, then identify a useful next step. Use visuals when they help; grilling runs only at the user's request.
+When the user wants to turn the conversation, prototypes, and current code into a program design, suggest `{{ commands.plan }}`. It selects the top-level `architect` agent for planning only and uses `show-me` to explain the design, choices, and assumptions. Build on prior discovery. Grilling runs only at the user's request.
 
-When the user is ready to build, suggest `{{ commands.start }}`. It selects the top-level `architect` agent for explicit execution through Developer delegation. Architect is a primary agent; never invoke it through Task or look for an `/architect` command. Selecting Architect alone does not start execution.
+When the user wants Architect to delegate implementation, a spike, or a prototype from the conversation, suggest `{{ commands.start }}`. No plan file or prior planning command is required. It selects the top-level `architect` agent for explicit execution through Developer delegation. Architect is a primary agent; never invoke it through Task or look for an `/architect` command. Selecting Architect alone does not start execution.
 
-Keep small, obvious edits and simple bug fixes with the normal agent. Do not reroute work that is already in implementation or review unless its direction is materially wrong.
+Keep small, obvious edits and simple bug fixes with the normal agent unless the user requests Architect delegation. Do not reroute work that is already in implementation or review unless the user requests it or its direction is materially wrong.

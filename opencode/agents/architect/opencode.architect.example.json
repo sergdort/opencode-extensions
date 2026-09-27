@@ -2,19 +2,6 @@
   "$schema": "https://opencode.ai/config.json",
   "instructions": [".opencode/ARCHITECT_INSTRUCTIONS.md"],
   "agent": {
-    "plan": {
-      "model": "openai/gpt-6-sol",
-      "variant": "high",
-      "permission": {
-        "task": {
-          "*": "deny",
-          "explore": "allow",
-          "oracle": "allow",
-          "contrarian": "allow",
-          "github-librarian": "allow"
-        }
-      }
-    },
     "architect": {
       "model": "openai/gpt-6-sol",
       "variant": "high"

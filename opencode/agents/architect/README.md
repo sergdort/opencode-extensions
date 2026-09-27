@@ -1,15 +1,19 @@
 # OpenCode Architect Orchestrator
 
-Architect is a persistent OpenCode primary agent that executes the agreed outcome. The built-in Plan agent handles planning: clarify the outcome, constraints, and what would demonstrate success, then identify a useful next step. Architect directs Developer subagents through implementation, verification, and honest handoff.
+Architect is a persistent OpenCode primary agent for program design and execution. Planning builds on the conversation, prototypes, and current code. Architect uses `show-me` to explain the design, then directs Developer subagents through implementation, verification, and honest handoff.
 
-Use `/plan-feature` for planning only, then `/start-work` to select Architect and execute. No manual agent switch or `/architect` command is needed. Developers submit local task commits when authorized. Architect reviews results and resumes the same Developer for corrections when available.
+Both `/plan-feature` and `/start-work` select Architect. The first produces a program design without implementation; the second executes. No manual agent switch or `/architect` command is needed. Developers submit local task commits when authorized. Architect reviews results and resumes the same Developer for corrections when available.
 
 ## Workflow
 
+Invoke `/start-work` directly after discussing the work when you want Architect to delegate it. No `plan.md` or prior `/plan-feature` invocation is required. For spikes and prototypes, the outcome can be a question to answer or behavior to demonstrate. Architect delegates code to `developer` or `developer-luna`, inspects the result, and directs corrections through the same loop used for planned work. It stops at the agreed scope; production hardening requires a separate request.
+
+When you want a program design before execution:
+
 ```text
-/plan-feature selects Plan
-  -> inspect the repository and clarify outcome, constraints, success criteria
-  -> identify a useful next step (visuals and grilling only when they help)
+conversation, exploration, and prototypes as needed
+  -> /plan-feature selects Architect for program design
+  -> use show-me to explain the design, choices, and assumptions
   -> /start-work selects Architect and executes
   -> pick the next step from evidence and delegate to a Developer
   -> Developer builds, adapts, verifies with the smallest credible checks
@@ -17,13 +21,13 @@ Use `/plan-feature` for planning only, then `/start-work` to select Architect an
   -> honest handoff and human acceptance
 ```
 
-The agreed outcome and real constraints bind the work; the implementation route is discovered by building and integrating. Developers may revise implementation choices as they learn, within user intent and safety constraints. Architect asks the user only when discovery changes desired behavior or requires a consequential trade-off, not merely because the original approach changed.
+The agreed outcome and real constraints bind the work. The program design is the current approach and can change as code is built and integrated. Developers may revise implementation choices as they learn, within user intent and safety constraints. Architect asks the user only when discovery changes desired behavior or requires a consequential trade-off, not merely because the original approach changed.
 
 ## What It Provides
 
 Generated agents in `generated/current/opencode/agents/`:
 
-- `architect.md`: primary orchestrator; owns intent and delegates product code
+- `architect.md`: primary agent; develops program designs, owns intent, and delegates product code
 - `developer.md`: Sol-high Developer for work with unresolved design, unfamiliar integration, or uncertain debugging
 - `developer-luna.md`: Luna-max Developer for bounded, predictable, directly verifiable work that follows an established pattern
 
@@ -34,19 +38,20 @@ Architect and both Developers use OpenCode's built-in Explore agent for focused 
 
 Generated commands in `generated/current/opencode/commands/`:
 
-- `plan-feature.md`: planning only; clarifies the outcome and picks a useful next step
+- `plan-feature.md`: planning only; develops a program design from existing discovery with `show-me`
 - `start-work.md`: explicit execution through Developer delegation, verification, and honest reporting
 - `review-work.md`: optional independent review of the implementation
 
-Planning uses the shared `show-me` skill when a visual helps. Independent Oracle or Contrarian review is a judgment call based on uncertainty and impact, not a required step; no findings is a valid outcome. `grill-me-architecture` remains a standalone skill invoked only at your request. GitHub Librarian is optional.
+Planning uses the shared `show-me` skill to explain responsibilities, interactions, and data or state flow with relevant paths, types, interfaces, or code sketches. A prototype may already contain the right design; preserve useful work and identify what needs refinement. Independent Oracle or Contrarian review is a judgment call based on uncertainty and impact, not a required step; no findings is a valid outcome. `grill-me-architecture` remains a standalone skill invoked only at your request. GitHub Librarian is optional.
 
 ## Durable State
 
-- `plan.md`: a lightweight durable note for continuity: outcome, constraints, decisions worth keeping, what would demonstrate success, the next step, and honest evidence. No template or ledger.
+- Conversation: agreed outcome, constraints, and current evidence
+- Optional `plan.md`: a lightweight durable note for continuity: outcome, constraints, program design and rationale, what would demonstrate success, the next step, and honest evidence. Keep enough text to understand the design without its visual artifacts. No template or ledger.
 - Git history: task submissions and correction commits
 - Working tree: active implementation
 
-Existing planning artifacts are preserved. If native planning restrictions prevent writing `plan.md`, the note stays in the conversation. An outcome already agreed in the conversation is enough to execute; do not retrofit plan metadata. A fresh or compacted Architect reads the note, the diff, and Git history before choosing the next step, and keeps recorded evidence honest and minimal.
+Existing planning artifacts are preserved. If native planning restrictions prevent writing `plan.md`, the note stays in the conversation. An outcome already agreed in the conversation is enough to execute; do not retrofit plan metadata or create a plan just to start. A fresh or compacted Architect reads the conversation, any relevant note, the diff, and Git history before choosing the next step, and keeps recorded evidence honest and minimal.
 
 ## Implementation Loop
 
@@ -68,8 +73,8 @@ Verification demonstrates intended behavior or a real failure risk with the smal
 
 ## Boundaries
 
-- The Plan agent inspects the repository before asking design questions and does not implement. Approval in conversation does not begin implementation; `/start-work` is the execution trigger.
-- Architect edits `plan.md` freely. Any other Architect file edit asks for user approval through the edit permission. Architect does not write product code.
+- During `/plan-feature`, Architect builds on prior discovery and does not implement or dispatch Developers. Approval in conversation does not begin implementation; `/start-work` is the execution trigger.
+- Architect edits `plan.md` freely. Use inline `show-me` diagrams and sketches under the existing permissions; edits to other files still ask for approval. Architect does not write product code.
 - Developers submit task-only local commits after focused proof when repository policy permits. They preserve user work and staged entries.
 - Runtime QA respects repository and user authority; nothing launches the app or erases data without permission. Final human acceptance remains required before merge or release.
 
@@ -132,9 +137,9 @@ Merge the instruction path into existing config. For a project:
 
 For global config, use an absolute path to the installed `ARCHITECT_INSTRUCTIONS.md`. The helper never changes these settings.
 
-### Plan Agent Config
+### Architect Config
 
-Merge the Plan model, variant, and `agent.plan.permission.task` from [the example config](opencode.architect.example.json) into the existing OpenCode config. It denies general delegation, then allows Explore, Oracle, Contrarian, and optional GitHub Librarian. Preserve the Plan agent's native file and shell restrictions; do not grant it implementation permissions. The link helper does not edit config.
+Use the Architect model and variant from [the example config](opencode.architect.example.json) for both commands. The generated Architect agent defines its Task permissions. `/plan-feature` restricts work to design and read-only discovery or review; `/start-work` authorizes Developer implementation. No built-in Plan agent override is needed. Existing Plan customization can remain for other uses. The link helper does not edit config.
 
 ## Agent Dependencies
 
@@ -143,7 +148,6 @@ Install Oracle and Contrarian when you want optional independent review. A missi
 The Task allowlist is:
 
 ```text
-plan -> explore, oracle, contrarian, github-librarian
 architect -> developer, developer-luna, explore, contrarian, oracle, github-librarian
 architect -> review when an optional read-only review agent is installed
 developer -> explore
@@ -156,7 +160,7 @@ Agent definitions omit `model` and `variant`. Configure role routing in global `
 
 Recommended routes:
 
-- Plan and Architect: `openai/gpt-6-sol`, `high`
+- Architect (design and execution): `openai/gpt-6-sol`, `high`
 - Complex Developer: `openai/gpt-6-sol`, `high`
 - Luna Developer: `openai/gpt-6-luna`, `max`
 - Explore: OpenCode built-in, with `openai/gpt-5.6-terra`, `low` as the recommended override
@@ -168,8 +172,12 @@ Architect picks the route per task from the work at hand; `plan.md` does not fix
 
 ## Usage
 
-1. Describe the feature and run `/plan-feature`. The command selects the built-in Plan agent. An optional argument selects a `plan.md` path or directory; a supplied path is respected and never silently replaced.
-2. Clarify the outcome, constraints, and what would demonstrate success. Add `show-me` visuals or grilling only when they help.
+For work already discussed, run `/start-work` without arguments. A supplied plan path must identify an existing plan; an invalid or missing plan stops execution instead of falling back silently.
+
+For design followed by execution:
+
+1. Explore the feature through conversation or prototypes as needed, then run `/plan-feature`. The command selects Architect for program design. An optional argument selects a `plan.md` path or directory; a supplied path is respected and never silently replaced.
+2. Inspect the `show-me` design, discuss important choices and assumptions, and revise the same note. Ask for grilling separately when useful.
 3. When you are ready to build, run `/start-work` with the same path if one was supplied. The command selects Architect and executes; an outcome already agreed in the conversation is enough.
 4. Use `/plan-feature` to revise the note before execution. During execution, Architect keeps it current when a decision changes.
 5. Finish with an honest handoff and human acceptance before merge or release.

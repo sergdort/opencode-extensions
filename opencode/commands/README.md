@@ -7,7 +7,7 @@ Core commands are generated from canonical procedures. Librarian remains a nativ
 - `bro.md`: restate the last response plainly and concisely
 - `handoff.md`: create repository-local handoff documents for a fresh agent
 - `github-librarian.md`: investigate GitHub repositories with the `github-librarian` subagent
-- `plan-feature.md`: select the built-in Plan agent to clarify the outcome and pick a useful next step (planning only)
+- `plan-feature.md`: select Architect to develop a program design with `show-me` from the conversation, prototypes, and code (planning only)
 - `start-work.md`: have Architect execute the agreed outcome through Developer delegation and focused verification
 - `review-work.md`: optionally review the implementation with an independent agent; this does not replace human QA or acceptance
 
@@ -38,8 +38,8 @@ Install `opencode/commands/github-librarian.md` separately for copy-based setups
 
 `github-librarian.md` assumes the `github-librarian` subagent is installed and task delegation is allowed from the `build` agent.
 
-`plan-feature.md` selects the built-in `plan` agent. Install `show-me`, and merge the Plan-agent Task permissions from the [Architect guide](../agents/architect/README.md#plan-agent-config) if you want optional Oracle or Contrarian review. The command clarifies the outcome and picks a useful next step; it never implements. Grilling is optional.
+`plan-feature.md` selects `architect`. Install Architect and the shared `show-me` skill as described in the [Architect guide](../agents/architect/README.md#install). The command develops a program design from existing discovery; it never implements or dispatches Developers. Oracle and Contrarian review remain optional. Grilling runs only at the user's request.
 
-`start-work.md` selects the persistent `architect` primary agent. It executes the agreed outcome through Developer delegation and focused verification; an outcome agreed in the conversation is enough. Install Architect and its Developers before execution.
+`start-work.md` selects the persistent `architect` primary agent. It executes agreed work through Developer delegation and focused verification, including spikes and prototypes discussed in the conversation. No plan file or prior `/plan-feature` invocation is required. Install Architect and its Developers before execution.
 
 `review-work.md` assumes an optional read-only agent named `review`. The agent returns findings in its response and does not create workflow state. Edit `templates/opencode/commands/review-work.md.njk` and regenerate when the agent has a different name.
