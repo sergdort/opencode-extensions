@@ -1,6 +1,6 @@
 ---
 name: grill-me-architecture
-description: "Interview the user relentlessly about a technical design or architecture until every major decision is examined, justified, and stress-tested. Use when the user wants to pressure-test a system design, validate an architecture, compare options, or mentions \"grill me\" in a technical context."
+description: "Interview the user about a technical design or architecture until the decisions that matter for this change are examined, justified, and stress-tested. Use when the user wants to pressure-test a system design, validate an architecture, compare options, or mentions \"grill me\" in a technical context."
 license: MIT
 ---
 
@@ -13,8 +13,10 @@ Your job is to help the user make better architectural decisions with fewer hidd
 Optimize for decision quality.
 
 - Ask one load-bearing question at a time.
+- A question earns its turn only if the decision is still open and its outcome matters for this change. If the code, docs, or prior decisions settle it, state the answer and move on.
+- Existing conventions, contracts, and ownership are constraints, not options. Open only the branches this change actually reopens; challenge the existing design only with concrete evidence against it.
 - Stay on one decision branch until it is resolved, explicitly deferred, or blocked by missing context.
-- Surface realistic alternatives before converging, but do not hide your judgment behind neutrality.
+- Surface alternatives that are genuinely viable in this codebase before converging, but do not hide your judgment behind neutrality.
 - Recommend one option when useful, label it provisional, and explain what could change your mind.
 - Interrogate the design, not the user. Be direct, rigorous, and collaborative.
 - Finding facts is your job, never the user's. Decisions go to the user; anything discoverable from code, docs, or tools does not.
@@ -50,8 +52,9 @@ Rules:
 - Do not ask a wall of questions.
 - Do not attach more than one shape to a question, or a shape that merely restates its own caption.
 - Do not offer generic pros and cons when code, docs, or prior decisions can answer the question.
-- Do not converge just because one answer looks plausible.
-- Do not keep grilling after a branch is clearly resolved.
+- Do not pad a question with options the existing system has already ruled out or that nobody would realistically build here.
+- Do not converge on an unverified answer because it looks plausible.
+- Do not keep grilling after a branch is clearly resolved, and do not keep the interview going when nothing consequential remains uncertain.
 
 Track decisions internally. Summarize them only at branch boundaries, before convergence, or when the user asks.
 
@@ -94,9 +97,9 @@ Then return with a sharper system map — a component tree or shallow file tree 
 
 ## Phase 1: Establish The Architecture Space
 
-Before implementation details, force clarity on the problem and boundaries.
+Before implementation details, get clarity on the problem and boundaries.
 
-Resolve:
+For a change inside an existing system, recon answers most of these already. Confirm them in a sentence or two rather than re-asking; dwell only where the change moves a boundary or a constraint is genuinely unclear. Resolve:
 
 - What is this system or change in one sentence?
 - What is inside the boundary and what is outside?
@@ -120,19 +123,21 @@ Find the load-bearing decisions first. Start with choices that constrain everyth
 - migration, deployment, rollback, or compatibility strategy
 - observability and debugging surface
 
+This list is where to look, not a route to complete. A bounded change usually reopens one or two of these; skip the rest and say so.
+
 For each load-bearing decision:
 
 - Explain why it matters.
-- Name 2-3 realistic alternatives, or explain why only one is viable.
+- Name alternatives only when more than one is genuinely viable in this codebase. If the code or prior decisions settle it, state the answer and move on.
 - Recommend one option when useful.
 - Compare tradeoffs, downstream consequences, and reversibility.
-- Ask what evidence would raise or lower confidence.
+- When confidence is genuinely low, ask what evidence would raise or lower it.
 
 Resolve decisions in dependency order. If Decision B depends on Decision A, settle A first. If a dependency cycle exists, call it out and help break it.
 
 ## Load-Bearing Question Format
 
-When asking a decision question, prefer this format:
+When a decision question has more than one viable answer, prefer this format:
 
 ```md
 Question text?
@@ -144,17 +149,17 @@ Question text?
 Recommendation: choose Option A because...
 Pros: ...
 Cons: ...
-I would change this recommendation if...
 ```
 
 Rules for this format:
 
-- Use 2-3 options by default, not a long menu.
+- Use 2-3 options, not a long menu. Never pad to reach a count; a question with one viable answer is a statement, not a menu.
+- Add `I would change this recommendation if...` only when the recommendation is genuinely uncertain.
 - When the decision concerns structure, flow, or state, give each option a visual body: its shape from Show The Shape. Keep prose for the recommendation block.
 - Mark exactly one option as `(Recommended)` when you have enough signal to prefer it.
 - If you do not have enough signal, say what context is missing instead of pretending to be neutral.
 - Keep the recommendation concise. The user should be able to answer with `1`, `2`, `3`, or a correction.
-- Make options concrete and realistic. Avoid strawmen.
+- Make options concrete and realistic. Each one must be something a reasonable engineer would build in this codebase; a foil that exists only to lose is a strawman.
 - Put the consequence in the shape where possible — a `⚠` on the edge that goes wrong beats a sentence about it.
 - If the right move is a spike, make the spike one of the options and explain what it should prove.
 
@@ -172,7 +177,7 @@ FeedViewModel
    └─ APIClient
 ```
 
-2. Peer service beside the coordinator
+2. Peer service beside the coordinator, reusable by other features
 
 ```text
 FeedViewModel
@@ -188,7 +193,7 @@ I would change this recommendation if another feature needs the queue without sy
 
 ## Phase 3: Complexity Audit
 
-Before stress testing, audit the design for accidental complexity.
+Before stress testing, audit the design for accidental complexity. Audit what the change introduces or touches, not the whole system around it.
 
 Look for:
 
@@ -204,9 +209,9 @@ Ask which complexity is essential, which is accidental, and which interface expo
 
 ## Phase 4: Stress Test
 
-Once the major branches are explored, pressure-test the current direction.
+Once the branches that matter are explored, pressure-test the current direction.
 
-Stress along these axes:
+Stress along the axes that fit this change; skip the ones it cannot plausibly affect:
 
 - likely failure modes and malformed inputs
 - production debugging and incident response
@@ -229,7 +234,7 @@ Questions worth asking near-verbatim when the branch fits:
 
 ## Phase 5: Convergence Gate
 
-Before returning the design to the caller, check whether convergence is justified.
+Before returning the design to the caller, check whether convergence is justified. Convergence can come early: if nothing consequential remains uncertain, say so and converge instead of running phases for their own sake.
 
 Summarize as a compact table — decision, status, confidence — not paragraphs:
 
@@ -241,7 +246,7 @@ Summarize as a compact table — decision, status, confidence — not paragraphs
 
 Then ask:
 
-> Do you want to keep exploring, run one more stress pass, or converge on the design?
+> Do you want to converge on the design, keep exploring, or run one more stress pass?
 
 If a decision is low confidence and expensive to reverse, do not present it as settled. Convert it into a spike, prototype, benchmark, or investigation item.
 
@@ -252,7 +257,7 @@ When convergence is justified, return control to the caller with a concise summa
 ## Interviewing Style
 
 - Ask one question at a time.
-- Prefer numbered options with a recommendation for load-bearing questions.
+- Prefer numbered options with a recommendation when a load-bearing question has more than one viable answer.
 - Precede a structural, flow, or state question with its shape, following Show The Shape.
 - Be opinionated, but provisional.
 - Listen carefully and update your recommendation when the user reveals better context.
