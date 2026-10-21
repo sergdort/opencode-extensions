@@ -72,6 +72,22 @@ test('retired Architect links are removed only when owned by this checkout', t =
   assert.equal(fs.readFileSync(path.join(destination, 'SKILL.md'), 'utf8'), 'user-owned skill');
 });
 
+test('retired Architect workflow links are removed from both harnesses', t => {
+  const { root, env } = fixture(t);
+  const links = [
+    [env.OPENCODE_CONFIG_DIR, ['agents/architect.md', 'ARCHITECT_INSTRUCTIONS.md', 'commands/plan-feature.md', 'commands/start-work.md'], 'opencode'],
+    [env.CODEX_SKILLS_DIR, ['plan-feature', 'start-work'], 'codex/skills'],
+  ].flatMap(([dir, names, source]) => names.map(name => {
+    const destination = path.join(dir, name);
+    symlink(path.join(root, 'generated/current', source, name), destination);
+    return destination;
+  }));
+  generateAndLink(root, {}, env, quiet);
+  for (const destination of links) assert.equal(fs.lstatSync(destination, { throwIfNoEntry: false }), undefined);
+  assert.ok(fs.existsSync(path.join(env.OPENCODE_CONFIG_DIR, 'commands/delegate.md')));
+  assert.ok(fs.existsSync(path.join(env.CODEX_SKILLS_DIR, 'delegate/SKILL.md')));
+});
+
 test('shared show-me conflicts are preserved before publication', t => {
   const { root, env, base } = fixture(t);
   const destination = path.join(env.CODEX_SKILLS_DIR, 'show-me/SKILL.md');

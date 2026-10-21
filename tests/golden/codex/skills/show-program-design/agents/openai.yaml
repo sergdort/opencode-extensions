@@ -1,4 +1,4 @@
 interface:
-  display_name: "start-work"
+  display_name: "show-program-design"
 policy:
   allow_implicit_invocation: false

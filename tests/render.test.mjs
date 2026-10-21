@@ -11,11 +11,10 @@ import { entries, mappings } from '../scripts/manifest.mjs';
 import { readTree, writeTree, assertTree } from '../scripts/lib/files.mjs';
 import { repository, fixture, put } from './helpers.mjs';
 
-const skills = ['bro', 'handoff', 'plan-feature', 'review-work', 'start-work'];
+const skills = ['bro', 'delegate', 'handoff', 'review-work', 'show-program-design'];
 const expectedNames = [
-  ...['bro', 'handoff', 'plan-feature', 'review-work', 'start-work'].map(n => `opencode/commands/${n}.md`),
-  ...['architect', 'developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
-  'opencode/ARCHITECT_INSTRUCTIONS.md',
+  ...skills.map(n => `opencode/commands/${n}.md`),
+  ...['developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
   ...skills.flatMap(n => [`codex/skills/${n}/SKILL.md`, `codex/skills/${n}/agents/openai.yaml`]),
   ...['developer', 'developer_luna', 'oracle', 'contrarian'].map(n => `codex/agents/${n}.toml`),
 ].sort();
@@ -42,41 +41,32 @@ test('complete native inventory, deterministic rendering and policy invariants',
     assert.match(role.developer_instructions, /smallest credible checks/);
     assert.doesNotMatch(role.developer_instructions, /never stage or commit/i);
   }
-  const workflow = files['codex/skills/start-work/SKILL.md'];
-  assert.match(workflow, /Work toward the agreed outcome through implementation and feedback/);
-  assert.match(workflow, /same Developer/);
-  assert.match(workflow, /smallest credible checks/);
-  assert.doesNotMatch(workflow, /\$decompose|Ticket:|`developer-luna`|\/start-work|\/plan-feature/);
-  assert.match(files['codex/skills/review-work/SKILL.md'], /read-only `oracle`/);
-  assert.equal(frontmatter(files['opencode/commands/plan-feature.md']).agent, 'architect');
-  assert.equal(frontmatter(files['opencode/commands/start-work.md']).agent, 'architect');
-  assert.match(files['codex/skills/plan-feature/SKILL.md'], /Native Plan mode is optional/);
-  assert.match(files['codex/skills/plan-feature/SKILL.md'], /Act as Architect in this main session/);
-  assert.match(workflow, /Act as Architect in this main session/);
-  assert.match(workflow, /leave Plan mode/);
   for (const harness of ['opencode', 'codex']) {
-    const plan = files[harness === 'opencode' ? 'opencode/commands/plan-feature.md' : 'codex/skills/plan-feature/SKILL.md'];
-    assert.match(plan, /useful next step/);
-    assert.match(plan, /Load `show-me`/);
-    assert.match(plan, /conversation, prototypes, and current code/);
-    assert.match(plan, /Planning only: do not implement product changes or dispatch Developers/);
-    assert.match(plan, /only when the user requests it/);
-    assert.match(plan, /No findings is a valid outcome/);
-    assert.match(plan, /never silently fall back/i);
-    assert.match(plan, /wait for the execution command/);
-    assert.doesNotMatch(plan, /architecture table|behavior ID|acceptance ledger|settled|provisional|Review baseline/i);
+    const workflow = files[harness === 'opencode' ? 'opencode/commands/delegate.md' : 'codex/skills/delegate/SKILL.md'];
+    assert.match(workflow, /same Developer/);
+    assert.match(workflow, /delegated claim alone is not proof/);
+    assert.match(workflow, /trivial correction yourself/);
+    assert.doesNotMatch(workflow, /Architect|plan\.md|\$decompose|Ticket:/);
   }
+  assert.equal(frontmatter(files['opencode/commands/delegate.md']).agent, undefined);
+  for (const [harness, name, next] of [['opencode', 'opencode/commands/show-program-design.md', '/delegate'], ['codex', 'codex/skills/show-program-design/SKILL.md', '$delegate']]) {
+    assert.match(files[name], /Load `show-me`/);
+    assert.match(files[name], /do not implement product changes or dispatch Developers/);
+    assert.ok(files[name].includes(`\`${next}\``), harness);
+    assert.doesNotMatch(files[name], /Architect|plan\.md/);
+  }
+  assert.equal(frontmatter(files['opencode/commands/show-program-design.md']).agent, undefined);
+  assert.match(files['codex/skills/delegate/SKILL.md'], /leave Plan mode/);
+  assert.match(files['codex/skills/delegate/SKILL.md'], /`developer_luna`/);
+  assert.match(files['codex/skills/review-work/SKILL.md'], /read-only `oracle`/);
   for (const name of ['opencode/agents/oracle.md', 'opencode/agents/contrarian.md']) {
     assert.match(files[name], /No findings is a valid outcome/);
   }
   for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect/);
   const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));
-  assert.equal(example.agent.plan, undefined);
-  assert.ok(example.agent.architect.model);
-  const tasks = frontmatter(files['opencode/agents/architect.md']).permission.task;
-  assert.equal(Object.keys(tasks)[0], '*');
-  assert.equal(tasks['*'], 'ask');
-  for (const role of ['explore', 'oracle', 'contrarian', 'developer', 'developer-luna']) assert.equal(tasks[role], 'allow');
+  assert.equal(example.agent.architect, undefined);
+  assert.equal(example.instructions, undefined);
+  assert.ok(example.agent.developer.model);
 });
 
 test('golden files match complete payload; tests never update fixtures', t => {

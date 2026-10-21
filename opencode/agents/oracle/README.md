@@ -30,7 +30,7 @@ mkdir -p ~/.config/opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" ~/.config/opencode/agents/oracle.md
 ```
 
-No `opencode.json` changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. The Architect package already includes the scoped policy and Task permission it needs to delegate to Oracle.
+No `opencode.json` changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. To let another primary agent delegate to Oracle, allow `oracle` in that agent's `permission.task`.
 
 ## Project Install
 
@@ -44,7 +44,7 @@ mkdir -p .opencode/agents
 cp "$ORACLE_DIR/agents/oracle.md" .opencode/agents/oracle.md
 ```
 
-No project config changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model. Install the Architect package as well when you want scoped Oracle delegation during its workflow.
+No project config changes are needed for direct `@oracle` use. Without an explicit route, Oracle inherits OpenCode's configured default model.
 
 The core helper `opencode/link-global.sh` generates and links Oracle with the workflow. Rerun it after source updates. Generation updates both payloads. For an existing Codex installation, rerun its helper to refresh agent copies. Then restart OpenCode and reload Codex. See the root README for migration and safety rules.
 

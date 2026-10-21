@@ -2,9 +2,8 @@
 export const mappings = {
   "opencode": {
     "commands": {
-      "plan": "/plan-feature",
-      "start": "/start-work",
-      "review": "/review-work"
+      "review": "/review-work",
+      "delegate": "/delegate"
     },
     "roles": {
       "bounded": "developer-luna",
@@ -18,9 +17,8 @@ export const mappings = {
   },
   "codex": {
     "commands": {
-      "plan": "$plan-feature",
-      "start": "$start-work",
-      "review": "$review-work"
+      "review": "$review-work",
+      "delegate": "$delegate"
     },
     "roles": {
       "bounded": "developer_luna",
@@ -109,59 +107,49 @@ export const entries = [
   },
   {
     "harness": "opencode",
-    "output": "opencode/commands/plan-feature.md",
-    "template": "templates/opencode/commands/plan-feature.md.njk",
-    "legacy": "opencode/commands/plan-feature.md"
+    "output": "opencode/commands/delegate.md",
+    "template": "templates/opencode/commands/delegate.md.njk"
   },
   {
     "harness": "codex",
-    "output": "codex/skills/plan-feature/SKILL.md",
-    "template": "templates/codex/skills/plan-feature.md.njk",
+    "output": "codex/skills/delegate/SKILL.md",
+    "template": "templates/codex/skills/delegate.md.njk",
     "metadata": {
-      "name": "plan-feature",
-      "description": "Use only when the user explicitly invokes $plan-feature. Develop a program design as Architect from the conversation, prototypes, and code using show-me. Planning only. Native Plan mode is optional"
+      "name": "delegate",
+      "description": "Use only when the user explicitly invokes $delegate. Delegate agreed work to a developer subagent and review the result in this session, including spikes and prototypes"
     },
-    "legacy": "codex/skills/plan-feature"
+    "legacy": null
   },
   {
     "harness": "codex",
-    "output": "codex/skills/plan-feature/agents/openai.yaml",
+    "output": "codex/skills/delegate/agents/openai.yaml",
     "template": "templates/codex/openai.yaml.njk",
     "context": {
-      "name": "plan-feature"
+      "name": "delegate"
     }
   },
   {
     "harness": "opencode",
-    "output": "opencode/commands/start-work.md",
-    "template": "templates/opencode/commands/start-work.md.njk",
-    "legacy": "opencode/commands/start-work.md"
+    "output": "opencode/commands/show-program-design.md",
+    "template": "templates/opencode/commands/show-program-design.md.njk"
   },
   {
     "harness": "codex",
-    "output": "codex/skills/start-work/SKILL.md",
-    "template": "templates/codex/skills/start-work.md.njk",
+    "output": "codex/skills/show-program-design/SKILL.md",
+    "template": "templates/codex/skills/show-program-design.md.njk",
     "metadata": {
-      "name": "start-work",
-      "description": "Use only when the user explicitly invokes $start-work. Act as Architect to delegate and verify agreed work, including spikes and prototypes. No plan required"
+      "name": "show-program-design",
+      "description": "Use only when the user explicitly invokes $show-program-design. Show the program design for agreed work with show-me so the approach, architecture, and key interfaces are aligned before building; design only"
     },
-    "legacy": "codex/skills/start-work"
+    "legacy": null
   },
   {
     "harness": "codex",
-    "output": "codex/skills/start-work/agents/openai.yaml",
+    "output": "codex/skills/show-program-design/agents/openai.yaml",
     "template": "templates/codex/openai.yaml.njk",
     "context": {
-      "name": "start-work"
+      "name": "show-program-design"
     }
-  },
-  {
-    "harness": "opencode",
-    "output": "opencode/agents/architect.md",
-    "template": "templates/opencode/agents/architect.md.njk",
-    "context": {},
-    "legacy": "opencode/agents/architect/agents/architect.md",
-    "required": []
   },
   {
     "harness": "opencode",
@@ -274,12 +262,6 @@ export const entries = [
     "context": {},
     "required": [],
     "legacy": "codex/agents/oracle.toml"
-  },
-  {
-    "harness": "opencode",
-    "output": "opencode/ARCHITECT_INSTRUCTIONS.md",
-    "template": "templates/opencode/ARCHITECT_INSTRUCTIONS.md.njk",
-    "legacy": "opencode/agents/architect/ARCHITECT_INSTRUCTIONS.md"
   }
 ];
 
@@ -287,4 +269,10 @@ export const retired = [
   { harness: 'opencode', destination: 'commands/decompose.md', legacy: 'opencode/commands/decompose.md' },
   { harness: 'codex', destination: 'skills/decompose', legacy: 'codex/skills/decompose' },
   { harness: 'codex', destination: 'skills/architect', legacy: 'codex/skills/architect' },
+  { harness: 'opencode', destination: 'agents/architect.md', legacy: 'opencode/agents/architect/agents/architect.md' },
+  { harness: 'opencode', destination: 'ARCHITECT_INSTRUCTIONS.md', legacy: 'opencode/agents/architect/ARCHITECT_INSTRUCTIONS.md' },
+  { harness: 'opencode', destination: 'commands/plan-feature.md', legacy: 'opencode/commands/plan-feature.md' },
+  { harness: 'opencode', destination: 'commands/start-work.md', legacy: 'opencode/commands/start-work.md' },
+  { harness: 'codex', destination: 'skills/plan-feature', legacy: 'codex/skills/plan-feature' },
+  { harness: 'codex', destination: 'skills/start-work', legacy: 'codex/skills/start-work' },
 ];

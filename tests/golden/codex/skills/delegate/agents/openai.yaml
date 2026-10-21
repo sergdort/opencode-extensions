@@ -1,4 +1,4 @@
 interface:
-  display_name: "plan-feature"
+  display_name: "delegate"
 policy:
   allow_implicit_invocation: false

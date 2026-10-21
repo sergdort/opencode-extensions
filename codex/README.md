@@ -48,32 +48,24 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
 
 ## Workflow
 
-Invoke `$start-work` directly after discussing the work when you want Architect to delegate it. No `plan.md` or prior `$plan-feature` invocation is required. This includes spikes and prototypes: the outcome can be a question to answer or behavior to demonstrate. Architect delegates code to `developer` or `developer_luna`, inspects the result, and directs corrections through the same loop used for planned work. It stops at the agreed scope; production hardening requires a separate request.
+Work in the main Codex thread as usual: discuss, prototype, or build directly. Near the end of the conversation, invoke `$show-program-design` to have the main thread use `show-me` to present the approach, core architecture, and important interfaces for alignment; it designs only and stops. When you want implementation done in a separate context, leave native Plan mode if active and invoke `$delegate`. The main thread keeps your intent, hands the agreed work to `developer` or `developer_luna`, inspects the diff, and directs corrections. Arguments add notes; the outcome agreed in the conversation is the brief. No `plan.md` is required.
 
-When you want a program design before execution:
+- For spikes and prototypes, the outcome can be a question to answer or behavior to demonstrate, with an agreed stopping point.
+- The main thread reviews the actual diff instead of trusting a delegated claim and resumes the same Developer for corrections when available. It makes trivial corrections itself when a round trip would cost more.
+- A strategy that fails twice changes instead of being repeated. Product conflicts and consequential trade-offs go back to you.
+- When your judgment can prevent substantial rework, especially on appearance or interaction, it shows a concrete intermediate result early and asks a focused question.
+- Oracle and Contrarian run only when uncertainty or impact justifies an independent read-only look.
 
-1. Explore the feature through conversation or prototypes as needed, then invoke `$plan-feature`. It establishes Architect in the main session and uses `show-me` to explain a concrete program design from what is already known.
-2. Discuss the design, important choices, and assumptions. Revise the same `plan.md` note. Independent Oracle or Contrarian review runs only when uncertainty or impact justifies it; no findings is a valid outcome. Grilling runs only at the user's request.
-3. When you are ready to build, leave native Plan mode if active and invoke `$start-work`. It establishes Architect in the main session and executes the agreed outcome.
-4. Architect picks the next useful step from evidence and delegates product code to a Developer, choosing the complex or bounded route by the work at hand. It reviews results and directs corrections.
-5. Verify with the smallest credible checks, hand off what remains manual, and finish with human acceptance.
+Developers explore and adapt internally and may revise implementation choices within user intent and safety constraints. The bounded Developer takes predictable, directly verifiable work that follows an established pattern and hands uncertain design or debugging back. Developers may submit task-owned local commits after focused proof when repository policy and the user permit them, preserving unrelated working-tree content and index entries.
 
-When user judgment can prevent substantial rework, Architect shows a concrete intermediate result and asks for focused feedback, especially on appearance or interaction. This is not a required approval step. Independent work continues while work that depends on the answer waits.
-
-Native Plan mode is optional for `$plan-feature`; the skill does not switch modes. In any mode, it designs without changing product code or dispatching Developers. The design is the current approach and can change during implementation. When native restrictions prevent writing `plan.md`, keep the note in the conversation or the native plan file. `$start-work` respects a supplied plan path and never falls back silently; an outcome already agreed in the conversation is enough to execute. It does not bypass an active Plan mode.
-
-Use `$plan-feature` to revise the note for the same feature. During implementation, Architect keeps it current when a decision changes. A conversational approval alone does not start execution. There is no separate `$architect` entry, `$decompose`, ticket queue, or `Ticket:` trailer protocol. The helper removes only retired skill links owned by this checkout; inspect old copied skills manually.
-
-Developers explore and adapt internally and may revise implementation choices as they learn, within user intent and established safety constraints. The bounded Developer takes predictable, directly verifiable work that follows an established pattern and hands uncertain design or debugging back. Developers may submit task-owned local commits after focused proof when repository policy and the user permit them, preserving unrelated working-tree content and index entries. Architect reviews and directs corrections; it does not commit product changes. The same Developer resumes corrections when available.
-
-The workflow uses the conversation, Git, the working tree, and an optional `plan.md`. The plan is a lightweight durable note: outcome, constraints, program design and rationale, what would demonstrate success, the next step, and honest evidence. It retains enough text to understand the design without its visual artifacts. Create a note only when it helps continuity. No template or decision brief is required. The workflow never removes planning artifacts automatically; cleanup belongs to the user.
+There is no `$architect`, `$plan-feature`, `$start-work`, `$decompose`, ticket queue, or `Ticket:` trailer protocol. The helper removes only retired skill links owned by this checkout; inspect old copied skills manually.
 
 ## Skills And Agents
 
 All five generated entry points have `policy.allow_implicit_invocation: false`:
 
-- `$plan-feature [plan-path]`: act as Architect and develop a program design with `show-me` from the conversation, prototypes, and code (planning only).
-- `$start-work [plan-path]`: establish Architect and delegate agreed work, including spikes and prototypes. The plan path is optional; a supplied path must identify an existing plan.
+- `$show-program-design [notes]`: present the program design with `show-me` for alignment; design only.
+- `$delegate [notes]`: delegate agreed work, including spikes and prototypes, to a Developer and review the result in the main thread.
 - `$bro`: restate the last response plainly.
 - `$handoff`: write repository-local handoff documents.
 - `$review-work [plan-path] [git-range]`: dispatch Oracle for independent implementation review.
@@ -89,11 +81,11 @@ Custom agents:
 | `oracle` | Read-only plan and implementation advice | `gpt-6-astra` / xhigh |
 | `contrarian` | Focused read-only challenge to a design decision | `gpt-6-astra` / xhigh |
 
-Select `gpt-6-sol` with `high` reasoning for planning and Architect execution. The main thread keeps its selected model; skills do not switch it. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
+The main thread keeps its selected model; skills do not switch it. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
 
-Planning uses the shared `show-me` skill for diagrams and code sketches that explain the design. Use inline visuals when file writes are restricted. Oracle and Contrarian stay optional independent reviewers, used when uncertainty or impact justifies them. Optional Librarian and repository verification tools do not become core dependencies.
+`$show-program-design` uses the shared `show-me` skill; it is also available for diagrams and code sketches whenever you ask. Oracle and Contrarian stay optional independent reviewers, used when uncertainty or impact justifies them. Optional Librarian and repository verification tools do not become core dependencies.
 
-Invoke `$grill-me-architecture` separately when you want a deeper design interview. The planning agent may recommend it for a specific difficult decision, but does not invoke it automatically.
+Invoke `$grill-me-architecture` separately when you want a deeper design interview.
 
 ## Permissions And Limits
 

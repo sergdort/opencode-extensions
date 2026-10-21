@@ -16,7 +16,7 @@ OpenCode packages live under `opencode/`:
 
 - `opencode/link-global.sh`: opt-in global symlink helper for the core OpenCode setup.
 - `opencode/commands/`: command documentation and the unchanged Librarian prompt. Core commands are generated into `generated/current/opencode/commands/`.
-- `opencode/agents/architect/`: persistent primary orchestrator plus complex and bounded Developer profiles and a contrarian agent for plan-driven feature work; local discovery uses OpenCode's built-in Explore agent.
+- `opencode/agents/architect/`: documentation and example config for the complex and bounded Developer subagents, Contrarian, and the `/show-program-design` and `/delegate` commands used from the normal `build` agent; local discovery uses OpenCode's built-in Explore agent. The directory keeps its historical name; there is no Architect primary agent.
 - `opencode/agents/oracle/`: read-only second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
 
@@ -40,7 +40,7 @@ The Last Harness package lives under `tlh/`:
 
 Shared skills live under `skills/`:
 
-- `skills/show-me/`: the shared visual explanation skill used by feature planning.
+- `skills/show-me/`: the shared visual explanation skill used by `show-program-design`.
 - `skills/grill-me-architecture/`: the standalone architecture grilling skill. Grilling is optional in the shared OpenCode/Codex workflow; Claude Code keeps its independent `/architect` integration. Both core link helpers link these shared skills directly into `~/.agents/skills/`.
 
 ## Generated Core Conventions
@@ -63,7 +63,7 @@ Shared skills live under `skills/`:
 ## File Conventions — OpenCode (`opencode/`)
 
 - Package documentation and example config live under `opencode/agents/<package>/`. Core agent definitions are generated into `generated/current/opencode/agents/*.md`; Librarian remains native source.
-- The Architect package's routing instruction is named `ARCHITECT_INSTRUCTIONS.md`.
+- Do not add an orchestrator primary agent or a routing instruction file. Core commands that delegate run in the user's current primary agent and omit `agent:`.
 - Example OpenCode config snippets are named `opencode.<package>.example.json`.
 - Package READMEs should include what the package provides, non-goals, install steps, any required config, usage, model defaults, and restart requirements.
 - Generated commands live in `generated/current/opencode/commands/*.md`. Use supported native frontmatter such as `description` and `agent` in their templates.
@@ -81,10 +81,10 @@ Shared skills live under `skills/`:
 - Core skills are generated into `generated/current/codex/skills/<skill>/SKILL.md` and use valid skill frontmatter. Each bundled workflow skill has `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
 - Keep skill descriptions explicit about manual invocation and scope. Do not add an implicit router in `AGENTS.md`.
 - Use Codex's built-in `explorer` for routine discovery instead of adding a duplicate Repo Scout.
-- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `plan-feature` uses Architect and `show-me` to develop a program design from the conversation, prototypes, and code, with independent review only when warranted. `grill-me-architecture` is standalone and runs only at the user's request; `skills/` holds both shared sources.
+- Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `show-program-design` uses `show-me` to align on the program design at the end of a conversation, design only. `grill-me-architecture` is standalone and runs only at the user's request; `skills/` holds both shared sources.
 - Keep `codex/link-global.sh` a scoped wrapper around the common generation/link implementation. It must not install dependencies, edit config, or change unrelated files.
-- The shared workflow uses `plan.md`, Git, and the working tree. `plan-feature` establishes Architect for program design only; `start-work` establishes Architect for execution. `plan.md` is a lightweight durable note with no required template, and an outcome agreed in the conversation can be enough to execute. Respect native Plan mode restrictions and respect a supplied plan path instead of silently falling back. Do not add tickets or a decomposition stage. The workflow never removes planning artifacts; cleanup belongs to the user.
-- Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the prompt contract and Architect's Git safety rules aligned.
+- The shared workflow uses the conversation, Git, and the working tree. `delegate` keeps the user's main session in charge: it dispatches a Developer, reviews the diff, and directs corrections. `show-program-design` presents the approach, architecture, and important interfaces for alignment and stops; it does not gate `delegate` or require a plan file. Respect native Plan mode restrictions. Do not add tickets, a decomposition stage, or an approval gate between design and implementation. The workflow never removes user artifacts; cleanup belongs to the user.
+- Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the Developer prompt contract and the delegate procedure's Git safety rules aligned.
 - Keep `codex/README.md` in sync when changing skills, custom agents, lifecycle rules, permissions, or model defaults.
 - Remind users to reload Codex after changing skills or custom agents.
 
@@ -111,7 +111,7 @@ Shared skills live under `skills/`:
 
 - Make the smallest correct change.
 - Preserve the repo's copy-based, reversible setup style.
-- Keep prompts direct, operational, and scoped to what the agent or command owns. The shared OpenCode/Codex workflow is intentionally lightweight: make the program design concrete from available evidence, revise the implementation route by building and integrating, and keep review and verification proportional to real uncertainty and impact. Do not reintroduce required plan templates, architecture tables, behavior IDs, verdict schemas, acceptance ledgers, or automatic review gates.
+- Keep prompts direct, operational, and scoped to what the agent or command owns. The shared OpenCode/Codex workflow is intentionally lightweight: the user's normal agent keeps intent, delegation is opt-in, the implementation route is revised by building and integrating, and review and verification stay proportional to real uncertainty and impact. Do not reintroduce required plan templates, architecture tables, behavior IDs, verdict schemas, acceptance ledgers, or automatic review gates.
 - Do not add backward-compatibility layers unless there is a concrete need.
 - Avoid duplicating detailed package docs in multiple places; use root guidance for repo-wide rules and package READMEs for package-specific details.
 - Keep files ASCII unless an existing file already needs non-ASCII.

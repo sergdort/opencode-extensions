@@ -47,33 +47,31 @@ For generation without global installation:
 npm run generate
 ```
 
-You can copy selected files from `generated/current/` instead. These files are self-contained. Node.js and this checkout are not needed at runtime for copied native files. Copy the shared `show-me` skill from `skills/`. Copy `grill-me-architecture` too if you want standalone grilling. See the [OpenCode Architect guide](opencode/agents/architect/README.md) and [Codex guide](codex/README.md).
+You can copy selected files from `generated/current/` instead. These files are self-contained. Node.js and this checkout are not needed at runtime for copied native files. Copy the shared `show-me` skill from `skills/`. Copy `grill-me-architecture` too if you want standalone grilling. See the [OpenCode agent guide](opencode/agents/architect/README.md) and [Codex guide](codex/README.md).
 
 ## Shared Workflow
 
-| Stage | OpenCode | Codex |
+Use the harness's normal agent (`build` in OpenCode, the main thread in Codex) for conversation, prototypes, and direct building. The packages add subagents and a few manual entry points around that:
+
+| Purpose | OpenCode | Codex |
 |---|---|---|
-| Develop a program design with show-me (planning only) | `/plan-feature` selects Architect | `$plan-feature` establishes Architect in the main session |
-| Execute the agreed outcome through Architect | `/start-work` selects Architect | `$start-work` establishes the role |
+| Show the program design for alignment before building | `/show-program-design` | `$show-program-design` |
+| Delegate agreed work to a Developer and review it in this session | `/delegate` | `$delegate` |
 | Plain-language restatement | `/bro` | `$bro` |
 | Handoff | `/handoff` | `$handoff` |
 | Independent implementation review | Optional `/review-work` via `review` | `$review-work` via `oracle` |
 
-Planning builds on the conversation, prototypes, and current code. Architect uses `show-me` to explain a concrete program design, important choices, and assumptions before implementation. The design can change as implementation provides new evidence. Grilling runs only at the user's request. Independent Oracle or Contrarian review happens when uncertainty or impact justifies it, not by default. The workflow uses `plan.md` as a lightweight durable note, Git, and the working tree. It requires no template, decision brief, tickets, or decomposition stage.
-
-Codex native Plan mode is optional. Planning respects the active mode's write restrictions, and a supplied plan path is respected rather than silently replaced. Invoke `start-work` directly for work agreed in the conversation, including spikes and prototypes. No plan file or prior `plan-feature` invocation is required; exploratory work uses the same Developer delegation and review loop. Leave Codex Plan mode before execution. OpenCode uses Architect for both planning and execution; the command defines which work is authorized.
-
-Architect owns intent and delegates product code to the complex or bounded Developer, choosing the route by the work at hand rather than fixed choreography. Developers discover the implementation route by building and integrating, verify with the smallest credible checks, and submit task-owned local commits when authorized. Review and verification stay proportional to real uncertainty and impact; nothing runs automatic full gates or repeated reviews. Final human acceptance remains required. Repository and user restrictions remain authoritative.
+Delegation picks the complex or bounded Developer by the work at hand, inspects the diff instead of trusting a delegated claim, and resumes the same Developer for corrections. Oracle and Contrarian are read-only reviewers used when uncertainty or impact justifies them, through delegation or directly. Program design uses `show-me` to present the approach, architecture, and important interfaces, then stops; implementation starts when you ask, directly or through delegation. `grill-me-architecture` runs at the user's request. There is no orchestrator agent, required plan file, template, tickets, or decomposition stage. Final human acceptance remains required, and repository and user restrictions remain authoritative.
 
 ## Rationale
 
-The shared workflow develops a program design from available evidence and revises the route through building and integrating: [responding to change over following a plan](https://agilemanifesto.org/principles.html), [YAGNI](https://martinfowler.com/bliki/Yagni.html), and [getting one piece done](https://basecamp.com/shapeup/3.2-chapter-11) instead of prescribing the whole solution up front. Ceremony earns its place only when uncertainty or blast radius justifies it.
+The shared workflow keeps design in the conversation and revises the route through building and integrating: [responding to change over following a plan](https://agilemanifesto.org/principles.html), [YAGNI](https://martinfowler.com/bliki/Yagni.html), and [getting one piece done](https://basecamp.com/shapeup/3.2-chapter-11) instead of prescribing the whole solution up front. Ceremony earns its place only when uncertainty or blast radius justifies it.
 
-Native mechanisms still differ. OpenCode uses a persistent primary agent and command bindings. Codex uses manual-only skills in the main thread and custom spawned agents. Prompt rules are not universal permission enforcement. Shared text cannot guarantee identical model behavior.
+Native mechanisms still differ. OpenCode uses commands and subagents. Codex uses manual-only skills in the main thread and custom spawned agents. Prompt rules are not universal permission enforcement. Shared text cannot guarantee identical model behavior.
 
 ## Migration And Recovery
 
-The helper recognizes exact legacy and generated links owned by this checkout, including dangling legacy links. It removes owned obsolete `decompose` links and the retired Codex `architect` skill link. It reports obsolete copies for manual inspection.
+The helper recognizes exact legacy and generated links owned by this checkout, including dangling legacy links. It removes owned obsolete `decompose` links, the retired Codex `architect` skill link, and the retired Architect workflow links (OpenCode `architect` agent, `ARCHITECT_INSTRUCTIONS.md`, and `plan-feature`/`start-work` in both harnesses). Config entries that referenced them are yours to remove. It reports obsolete copies for manual inspection.
 
 The helpers link both shared skill directories directly from `skills/`. Codex discovers directory links but skips a symlinked `SKILL.md`. For an older install with a real skill directory containing a `SKILL.md` link, move that directory outside all skill search paths, then rerun the helper. The helper preserves those directories, including with `--force`. An existing personal `show-me` skill is a named conflict and is preserved by default. Unmanaged or edited regular files require explicit `--force` to replace. Directories and foreign links are never removed by force. Back up and move conflicting copies or links manually, then rerun. Old installed links to removed source paths need this migration before the next agent session.
 
