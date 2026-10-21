@@ -19,6 +19,7 @@ OpenCode packages live under `opencode/`:
 - `opencode/agents/architect/`: documentation and example config for the complex and bounded Developer subagents, Contrarian, and the `/show-program-design` and `/delegate` commands used from the normal `build` agent; local discovery uses OpenCode's built-in Explore agent. The directory keeps its historical name; there is no Architect primary agent.
 - `opencode/agents/oracle/`: read-only second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
+- `opencode/plugins/second-opinions/`: optional V2 server plugin that appends an Oracle/Contrarian consultation policy to selected primary agents (default `build`) through the `context` hook. Outside generation; installed by a `plugins` config entry, not by the link helpers.
 
 The Claude Code package lives under `claude/`:
 

@@ -15,7 +15,7 @@ scripts/               renderer, output manifest, publication, link helpers
 generated/current/     generated native installation files (Git-ignored)
 tests/golden/          reviewed native output fixtures (tracked, not installed)
 skills/                shared show-me and optional grill-me-architecture skills
-opencode/              documentation, example config, Librarian, scoped helper
+opencode/              documentation, example config, Librarian, optional plugin, scoped helper
 codex/                 documentation, optional Librarian, scoped helper
 claude/                unchanged independent Claude Code workflow
 tlh/                   unchanged additive prompt package
@@ -103,6 +103,6 @@ Review the full fixture diff before committing it. Golden approval does not bypa
 
 ## Independent Packages
 
-[Claude Code](claude/README.md) retains its existing ticket workflow. [The Last Harness](tlh/README.md) remains an additive prompt package. [OpenCode Librarian](opencode/agents/librarian/README.md) and [Codex Librarian](codex/optional/librarian/README.md) remain separately maintained native packages.
+[Claude Code](claude/README.md) retains its existing ticket workflow. [The Last Harness](tlh/README.md) remains an additive prompt package. [OpenCode Librarian](opencode/agents/librarian/README.md) and [Codex Librarian](codex/optional/librarian/README.md) remain separately maintained native packages. The optional [OpenCode second-opinions plugin](opencode/plugins/second-opinions/README.md) tells `build` when to consult Oracle or Contrarian; it is installed by a `plugins` config entry, not by the link helpers.
 
 See [AGENTS.md](AGENTS.md) for contributor rules.
