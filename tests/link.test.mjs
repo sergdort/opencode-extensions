@@ -142,7 +142,7 @@ test('selected link edits with shared publication; partial installation can resu
   generateAndLink(root, { harness: 'opencode' }, env, message => notices.push(message));
   assert.equal(fs.lstatSync(skill).ino, inode);
   assert.match(fs.readFileSync(path.join(skill, 'SKILL.md'), 'utf8'), /Shared update/);
-  assert.match(notices.join('\n'), /BOTH payloads/);
+  assert.match(notices.join('\n'), /ALL payloads/);
   const newEnv = { ...env, CODEX_SKILLS_DIR: path.join(env.HOME, 'new-skills'), CODEX_AGENTS_DIR: path.join(env.HOME, 'new-agents') };
   const actions = installation(root, { harness: 'codex' }, newEnv);
   assert.throws(() => applyInstallation(actions, (_, count) => { if (count === 2) throw Error('injected'); }, quiet), /Installation incomplete/);
@@ -247,4 +247,32 @@ test('partial copy installation resumes and optional Librarian uses managed copi
   fs.appendFileSync(librarian, '\n# source update\n');
   generateAndLink(root, { harness: 'codex', withLibrarian: true }, env, quiet);
   assert.match(fs.readFileSync(installed, 'utf8'), /source update/);
+});
+
+test('Claude Code links agents, commands, shared skills and optional Librarian; retired workflow links are removed', t => {
+  const { root, env, base } = fixture(t);
+  const dir = env.CLAUDE_CONFIG_DIR;
+  const retiredLinks = ['commands/architect.md', 'commands/start-work.md', 'agents/repo-scout.md'].map(name => {
+    symlink(path.join(root, 'claude', name), path.join(dir, name));
+    return path.join(dir, name);
+  });
+  const legacyDeveloper = path.join(dir, 'agents/developer.md');
+  symlink(path.join(root, 'claude/agents/developer.md'), legacyDeveloper);
+  const foreign = path.join(dir, 'commands/decompose.md');
+  symlink(path.join(base, 'foreign/decompose.md'), foreign);
+  generateAndLink(root, { harness: 'claude' }, env, quiet);
+  for (const destination of retiredLinks) assert.equal(fs.lstatSync(destination, { throwIfNoEntry: false }), undefined);
+  assert.equal(fs.readlinkSync(foreign), path.join(base, 'foreign/decompose.md'));
+  assert.equal(fs.readlinkSync(legacyDeveloper), path.join(root, 'generated/current/claude/agents/developer.md'));
+  for (const name of ['agents/oracle.md', 'agents/developer-luna.md', 'commands/delegate.md', 'commands/review-work.md']) {
+    assert.equal(fs.readlinkSync(path.join(dir, name)), path.join(root, 'generated/current/claude', name));
+  }
+  for (const name of ['show-me', 'grill-me-architecture']) {
+    assert.equal(fs.readlinkSync(path.join(dir, 'skills', name)), path.join(root, 'skills', name));
+  }
+  assert.equal(fs.existsSync(path.join(dir, 'agents/github-librarian.md')), false);
+  assert.equal(fs.existsSync(env.OPENCODE_CONFIG_DIR), false);
+  assert.equal(fs.existsSync(env.CODEX_AGENTS_DIR), false);
+  generateAndLink(root, { harness: 'claude', withLibrarian: true }, env, quiet);
+  assert.equal(fs.readlinkSync(path.join(dir, 'commands/github-librarian.md')), path.join(root, 'claude/commands/github-librarian.md'));
 });

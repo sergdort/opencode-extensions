@@ -72,10 +72,12 @@ function unchangedCopy(action) {
 
 export function installation(root, options = {}, environment = process.env, files = render(root)) {
   const home = environment.HOME || os.homedir();
-  const selected = options.harness ?? 'both';
-  if (!['both', 'opencode', 'codex'].includes(selected)) throw new Error(`Unknown harness: ${selected}`);
-  const oc = selected !== 'codex';
-  const cx = selected !== 'opencode';
+  const selected = options.harness ?? 'all';
+  if (!['all', 'opencode', 'codex', 'claude'].includes(selected)) throw new Error(`Unknown harness: ${selected}`);
+  const oc = ['all', 'opencode'].includes(selected);
+  const cx = ['all', 'codex'].includes(selected);
+  const cl = ['all', 'claude'].includes(selected);
+  const enabled = harness => ({ opencode: oc, codex: cx, claude: cl })[harness];
   const bases = {};
   if (oc) {
     bases.opencode = destinationRoot(environment.OPENCODE_CONFIG_DIR || path.join(environment.XDG_CONFIG_HOME || path.join(home, '.config'), 'opencode'), root, home);
@@ -85,6 +87,7 @@ export function installation(root, options = {}, environment = process.env, file
     bases.skills = destinationRoot(environment.CODEX_SKILLS_DIR || path.join(home, '.agents/skills'), root, home);
     bases.agents = destinationRoot(environment.CODEX_AGENTS_DIR || path.join(home, '.codex/agents'), root, home);
   }
+  if (cl) bases.claude = destinationRoot(environment.CLAUDE_CONFIG_DIR || path.join(home, '.claude'), root, home);
   const actions = new Map();
   function add(base, relative, source, legacy = [], remove = false, body) {
     const destination = path.join(base, relative);
@@ -95,21 +98,22 @@ export function installation(root, options = {}, environment = process.env, file
     actions.set(destination, action);
   }
   for (const entry of entries) {
-    if ((entry.harness === 'opencode' && !oc) || (entry.harness === 'codex' && !cx)) continue;
+    if (!enabled(entry.harness)) continue;
     if (entry.output === 'opencode/commands/review-work.md' && !options.withReview) continue;
-    let relative = entry.output.replace(/^(opencode|codex)\//, '');
+    let relative = entry.output.replace(/^(opencode|codex|claude)\//, '');
     let output = entry.output;
     if (relative.endsWith('/agents/openai.yaml')) continue;
     if (relative.endsWith('/SKILL.md')) { relative = relative.replace(/\/SKILL.md$/, ''); output = output.replace(/\/SKILL.md$/, ''); }
-    const base = entry.harness === 'opencode' ? bases.opencode : relative.startsWith('skills/') ? bases.skills : bases.agents;
+    const base = entry.harness === 'opencode' ? bases.opencode : entry.harness === 'claude' ? bases.claude
+      : relative.startsWith('skills/') ? bases.skills : bases.agents;
     if (entry.harness === 'codex') relative = relative.replace(/^(skills|agents)\//, '');
     add(base, relative, path.join(root, 'generated/current', output), entry.legacy ? [entry.legacy] : [], false,
       entry.harness === 'codex' && output.startsWith('codex/agents/') ? files[output] : undefined);
   }
   for (const item of retired) {
-    if ((item.harness === 'opencode' && !oc) || (item.harness === 'codex' && !cx)) continue;
-    const base = item.harness === 'opencode' ? bases.opencode : bases.skills;
-    const relative = item.harness === 'opencode' ? item.destination : item.destination.replace(/^skills\//, '');
+    if (!enabled(item.harness)) continue;
+    const base = item.harness === 'codex' ? bases.skills : bases[item.harness];
+    const relative = item.harness === 'codex' ? item.destination.replace(/^skills\//, '') : item.destination;
     add(base, relative, path.join(root, 'generated/current', item.harness, item.destination), [item.legacy], true);
   }
   for (const name of ['show-me', 'grill-me-architecture']) {
@@ -117,6 +121,7 @@ export function installation(root, options = {}, environment = process.env, file
     if (!stat(path.join(source, 'SKILL.md'))?.isFile()) throw new Error(`Missing bundled shared skill: ${source}/SKILL.md`);
     if (oc) add(bases.sharedOpenCode, name, source);
     if (cx) add(bases.skills, name, source);
+    if (cl) add(bases.claude, `skills/${name}`, source);
   }
   // Optional-package sources remain independent of generation.
   if (oc) {
@@ -127,6 +132,10 @@ export function installation(root, options = {}, environment = process.env, file
     add(bases.skills, 'github-librarian', path.join(root, 'codex/optional/librarian/skills/github-librarian'));
     const source = path.join(root, 'codex/optional/librarian/agents/github_librarian.toml');
     add(bases.agents, 'github_librarian.toml', source, [], false, fs.readFileSync(source, 'utf8'));
+  }
+  if (cl && options.withLibrarian) {
+    add(bases.claude, 'agents/github-librarian.md', path.join(root, 'claude/agents/github-librarian.md'));
+    add(bases.claude, 'commands/github-librarian.md', path.join(root, 'claude/commands/github-librarian.md'));
   }
   const list = [...actions.values()];
   for (const action of list) {
@@ -181,7 +190,7 @@ export function applyInstallation(actions, checkpoint = () => {}, report = conso
     }
   } catch (error) {
     const pending = actions.filter(a => ['link', 'copy', 'remove'].includes(a.operation) && !changed.includes(a.destination)).map(a => a.destination);
-    throw new Error(`${error.message}\nInstallation incomplete. Changed: ${changed.join(', ') || 'none'}. Pending: ${pending.join(', ') || 'none'}. Rerun before reloading either harness.`);
+    throw new Error(`${error.message}\nInstallation incomplete. Changed: ${changed.join(', ') || 'none'}. Pending: ${pending.join(', ') || 'none'}. Rerun before reloading any harness.`);
   }
   return changed;
 }
@@ -193,13 +202,13 @@ export function generateAndLink(root, options = {}, environment = process.env, r
     const files = render(root);
     const actions = installation(root, options, environment, files);
     if (options.dryRun) {
-      report('Dry run: validate and regenerate BOTH payloads; selection limits global installation edits only.');
+      report('Dry run: validate and regenerate ALL payloads; selection limits global installation edits only.');
       for (const action of actions) report(`${action.operation}: ${action.destination} -> ${action.source}`);
     } else {
       publish(root, files);
       applyInstallation(actions, undefined, report);
     }
-    report('Generation updates BOTH payloads. Rerun the Codex helper after source updates to refresh agent copies. Restart OpenCode and reload Codex after installation.');
+    report('Generation updates ALL payloads. Rerun the Codex helper after source updates to refresh agent copies. Restart OpenCode and Claude Code and reload Codex after installation.');
     return { files, actions };
   };
   // A dry run neither publishes output nor creates a lock or destination directory.

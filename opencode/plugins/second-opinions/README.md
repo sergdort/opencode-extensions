@@ -7,7 +7,7 @@ Subagent descriptions alone rarely lead `build` to ask for a second opinion. Thi
 ## What It Provides
 
 - `index.ts`: registers a `context` session hook. For each model call by a listed agent, it appends `policy.md` as one system text part.
-- `policy.md`: the trigger rule. It names a few moments (choosing between viable approaches, fixing an inferred root cause, reporting a non-trivial change done). These moments count only when the work touches a high-risk area. The file also lists when to skip.
+- `policy.md`: the trigger rule. Claude Code can reuse it through `--append-system-prompt-file`; see the Claude Code README. It names a few moments (choosing between viable approaches, fixing an inferred root cause, reporting a non-trivial change done). These moments count only when the work touches a high-risk area. The file also lists when to skip.
 
 The appended text changes only the outgoing model call. It is not saved in session history or configuration. The text is constant, so prompt caching still works.
 

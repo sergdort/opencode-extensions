@@ -62,10 +62,11 @@ There is no `$architect`, `$plan-feature`, `$start-work`, `$decompose`, ticket q
 
 ## Skills And Agents
 
-All five generated entry points have `policy.allow_implicit_invocation: false`:
+All six generated entry points have `policy.allow_implicit_invocation: false`:
 
 - `$show-program-design [notes]`: present the program design with `show-me` for alignment; design only.
 - `$delegate [notes]`: delegate agreed work, including spikes and prototypes, to a Developer and review the result in the main thread.
+- `$council [notes]`: ask Oracle and Contrarian for independent views on the current question in parallel, then judge them in the main thread.
 - `$bro`: restate the last response plainly.
 - `$handoff`: write repository-local handoff documents.
 - `$review-work [plan-path] [git-range]`: dispatch Oracle for independent implementation review.

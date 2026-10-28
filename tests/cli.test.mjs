@@ -10,7 +10,7 @@ import { readTree, assertTree } from '../scripts/lib/files.mjs';
 function executableFixture(t) {
   const fixtureData = fixture(t);
   const { root } = fixtureData;
-  for (const name of ['scripts', 'package.json', 'link-global.sh', 'codex/link-global.sh', 'opencode/link-global.sh']) {
+  for (const name of ['scripts', 'package.json', 'link-global.sh', 'codex/link-global.sh', 'opencode/link-global.sh', 'claude/link-global.sh']) {
     fs.cpSync(path.join(repository, name), path.join(root, name), { recursive: true });
   }
   symlink(path.join(repository, 'node_modules'), path.join(root, 'node_modules'));
@@ -40,14 +40,19 @@ test('scoped helpers share validation and never install dependencies', t => {
   assert.equal(run('link-global.sh', ['--harness']).status, 1);
   const dry = run('codex/link-global.sh', ['--dry-run']);
   assert.equal(dry.status, 0, dry.stderr);
-  assert.match(dry.stdout, /BOTH payloads/);
+  assert.match(dry.stdout, /ALL payloads/);
   assert.equal(fs.existsSync(path.join(root, 'generated')), false);
   const result = run('codex/link-global.sh', []);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(env.OPENCODE_CONFIG_DIR), false);
+  assert.equal(fs.existsSync(env.CLAUDE_CONFIG_DIR), false);
   assert.equal(fs.lstatSync(path.join(env.CODEX_SKILLS_DIR, 'bro')).isSymbolicLink(), true);
   assert.equal(fs.lstatSync(path.join(env.CODEX_AGENTS_DIR, 'developer.toml')).isFile(), true);
   assert.match(result.stdout, /Copied:/);
+  const claude = run('claude/link-global.sh', []);
+  assert.equal(claude.status, 0, claude.stderr);
+  assert.equal(fs.lstatSync(path.join(env.CLAUDE_CONFIG_DIR, 'agents/oracle.md')).isSymbolicLink(), true);
+  assert.equal(fs.existsSync(env.OPENCODE_CONFIG_DIR), false);
   fs.unlinkSync(path.join(root, 'node_modules'));
   const missing = run('link-global.sh', ['--dry-run']);
   assert.equal(missing.status, 1);
