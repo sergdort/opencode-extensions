@@ -30,8 +30,17 @@ export function validatePayload(files) {
       if (YAML.parse(files[policyPath] ?? '')?.policy?.allow_implicit_invocation !== false) {
         throw new Error(`Manual-only policy required: ${policyPath}`);
       }
-    } else if (/opencode\/(commands|agents)\//.test(name)) {
-      if (!frontmatter(text, name)?.description) throw new Error(`Missing description: ${name}`);
+    } else if (/^(opencode|claude)\/(commands|agents)\//.test(name)) {
+      const metadata = frontmatter(text, name);
+      if (!metadata?.description) throw new Error(`Missing description: ${name}`);
+      if (name.startsWith('claude/agents/')) {
+        for (const field of ['name', 'tools', 'model']) {
+          if (typeof metadata[field] !== 'string' || !metadata[field].trim()) throw new Error(`Missing ${field}: ${name}`);
+        }
+        if (/^(oracle|contrarian)$/.test(metadata.name) && /\b(Edit|Write)\b/.test(metadata.tools)) {
+          throw new Error(`Read-only agent grants edit tools: ${name}`);
+        }
+      }
     }
   }
 }
@@ -57,7 +66,8 @@ export function render(root, manifest = entries, nativeMappings = mappings) {
     for (const key of entry.required ?? []) {
       if (context[key] === undefined || context[key] === null) throw new Error(`Missing required context: ${entry.output}.${key}`);
     }
-    if (entry.metadata) context.frontmatter = YAML.stringify(entry.metadata).trimEnd();
+    // Claude Code frontmatter stays on single lines; other harnesses keep the library default.
+    if (entry.metadata) context.frontmatter = YAML.stringify(entry.metadata, entry.harness === 'claude' ? { lineWidth: 0 } : undefined).trimEnd();
     let text = env.render(entry.template, context).trimEnd() + '\n';
     if (entry.format === 'toml') {
       const obj = { ...entry.metadata, developer_instructions: text };

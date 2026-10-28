@@ -1,0 +1,4 @@
+interface:
+  display_name: "council"
+policy:
+  allow_implicit_invocation: false

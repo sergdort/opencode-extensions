@@ -12,6 +12,8 @@ A moment counts only when the work touches money, billing, or entitlements; auth
 
 Consult `contrarian` instead when the issue is one hard-to-reverse choice made under uncertainty. Give it the decision, the alternative you rejected, and why.
 
+Consult both in parallel, with the same neutral brief, when a design or debugging problem is hard and open: more than one credible approach, and the code does not settle which is right. Leave your preferred answer out of the brief.
+
 Give the subagent the goal, the relevant files or diff, and what you want challenged. Weigh its answer rather than adopting it wholesale, and tell the user what changed because of it.
 
 Skip when the edit is mechanical, the answer is in the code, or the user declined a review. When you skip at one of the moments above, say so in one line with the reason.

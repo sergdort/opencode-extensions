@@ -1,17 +1,17 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const usage = `Usage: link-global.sh [--harness both|opencode|codex] [--dry-run] [--force] [--with-review] [--with-librarian]
+const usage = `Usage: link-global.sh [--harness all|opencode|codex|claude] [--dry-run] [--force] [--with-review] [--with-librarian]
 
-Generate BOTH core payloads and install the selected harness destinations.
+Generate ALL core payloads and install the selected harness destinations (default: all).
 Selection limits installation edits, not updates to already-linked generated content.
 Codex agents are managed regular copies; rerun with Codex selected to refresh them.
 Run npm ci explicitly first. No dependency installation or config editing occurs.
 --force replaces conflicting regular files only, never directories or foreign links.
 --with-review links OpenCode review-work (requires an existing read-only review agent).
---with-librarian adds the optional Codex Librarian. OpenCode keeps its existing Librarian links.
+--with-librarian adds the optional Codex and Claude Code Librarian. OpenCode keeps its existing Librarian links.
 Overrides: OPENCODE_CONFIG_DIR, XDG_CONFIG_HOME, AGENTS_SKILLS_DIR,
-CODEX_SKILLS_DIR, CODEX_AGENTS_DIR. Restart/reload both already-linked harnesses.`;
+CODEX_SKILLS_DIR, CODEX_AGENTS_DIR, CLAUDE_CONFIG_DIR. Restart/reload all already-linked harnesses.`;
 
 try {
   const args = process.argv.slice(2);

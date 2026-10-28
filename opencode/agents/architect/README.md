@@ -19,6 +19,7 @@ Generated commands in `generated/current/opencode/commands/`:
 
 - `show-program-design.md`: present the program design with `show-me` for alignment; design only
 - `delegate.md`: delegate agreed work, including spikes and prototypes, to a Developer and review the result in the current session
+- `council.md`: ask Oracle and Contrarian for independent views on the current question in parallel, then judge them in the current session
 - `review-work.md`: optional independent review of the implementation
 - `bro.md`, `handoff.md`: utilities
 
@@ -76,7 +77,7 @@ EXTENSIONS_DIR=/path/to/opencode-extensions
 NATIVE_DIR="$EXTENSIONS_DIR/generated/current/opencode"
 mkdir -p .opencode/agents .opencode/commands .agents/skills/show-me
 cp "$NATIVE_DIR/agents/"*.md .opencode/agents/
-cp "$NATIVE_DIR/commands/"{bro,delegate,handoff,show-program-design}.md .opencode/commands/
+cp "$NATIVE_DIR/commands/"{bro,council,delegate,handoff,show-program-design}.md .opencode/commands/
 cp "$EXTENSIONS_DIR/skills/show-me/SKILL.md" .agents/skills/show-me/SKILL.md
 ```
 

@@ -11,12 +11,14 @@ import { entries, mappings } from '../scripts/manifest.mjs';
 import { readTree, writeTree, assertTree } from '../scripts/lib/files.mjs';
 import { repository, fixture, put } from './helpers.mjs';
 
-const skills = ['bro', 'delegate', 'handoff', 'review-work', 'show-program-design'];
+const skills = ['bro', 'council', 'delegate', 'handoff', 'review-work', 'show-program-design'];
 const expectedNames = [
   ...skills.map(n => `opencode/commands/${n}.md`),
   ...['developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
   ...skills.flatMap(n => [`codex/skills/${n}/SKILL.md`, `codex/skills/${n}/agents/openai.yaml`]),
   ...['developer', 'developer_luna', 'oracle', 'contrarian'].map(n => `codex/agents/${n}.toml`),
+  ...skills.map(n => `claude/commands/${n}.md`),
+  ...['developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `claude/agents/${n}.md`),
 ].sort();
 
 test('complete native inventory, deterministic rendering and policy invariants', () => {
@@ -41,15 +43,14 @@ test('complete native inventory, deterministic rendering and policy invariants',
     assert.match(role.developer_instructions, /smallest credible checks/);
     assert.doesNotMatch(role.developer_instructions, /never stage or commit/i);
   }
-  for (const harness of ['opencode', 'codex']) {
-    const workflow = files[harness === 'opencode' ? 'opencode/commands/delegate.md' : 'codex/skills/delegate/SKILL.md'];
+  for (const workflow of ['opencode/commands/delegate.md', 'codex/skills/delegate/SKILL.md', 'claude/commands/delegate.md'].map(n => files[n])) {
     assert.match(workflow, /same Developer/);
     assert.match(workflow, /delegated claim alone is not proof/);
     assert.match(workflow, /trivial correction yourself/);
     assert.doesNotMatch(workflow, /Architect|plan\.md|\$decompose|Ticket:/);
   }
   assert.equal(frontmatter(files['opencode/commands/delegate.md']).agent, undefined);
-  for (const [harness, name, next] of [['opencode', 'opencode/commands/show-program-design.md', '/delegate'], ['codex', 'codex/skills/show-program-design/SKILL.md', '$delegate']]) {
+  for (const [harness, name, next] of [['opencode', 'opencode/commands/show-program-design.md', '/delegate'], ['codex', 'codex/skills/show-program-design/SKILL.md', '$delegate'], ['claude', 'claude/commands/show-program-design.md', '/delegate']]) {
     assert.match(files[name], /Load `show-me`/);
     assert.match(files[name], /do not implement product changes or dispatch Developers/);
     assert.ok(files[name].includes(`\`${next}\``), harness);
@@ -62,7 +63,32 @@ test('complete native inventory, deterministic rendering and policy invariants',
   for (const name of ['opencode/agents/oracle.md', 'opencode/agents/contrarian.md']) {
     assert.match(files[name], /No findings is a valid outcome/);
   }
-  for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect/);
+  for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect|\/start-work/);
+  const claudeAgents = Object.fromEntries(['developer', 'developer-luna', 'oracle', 'contrarian']
+    .map(n => [n, frontmatter(files[`claude/agents/${n}.md`])]));
+  for (const [name, meta] of Object.entries(claudeAgents)) {
+    assert.equal(meta.name, name);
+    assert.equal(/\b(Edit|Write)\b/.test(meta.tools), name.startsWith('developer'), name);
+  }
+  assert.deepEqual(Object.fromEntries(Object.entries(claudeAgents).map(([n, m]) => [n, [m.model, m.effort]])), {
+    'developer': ['claude-sonnet-5-5', 'high'], 'developer-luna': ['gpt-6.1-sol(medium)', undefined],
+    'oracle': ['claude-fable-5-1', 'high'], 'contrarian': ['gpt-6-astra(xhigh)', undefined],
+  });
+  for (const name of Object.keys(files).filter(n => n.startsWith('claude/commands/'))) {
+    assert.equal(frontmatter(files[name]).agent, undefined, name);
+    assert.doesNotMatch(files[name].split('\n---\n')[0], /\n  /, `single-line frontmatter: ${name}`);
+  }
+  for (const name of ['opencode/commands/council.md', 'codex/skills/council/SKILL.md', 'claude/commands/council.md']) {
+    assert.match(files[name], /`oracle` and `contrarian` in parallel with the same brief/);
+    assert.match(files[name], /Do not substitute another role or model/);
+    assert.match(files[name], /One round by default/);
+  }
+  assert.match(files['claude/commands/delegate.md'], /leave plan mode/);
+  assert.match(files['claude/commands/delegate.md'], /`developer-luna`/);
+  assert.match(files['claude/commands/review-work.md'], /read-only `oracle`/);
+  assert.match(files['claude/commands/review-work.md'], /Plan argument: `\$1`/);
+  const readOnly = files['claude/agents/oracle.md'].replace('tools: Read, Grep', 'tools: Read, Edit, Grep');
+  assert.throws(() => validatePayload({ ...files, 'claude/agents/oracle.md': readOnly }), /Read-only agent/);
   const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));
   assert.equal(example.agent.architect, undefined);
   assert.equal(example.instructions, undefined);

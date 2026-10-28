@@ -1,13 +1,13 @@
 # Contributor Guidance
 
-This repo packages lightweight agent extensions for four harnesses — OpenCode (`opencode/`), Claude Code (`claude/`), Codex (`codex/`), and The Last Harness (`tlh/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` maps the packages. OpenCode and Codex share canonical procedures and generate complete native files; package READMEs hold installation details.
+This repo packages lightweight agent extensions for four harnesses — OpenCode (`opencode/`), Claude Code (`claude/`), Codex (`codex/`), and The Last Harness (`tlh/`) — as file-based Markdown prompts, agent definitions, instruction files, and example config snippets. `README.md` maps the packages. OpenCode, Codex, and Claude Code share canonical procedures and generate complete native files; package READMEs hold installation details.
 
 ## Project Shape
 
-- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh`, `codex/link-global.sh`, and `tlh/link-global.sh` are opt-in helpers for global setups. OpenCode and TLH use symlinks; Codex uses skill-directory symlinks and managed regular agent copies.
+- Keep the project explicit and file-based. Packages remain independently copyable; `opencode/link-global.sh`, `codex/link-global.sh`, `claude/link-global.sh`, and `tlh/link-global.sh` are opt-in helpers for global setups. OpenCode, Claude Code, and TLH use symlinks; Codex uses skill-directory symlinks and managed regular agent copies.
 - Do not add plugins, installers, hidden config mutation, subprocess harnesses, automatic model routing, or runtime state machines unless the user explicitly chooses that direction.
 - Each package should be understandable and usable on its own after copying its files into the harness config directory (`~/.config/opencode/` / `.opencode/` for OpenCode; `~/.claude/` / `.claude/` for Claude Code; `~/.agents/skills` + `~/.codex/agents` / project `.agents/skills` + `.codex/agents` for Codex; `~/.the-last-harness/agent/prompts/` / project `.pi/prompts/` for The Last Harness).
-- OpenCode and Codex share `canonical/` procedure bodies. Native templates and `scripts/manifest.mjs` adapt commands, skill metadata, role names, models, permissions, and inputs. Claude Code, TLH, and Librarian sources remain independent; do not migrate them as part of core unification.
+- OpenCode, Codex, and Claude Code share `canonical/` procedure bodies. Native templates and `scripts/manifest.mjs` adapt commands, skill metadata, role names, models, permissions, and inputs. TLH and Librarian sources remain independent; do not migrate them as part of core unification.
 - `tlh/` is deliberately not a fourth workflow tree. The Last Harness ships its own architect, ticket loop, and subagents; that package only adds optional steps on top and must stay additive.
 
 ## Current Packages
@@ -23,7 +23,10 @@ OpenCode packages live under `opencode/`:
 
 The Claude Code package lives under `claude/`:
 
-- `claude/agents/` + `claude/commands/`: the ticket-driven architect/developer harness. See `claude/README.md` for the workflow, execution model, and model/effort allocation.
+- `claude/link-global.sh`: opt-in global symlink helper for the core Claude Code setup, with an explicit optional Librarian flag.
+- `generated/current/claude/agents/` + `generated/current/claude/commands/`: complex and bounded Developer, Oracle, and Contrarian subagents, and the shared workflow and utility commands.
+- `claude/agents/github-librarian.md` + `claude/commands/github-librarian.md`: optional GitHub research agent and command.
+- `claude/README.md`: install, CLIProxyAPI launch, models, execution notes, and migration from the retired ticket workflow.
 
 The Codex package lives under `codex/`:
 
@@ -42,7 +45,7 @@ The Last Harness package lives under `tlh/`:
 Shared skills live under `skills/`:
 
 - `skills/show-me/`: the shared visual explanation skill used by `show-program-design`.
-- `skills/grill-me-architecture/`: the standalone architecture grilling skill. Grilling is optional in the shared OpenCode/Codex workflow; Claude Code keeps its independent `/architect` integration. Both core link helpers link these shared skills directly into `~/.agents/skills/`.
+- `skills/grill-me-architecture/`: the standalone architecture grilling skill. Grilling is optional in the shared workflow. The core link helpers link these shared skills directly into `~/.agents/skills/` and `~/.claude/skills/`.
 
 ## Generated Core Conventions
 
@@ -51,7 +54,7 @@ Shared skills live under `skills/`:
 - Validate missing inputs, mappings, native syntax, and manual-only policy before publishing. Serialize Codex instructions with the TOML library and test the round trip.
 - Publish a complete immutable release and atomically switch `generated/current`. Share one generation/link lock. Never silently repair or prune published releases.
 - Link helpers preflight selected named destinations before publication. Preserve foreign links, directories, and unrelated files. Force applies only to regular-file conflicts. Retired links require exact ownership in this checkout.
-- Every entry point regenerates both payloads. Harness selection limits installation edits. Codex agent copies refresh only when Codex is selected. Tell users to rerun after source updates, then restart OpenCode and reload Codex.
+- Every entry point regenerates all payloads. Harness selection limits installation edits. Codex agent copies refresh only when Codex is selected. Tell users to rerun after source updates, then restart OpenCode and Claude Code and reload Codex.
 - Codex agent copies include source-path and content-hash comments. Update only unchanged copies owned by this checkout; require explicit force for edited or unmanaged regular files. Migrate owned agent symlinks to copies.
 - Keep `skills/show-me/` and `skills/grill-me-architecture/` as the shared sources and link their directories directly. Keep optional packages outside generation.
 
@@ -71,10 +74,12 @@ Shared skills live under `skills/`:
 
 ## File Conventions — Claude Code (`claude/`)
 
-- Subagents live in `claude/agents/*.md` with `name`, `description`, `tools`, `model`, and `effort` frontmatter. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`.
-- Commands live in `claude/commands/*.md`; they run in the main session (no `agent:` binding), so any role instructions belong in the command body itself.
-- The workflow's durable artifacts are `decision-brief.md`, `plan.md`, and `tickets/*.md`; ticket state is derived from git `Ticket:` trailers, not stored. Do not introduce hidden session state.
-- Keep `claude/README.md` in sync when changing agents, commands, or the loop mechanics — it is the package's contract.
+- Core subagents are generated into `generated/current/claude/agents/*.md` with `name`, `description`, `tools`, and `model` frontmatter, plus `effort` for Claude models. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`; validation enforces this for Oracle and Contrarian.
+- GPT-backed agents need Claude Code to run through CLIProxyAPI. Put their effort in the model's `(level)` suffix, not in `effort`. Keep model IDs in `scripts/manifest.mjs`.
+- Core commands are generated into `generated/current/claude/commands/*.md` with `description` and optional `argument-hint`. They run in the main session (no `agent:` binding), so role instructions belong in the command body. Keep generated frontmatter values on single lines.
+- The shared workflow uses the conversation, Git, and the working tree, as for Codex. Do not reintroduce tickets, a required plan file, or hidden session state. A missing or unreachable subagent is reported, not substituted.
+- Keep the Librarian in `claude/agents/` and `claude/commands/` outside generation.
+- Keep `claude/README.md` in sync when changing agents, commands, models, or proxy requirements — it is the package's contract. Remind users to restart Claude Code after changing agents or commands.
 
 ## File Conventions — Codex (`codex/`)
 
