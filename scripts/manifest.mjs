@@ -116,7 +116,7 @@ const claudeEntries = [
       "name": "oracle",
       "description": "Read-only second opinion on plans, designs, diagnoses, and code changes when uncertainty or impact justifies it. Considers consequential defects and excess scope, complexity, or tests.",
       "tools": readOnlyTools,
-      "model": "claude-fable-5-1",
+      "model": "claude-fable-5-2",
       "effort": "high"
     }
   },
