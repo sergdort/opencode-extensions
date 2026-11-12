@@ -1,6 +1,7 @@
 ---
 description: Create repo-local handoff documents for a fresh agent
 argument-hint: "[focus or instructions]"
+disable-model-invocation: true
 ---
 Write a handoff document summarising the current conversation so a fresh agent can continue the work.
 

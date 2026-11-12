@@ -64,7 +64,9 @@ const claudeEntries = [
     "harness": "claude",
     "output": `claude/commands/${name}.md`,
     "template": `templates/claude/commands/${name}.md.njk`,
-    "metadata": hint ? { description, "argument-hint": hint } : { description },
+    "metadata": hint
+      ? { description, "argument-hint": hint, "disable-model-invocation": true }
+      : { description, "disable-model-invocation": true },
     "legacy": name === "handoff" ? "claude/commands/handoff.md" : null,
   })),
   {

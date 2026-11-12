@@ -76,7 +76,7 @@ Shared skills live under `skills/`:
 
 - Core subagents are generated into `generated/current/claude/agents/*.md` with `name`, `description`, `tools`, and `model` frontmatter, plus `effort` for Claude models. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`; validation enforces this for Oracle and Contrarian.
 - GPT-backed agents need Claude Code to run through CLIProxyAPI. Put their effort in the model's `(level)` suffix, not in `effort`. Keep model IDs in `scripts/manifest.mjs`.
-- Core commands are generated into `generated/current/claude/commands/*.md` with `description` and optional `argument-hint`. They run in the main session (no `agent:` binding), so role instructions belong in the command body. Keep generated frontmatter values on single lines.
+- Core commands are generated into `generated/current/claude/commands/*.md` with `description`, optional `argument-hint`, and `disable-model-invocation: true`, so only the user can start them. They run in the main session (no `agent:` binding), so role instructions belong in the command body. Keep generated frontmatter values on single lines.
 - The shared workflow uses the conversation, Git, and the working tree, as for Codex. Do not reintroduce tickets, a required plan file, or hidden session state. A missing or unreachable subagent is reported, not substituted.
 - Keep the Librarian in `claude/agents/` and `claude/commands/` outside generation.
 - Keep `claude/README.md` in sync when changing agents, commands, models, or proxy requirements — it is the package's contract. Remind users to restart Claude Code after changing agents or commands.
