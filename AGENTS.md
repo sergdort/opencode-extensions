@@ -24,7 +24,7 @@ OpenCode packages live under `opencode/`:
 The Claude Code package lives under `claude/`:
 
 - `claude/link-global.sh`: opt-in global symlink helper for the core Claude Code setup, with an explicit optional Librarian flag.
-- `generated/current/claude/agents/` + `generated/current/claude/commands/`: complex and bounded Developer, Oracle, and Contrarian subagents, and the shared workflow and utility commands.
+- `generated/current/claude/agents/` + `generated/current/claude/commands/`: complex and bounded Developer, Oracle, Contrarian, and Sol Reviewer subagents, and the shared workflow and utility commands.
 - `claude/agents/github-librarian.md` + `claude/commands/github-librarian.md`: optional GitHub research agent and command.
 - `claude/README.md`: install, CLIProxyAPI launch, models, execution notes, and migration from the retired ticket workflow.
 
@@ -74,7 +74,7 @@ Shared skills live under `skills/`:
 
 ## File Conventions — Claude Code (`claude/`)
 
-- Core subagents are generated into `generated/current/claude/agents/*.md` with `name`, `description`, `tools`, and `model` frontmatter, plus `effort` for Claude models. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`; validation enforces this for Oracle and Contrarian.
+- Core subagents are generated into `generated/current/claude/agents/*.md` with `name`, `description`, `tools`, and `model` frontmatter, plus `effort` for Claude models. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`; validation enforces this for Oracle, Contrarian, and Sol Reviewer.
 - GPT-backed agents need Claude Code to run through CLIProxyAPI. Put their effort in the model's `(level)` suffix, not in `effort`. Keep model IDs in `scripts/manifest.mjs`.
 - Core commands are generated into `generated/current/claude/commands/*.md` with `description`, optional `argument-hint`, and `disable-model-invocation: true`, so only the user can start them. They run in the main session (no `agent:` binding), so role instructions belong in the command body. Keep generated frontmatter values on single lines.
 - The shared workflow uses the conversation, Git, and the working tree, as for Codex. Do not reintroduce tickets, a required plan file, or hidden session state. A missing or unreachable subagent is reported, not substituted.
@@ -117,7 +117,7 @@ Shared skills live under `skills/`:
 
 - Make the smallest correct change.
 - Preserve the repo's copy-based, reversible setup style.
-- Keep prompts direct, operational, and scoped to what the agent or command owns. The shared OpenCode/Codex workflow is intentionally lightweight: the user's normal agent keeps intent, delegation is opt-in, the implementation route is revised by building and integrating, and review and verification stay proportional to real uncertainty and impact. Do not reintroduce required plan templates, architecture tables, behavior IDs, verdict schemas, acceptance ledgers, or automatic review gates.
+- Keep prompts direct, operational, and scoped to what the agent or command owns. The shared OpenCode/Codex workflow is intentionally lightweight: the user's normal agent keeps intent, delegation is opt-in, the implementation route is revised by building and integrating, and review and verification stay proportional to real uncertainty and impact. Do not reintroduce required plan templates, architecture tables, behavior IDs, verdict schemas, acceptance ledgers, or automatic review gates. The one exception is `/sol-review` (OpenCode and Claude Code only): its severity labels, verdict line, and finding list stay inside that manual command and the conversation.
 - Do not add backward-compatibility layers unless there is a concrete need.
 - Avoid duplicating detailed package docs in multiple places; use root guidance for repo-wide rules and package READMEs for package-specific details.
 - Keep files ASCII unless an existing file already needs non-ASCII.
