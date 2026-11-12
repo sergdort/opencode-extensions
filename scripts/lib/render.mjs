@@ -37,7 +37,7 @@ export function validatePayload(files) {
         for (const field of ['name', 'tools', 'model']) {
           if (typeof metadata[field] !== 'string' || !metadata[field].trim()) throw new Error(`Missing ${field}: ${name}`);
         }
-        if (/^(oracle|contrarian)$/.test(metadata.name) && /\b(Edit|Write)\b/.test(metadata.tools)) {
+        if (/^(oracle|contrarian|sol-reviewer)$/.test(metadata.name) && /\b(Edit|Write)\b/.test(metadata.tools)) {
           throw new Error(`Read-only agent grants edit tools: ${name}`);
         }
       }

@@ -60,6 +60,7 @@ const claudeEntries = [
     ["delegate", "Delegate agreed work to a Developer subagent and review the result in this session, including spikes and prototypes", "[notes]"],
     ["show-program-design", "Show the program design for agreed work with show-me so the approach, architecture, and key interfaces are aligned before building; design only", "[notes]"],
     ["council", "Ask oracle and contrarian for independent views on the current question in parallel, then judge them and continue the discussion", "[question or notes]"],
+    ["sol-review", "Review the current change for bugs with sol-reviewer, fix agreed findings, and re-check once", "[git-base-or-range] [notes]"],
   ].map(([name, description, hint]) => ({
     "harness": "claude",
     "output": `claude/commands/${name}.md`,
@@ -120,6 +121,17 @@ const claudeEntries = [
       "tools": readOnlyTools,
       "model": "claude-fable-5-2",
       "effort": "high"
+    }
+  },
+  {
+    "harness": "claude",
+    "output": "claude/agents/sol-reviewer.md",
+    "template": "templates/claude/agents/sol-reviewer.md.njk",
+    "metadata": {
+      "name": "sol-reviewer",
+      "description": "Read-only correctness review of one code change for bugs, edge cases, broken callers, and mismatch with intent. Use only through /sol-review or when the user asks for a Sol review; not for design review.",
+      "tools": readOnlyTools,
+      "model": "gpt-6.1-sol(high)"
     }
   },
 ];
@@ -265,6 +277,16 @@ export const entries = [
     "context": {
       "name": "council"
     }
+  },
+  {
+    "harness": "opencode",
+    "output": "opencode/commands/sol-review.md",
+    "template": "templates/opencode/commands/sol-review.md.njk"
+  },
+  {
+    "harness": "opencode",
+    "output": "opencode/agents/sol-reviewer.md",
+    "template": "templates/opencode/agents/sol-reviewer.md.njk"
   },
   {
     "harness": "opencode",

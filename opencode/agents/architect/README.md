@@ -12,6 +12,7 @@ Generated agents in `generated/current/opencode/agents/`:
 - `developer-luna.md`: bounded Developer for predictable, directly verifiable work that follows an established pattern
 - `oracle.md`: read-only second opinion on plans, designs, diagnoses, and code changes
 - `contrarian.md`: read-only adversarial challenge to one decision
+- `sol-reviewer.md`: read-only correctness reviewer for one code change, used by `/sol-review`
 
 Both Developers work from short self-contained briefs and use OpenCode's built-in Explore agent for read-only discovery. They can be called through `/delegate` or directly with `@developer` and `@developer-luna`.
 
@@ -20,6 +21,7 @@ Generated commands in `generated/current/opencode/commands/`:
 - `show-program-design.md`: present the program design with `show-me` for alignment; design only
 - `delegate.md`: delegate agreed work, including spikes and prototypes, to a Developer and review the result in the current session
 - `council.md`: ask Oracle and Contrarian for independent views on the current question in parallel, then judge them in the current session
+- `sol-review.md`: review the current change for bugs with `sol-reviewer`, fix agreed findings in the current session, and re-check once
 - `review-work.md`: optional independent review of the implementation
 - `bro.md`, `handoff.md`: utilities
 
@@ -77,7 +79,7 @@ EXTENSIONS_DIR=/path/to/opencode-extensions
 NATIVE_DIR="$EXTENSIONS_DIR/generated/current/opencode"
 mkdir -p .opencode/agents .opencode/commands .agents/skills/show-me
 cp "$NATIVE_DIR/agents/"*.md .opencode/agents/
-cp "$NATIVE_DIR/commands/"{bro,council,delegate,handoff,show-program-design}.md .opencode/commands/
+cp "$NATIVE_DIR/commands/"{bro,council,delegate,handoff,show-program-design,sol-review}.md .opencode/commands/
 cp "$EXTENSIONS_DIR/skills/show-me/SKILL.md" .agents/skills/show-me/SKILL.md
 ```
 
@@ -97,7 +99,8 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
           "developer": "allow",
           "developer-luna": "allow",
           "oracle": "allow",
-          "contrarian": "allow"
+          "contrarian": "allow",
+          "sol-reviewer": "allow"
         }
       }
     }
@@ -117,6 +120,7 @@ Recommended routes:
 - Luna Developer: `openai/gpt-6-luna`, `max`
 - Explore: OpenCode built-in, with `openai/gpt-5.6-terra`, `low` as the recommended override
 - Oracle and Contrarian: `openai/gpt-6-astra`, `xhigh`
+- Sol Reviewer: `openai/gpt-6.1-sol`, `high`
 
 Merge the `agent` block from [the example config](opencode.architect.example.json) into your config and edit routes to match available models and variants. The primary agent's own model is whatever you already use for `build`.
 

@@ -58,6 +58,7 @@ Use the harness's normal agent (`build` in OpenCode, the main thread in Codex an
 | Show the program design for alignment before building | `/show-program-design` | `$show-program-design` | `/show-program-design` |
 | Delegate agreed work to a Developer and review it in this session | `/delegate` | `$delegate` | `/delegate` |
 | Ask Oracle and Contrarian in parallel and judge their views | `/council` | `$council` | `/council` |
+| Bug review loop with Sol: review, fix, re-check once | `/sol-review` | - | `/sol-review` |
 | Plain-language restatement | `/bro` | `$bro` | `/bro` |
 | Handoff | `/handoff` | `$handoff` | `/handoff` |
 | Independent implementation review | Optional `/review-work` via `review` | `$review-work` via `oracle` | `/review-work` via `oracle` |

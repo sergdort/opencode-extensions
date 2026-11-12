@@ -12,6 +12,7 @@ Subagents (`~/.claude/agents/`):
 | `developer-luna` | `gpt-6.1-sol(medium)` | suffix | Bounded work that follows an established pattern |
 | `oracle` | `claude-fable-5-2` | `high` | Read-only second opinion |
 | `contrarian` | `gpt-6-astra(xhigh)` | suffix | Read-only adversarial challenge to one decision |
+| `sol-reviewer` | `gpt-6.1-sol(high)` | suffix | Read-only correctness review for `/sol-review` |
 
 Commands (`~/.claude/commands/`). They run in the main session:
 
@@ -20,6 +21,7 @@ Commands (`~/.claude/commands/`). They run in the main session:
 | `/show-program-design [notes]` | Show the approach, architecture, and key interfaces with `show-me`; design only |
 | `/delegate [notes]` | Dispatch a Developer, review the diff in this session, direct corrections |
 | `/council [question or notes]` | Ask `oracle` and `contrarian` in parallel with one neutral brief, then judge their views |
+| `/sol-review [git-base-or-range] [notes]` | Ask `sol-reviewer` to find bugs in the current change, fix agreed findings, and re-check once |
 | `/review-work [plan-path-or-directory] [git-range]` | Optional independent review by `oracle` |
 | `/bro` | Restate the last reply in plain language |
 | `/handoff [focus]` | Write repo-local handoff documents |
@@ -60,7 +62,7 @@ Restart Claude Code after installation and after each rerun. Rerun the helper af
 
 ## Run Through CLIProxyAPI
 
-`developer-luna` and `contrarian` use GPT models. Claude Code reaches them only through [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). `ANTHROPIC_BASE_URL` applies to the whole process, so the main session also goes through the proxy.
+`developer-luna`, `contrarian`, and `sol-reviewer` use GPT models. Claude Code reaches them only through [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). `ANTHROPIC_BASE_URL` applies to the whole process, so the main session also goes through the proxy.
 
 1. Log in to Claude and Codex in CLIProxyAPI. Check that `GET /v1/models` lists `claude-opus-5-5`, `claude-fable-5-2`, `claude-sonnet-5-5`, `gpt-6-astra`, and `gpt-6.1-sol`.
 2. Start Claude Code with the proxy address and a proxy client key from `access.api-keys`. This is not an upstream provider key:
