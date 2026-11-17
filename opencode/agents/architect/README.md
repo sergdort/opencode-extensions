@@ -119,8 +119,9 @@ Recommended routes:
 - Complex Developer: `openai/gpt-6-sol`, `high`
 - Luna Developer: `openai/gpt-6-luna`, `max`
 - Explore: OpenCode built-in, with `openai/gpt-5.6-terra`, `low` as the recommended override
-- Oracle and Contrarian: `openai/gpt-6-astra`, `xhigh`
-- Sol Reviewer: `openai/gpt-6.1-sol`, `high`
+- Oracle: `openai/gpt-6-astra`, `xhigh`
+- Contrarian: `openai/gpt-6.2-astra`, `xhigh`
+- Sol Reviewer: `openai/gpt-6.2-sol`, `high`
 
 Merge the `agent` block from [the example config](opencode.architect.example.json) into your config and edit routes to match available models and variants. The primary agent's own model is whatever you already use for `build`.
 

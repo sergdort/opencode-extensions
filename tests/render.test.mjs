@@ -74,8 +74,8 @@ test('complete native inventory, deterministic rendering and policy invariants',
   }
   assert.deepEqual(Object.fromEntries(Object.entries(claudeAgents).map(([n, m]) => [n, [m.model, m.effort]])), {
     'developer': ['claude-sonnet-5-5', 'high'], 'developer-luna': ['gpt-6.1-sol(medium)', undefined],
-    'oracle': ['claude-fable-5-2', 'high'], 'contrarian': ['gpt-6-astra(xhigh)', undefined],
-    'sol-reviewer': ['gpt-6.1-sol(high)', undefined],
+    'oracle': ['claude-fable-5-2', 'high'], 'contrarian': ['gpt-6.2-astra(xhigh)', undefined],
+    'sol-reviewer': ['gpt-6.2-sol(high)', undefined],
   });
   for (const name of ['opencode/commands/sol-review.md', 'claude/commands/sol-review.md']) {
     assert.match(files[name], /Dispatch `sol-reviewer`/);

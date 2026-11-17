@@ -80,7 +80,7 @@ Custom agents:
 | `developer` | Complex or uncertain implementation | `gpt-6-sol` / high |
 | `developer_luna` | Bounded, directly verifiable implementation | `gpt-6-luna` / max |
 | `oracle` | Read-only plan and implementation advice | `gpt-6-astra` / xhigh |
-| `contrarian` | Focused read-only challenge to a design decision | `gpt-6-astra` / xhigh |
+| `contrarian` | Focused read-only challenge to a design decision | `gpt-6.2-astra` / xhigh |
 
 The main thread keeps its selected model; skills do not switch it. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
 

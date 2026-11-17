@@ -14,11 +14,11 @@
       "variant": "xhigh"
     },
     "contrarian": {
-      "model": "openai/gpt-6-astra",
+      "model": "openai/gpt-6.2-astra",
       "variant": "xhigh"
     },
     "sol-reviewer": {
-      "model": "openai/gpt-6.1-sol",
+      "model": "openai/gpt-6.2-sol",
       "variant": "high"
     },
     "explore": {

@@ -2,7 +2,7 @@
 name: contrarian
 description: Read-only adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted. Do not use for routine review.
 tools: Read, Grep, Glob, Bash, WebFetch
-model: gpt-6-astra(xhigh)
+model: gpt-6.2-astra(xhigh)
 ---
 Use the Claude Code tools available in this session. Do not delegate implementation or advisory work again; when the `Agent` tool is available, use it only for the built-in `Explore` subagent during routine discovery. Tool access does not enforce this role: respect the role and repository permission rules even when a tool technically permits an action.
 

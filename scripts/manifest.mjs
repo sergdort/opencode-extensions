@@ -107,7 +107,7 @@ const claudeEntries = [
       "name": "contrarian",
       "description": "Read-only adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted. Do not use for routine review.",
       "tools": readOnlyTools,
-      "model": "gpt-6-astra(xhigh)"
+      "model": "gpt-6.2-astra(xhigh)"
     }
   },
   {
@@ -131,7 +131,7 @@ const claudeEntries = [
       "name": "sol-reviewer",
       "description": "Read-only correctness review of one code change for bugs, edge cases, broken callers, and mismatch with intent. Use only through /sol-review or when the user asks for a Sol review; not for design review.",
       "tools": readOnlyTools,
-      "model": "gpt-6.1-sol(high)"
+      "model": "gpt-6.2-sol(high)"
     }
   },
 ];
@@ -368,7 +368,7 @@ export const entries = [
     "metadata": {
       "name": "contrarian",
       "description": "Read-only adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted.",
-      "model": "gpt-6-astra",
+      "model": "gpt-6.2-astra",
       "model_reasoning_effort": "xhigh",
       "sandbox_mode": "read-only"
     },

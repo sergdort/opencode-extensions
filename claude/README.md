@@ -11,8 +11,8 @@ Subagents (`~/.claude/agents/`):
 | `developer` | `claude-sonnet-5-5` | `high` | Product code under uncertainty |
 | `developer-luna` | `gpt-6.1-sol(medium)` | suffix | Bounded work that follows an established pattern |
 | `oracle` | `claude-fable-5-2` | `high` | Read-only second opinion |
-| `contrarian` | `gpt-6-astra(xhigh)` | suffix | Read-only adversarial challenge to one decision |
-| `sol-reviewer` | `gpt-6.1-sol(high)` | suffix | Read-only correctness review for `/sol-review` |
+| `contrarian` | `gpt-6.2-astra(xhigh)` | suffix | Read-only adversarial challenge to one decision |
+| `sol-reviewer` | `gpt-6.2-sol(high)` | suffix | Read-only correctness review for `/sol-review` |
 
 Commands (`~/.claude/commands/`). They run in the main session:
 
@@ -64,7 +64,7 @@ Restart Claude Code after installation and after each rerun. Rerun the helper af
 
 `developer-luna`, `contrarian`, and `sol-reviewer` use GPT models. Claude Code reaches them only through [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). `ANTHROPIC_BASE_URL` applies to the whole process, so the main session also goes through the proxy.
 
-1. Log in to Claude and Codex in CLIProxyAPI. Check that `GET /v1/models` lists `claude-opus-5-5`, `claude-fable-5-2`, `claude-sonnet-5-5`, `gpt-6-astra`, and `gpt-6.1-sol`.
+1. Log in to Claude and Codex in CLIProxyAPI. Check that `GET /v1/models` lists `claude-opus-5-5`, `claude-fable-5-2`, `claude-sonnet-5-5`, `gpt-6.1-sol`, `gpt-6.2-astra`, and `gpt-6.2-sol`.
 2. Start Claude Code with the proxy address and a proxy client key from `access.api-keys`. This is not an upstream provider key:
 
    ```bash
