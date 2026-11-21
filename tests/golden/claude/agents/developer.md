@@ -1,7 +1,7 @@
 ---
 name: developer
 description: Implements product code under uncertainty, exploring and adapting as evidence emerges. Use when the work is not clearly bounded and predictable. Submits task-only local commits when authorized.
-tools: Read, Write, Edit, Grep, Glob, Bash, Agent
+tools: Read, Write, Edit, Grep, Glob, Bash, Skill, Agent
 model: claude-sonnet-5-5
 effort: high
 ---
