@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import * as TOML from 'smol-toml';
 import { render } from '../scripts/lib/render.mjs';
 import { generateAndLink, installation, applyInstallation } from '../scripts/lib/link.mjs';
@@ -147,7 +148,7 @@ test('selected link edits with shared publication; partial installation can resu
   const actions = installation(root, { harness: 'codex' }, newEnv);
   assert.throws(() => applyInstallation(actions, (_, count) => { if (count === 2) throw Error('injected'); }, quiet), /Installation incomplete/);
   generateAndLink(root, { harness: 'codex' }, newEnv, quiet);
-  assert.ok(fs.existsSync(path.join(newEnv.CODEX_AGENTS_DIR, 'developer_luna.toml')));
+  assert.ok(fs.existsSync(path.join(newEnv.CODEX_AGENTS_DIR, 'contrarian.toml')));
 });
 
 test('changed destinations after preflight and foreign skill directory links stop installation', t => {
@@ -241,7 +242,7 @@ test('partial copy installation resumes and optional Librarian uses managed copi
   let copies = 0;
   assert.throws(() => applyInstallation(actions, action => {
     if (action.operation === 'copy' && ++copies === 2) throw Error('injected copy failure');
-  }, quiet), /Installation incomplete.*Changed:.*developer.toml.*Pending:.*developer_luna.toml/s);
+  }, quiet), /Installation incomplete.*Changed:.*developer.toml.*Pending:.*contrarian.toml/s);
   generateAndLink(root, { harness: 'codex', withLibrarian: true }, env, quiet);
   assert.equal(fs.lstatSync(installed).isFile(), true);
   fs.appendFileSync(librarian, '\n# source update\n');
@@ -264,7 +265,7 @@ test('Claude Code links agents, commands, shared skills and optional Librarian; 
   for (const destination of retiredLinks) assert.equal(fs.lstatSync(destination, { throwIfNoEntry: false }), undefined);
   assert.equal(fs.readlinkSync(foreign), path.join(base, 'foreign/decompose.md'));
   assert.equal(fs.readlinkSync(legacyDeveloper), path.join(root, 'generated/current/claude/agents/developer.md'));
-  for (const name of ['agents/oracle.md', 'agents/developer-luna.md', 'commands/delegate.md', 'commands/review-work.md']) {
+  for (const name of ['agents/oracle.md', 'agents/developer.md', 'commands/delegate.md', 'commands/review-work.md']) {
     assert.equal(fs.readlinkSync(path.join(dir, name)), path.join(root, 'generated/current/claude', name));
   }
   for (const name of ['show-me', 'grill-me-architecture']) {
@@ -275,4 +276,23 @@ test('Claude Code links agents, commands, shared skills and optional Librarian; 
   assert.equal(fs.existsSync(env.CODEX_AGENTS_DIR), false);
   generateAndLink(root, { harness: 'claude', withLibrarian: true }, env, quiet);
   assert.equal(fs.readlinkSync(path.join(dir, 'commands/github-librarian.md')), path.join(root, 'claude/commands/github-librarian.md'));
+});
+
+test('retired Developer Luna: unchanged Codex copies and owned links are removed; edited copies remain', t => {
+  const { root, env } = fixture(t);
+  const body = 'name = "developer_luna"\n';
+  const source = path.join(root, 'generated/current/codex/agents/developer_luna.toml');
+  const copy = path.join(env.CODEX_AGENTS_DIR, 'developer_luna.toml');
+  const digest = createHash('sha256').update(body).digest('hex');
+  put(copy, `# Managed by opencode-extensions\n# Source: ${JSON.stringify(source)}\n# Content-SHA256: ${digest}\n\n${body}`);
+  const claude = path.join(env.CLAUDE_CONFIG_DIR, 'agents/developer-luna.md');
+  symlink(path.join(root, 'generated/current/claude/agents/developer-luna.md'), claude);
+  generateAndLink(root, {}, env, quiet);
+  assert.equal(fs.existsSync(copy), false);
+  assert.equal(fs.lstatSync(claude, { throwIfNoEntry: false }), undefined);
+  put(copy, `# Managed by opencode-extensions\n# Source: ${JSON.stringify(source)}\n# Content-SHA256: ${digest}\n\n${body}# edited\n`);
+  const notices = [];
+  generateAndLink(root, { harness: 'codex' }, env, message => notices.push(message));
+  assert.equal(fs.existsSync(copy), true);
+  assert.match(notices.join('\n'), /Unmanaged obsolete entry remains.*developer_luna\.toml/);
 });

@@ -34,11 +34,8 @@ export function validatePayload(files) {
       const metadata = frontmatter(text, name);
       if (!metadata?.description) throw new Error(`Missing description: ${name}`);
       if (name.startsWith('claude/agents/')) {
-        for (const field of ['name', 'tools', 'model']) {
+        for (const field of ['name', 'model']) {
           if (typeof metadata[field] !== 'string' || !metadata[field].trim()) throw new Error(`Missing ${field}: ${name}`);
-        }
-        if (/^(oracle|contrarian|sol-reviewer)$/.test(metadata.name) && /\b(Edit|Write)\b/.test(metadata.tools)) {
-          throw new Error(`Read-only agent grants edit tools: ${name}`);
         }
       }
     }

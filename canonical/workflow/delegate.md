@@ -10,9 +10,8 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 
 ## Delegate
 
-- Use `developer` when design, integration, or debugging is unresolved, and `{{ roles.bounded }}` for predictable, directly verifiable work that follows an established pattern. Reassess when evidence changes the route.
-- Give the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; Developers explore and adapt internally. A small feature is one dispatch.
-- Developers may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
+- Dispatch `developer` with the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; the Developer explores and adapts internally. A small feature is one dispatch.
+- The Developer may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
 
 ## Review And Correct
 
@@ -20,7 +19,7 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 - Resume the same Developer for corrections when available. If a strategy fails twice, change it instead of repeating the prompt.
 - Make a trivial correction yourself when a round trip would cost more than the edit.
 - When appearance, interaction, or another uncertain part needs the user's judgment, show a concrete intermediate result early and ask a focused question.
-- Use `oracle` or `contrarian` only when uncertainty or impact justifies an independent read-only look. No findings is a valid outcome.
+- Use `oracle` or `contrarian` only when uncertainty or impact justifies an independent look. No findings is a valid outcome.
 - Stop once the outcome is adequately supported instead of accumulating speculative improvements.
 
 ## Git Safety And Reporting

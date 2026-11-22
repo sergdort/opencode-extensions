@@ -6,7 +6,6 @@ export const mappings = {
       "delegate": "/delegate"
     },
     "roles": {
-      "bounded": "developer-luna",
       "review": "review"
     },
     "inputs": {
@@ -21,7 +20,6 @@ export const mappings = {
       "delegate": "$delegate"
     },
     "roles": {
-      "bounded": "developer_luna",
       "review": "oracle"
     },
     "inputs": {
@@ -36,7 +34,6 @@ export const mappings = {
       "delegate": "/delegate"
     },
     "roles": {
-      "bounded": "developer-luna",
       "review": "oracle"
     },
     "inputs": {
@@ -47,9 +44,6 @@ export const mappings = {
   }
 };
 
-
-const readOnlyTools = "Read, Grep, Glob, Bash, WebFetch";
-const developerTools = "Read, Write, Edit, Grep, Glob, Bash, Skill, Agent";
 
 // Claude Code subagents send `model` verbatim. GPT models need CLIProxyAPI; the `(level)` suffix sets their effort.
 const claudeEntries = [
@@ -77,26 +71,10 @@ const claudeEntries = [
     "legacy": "claude/agents/developer.md",
     "metadata": {
       "name": "developer",
-      "description": "Implements product code under uncertainty, exploring and adapting as evidence emerges. Use when the work is not clearly bounded and predictable. Submits task-only local commits when authorized.",
-      "tools": developerTools,
+      "description": "Implements product code, exploring and adapting as evidence emerges. Submits task-only local commits when authorized.",
       "model": "claude-sonnet-5-5",
       "effort": "high"
     },
-    "context": { "bounded": false },
-    "required": ["bounded"]
-  },
-  {
-    "harness": "claude",
-    "output": "claude/agents/developer-luna.md",
-    "template": "templates/claude/agents/developer.md.njk",
-    "metadata": {
-      "name": "developer-luna",
-      "description": "Implements bounded, predictable, directly verifiable work that follows an established pattern. Hands unresolved design or uncertain debugging back.",
-      "tools": developerTools,
-      "model": "gpt-6.1-sol(medium)"
-    },
-    "context": { "bounded": true },
-    "required": ["bounded"]
   },
   {
     "harness": "claude",
@@ -105,8 +83,7 @@ const claudeEntries = [
     "legacy": "claude/agents/contrarian.md",
     "metadata": {
       "name": "contrarian",
-      "description": "Read-only adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted. Do not use for routine review.",
-      "tools": readOnlyTools,
+      "description": "Adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted. Do not use for routine review.",
       "model": "gpt-6.2-astra(xhigh)"
     }
   },
@@ -117,8 +94,7 @@ const claudeEntries = [
     "legacy": "claude/agents/oracle.md",
     "metadata": {
       "name": "oracle",
-      "description": "Read-only second opinion on plans, designs, diagnoses, and code changes when uncertainty or impact justifies it. Considers consequential defects and excess scope, complexity, or tests.",
-      "tools": readOnlyTools,
+      "description": "Second opinion on plans, designs, diagnoses, and code changes when uncertainty or impact justifies it. Considers consequential defects and excess scope, complexity, or tests.",
       "model": "claude-fable-5-2",
       "effort": "high"
     }
@@ -129,8 +105,7 @@ const claudeEntries = [
     "template": "templates/claude/agents/sol-reviewer.md.njk",
     "metadata": {
       "name": "sol-reviewer",
-      "description": "Read-only correctness review of one code change for bugs, edge cases, broken callers, and mismatch with intent. Use only through /sol-review or when the user asks for a Sol review; not for design review.",
-      "tools": readOnlyTools,
+      "description": "Correctness review of one code change for bugs, edge cases, broken callers, and mismatch with intent. Use only through /sol-review or when the user asks for a Sol review; not for design review.",
       "model": "gpt-6.2-sol(high)"
     }
   },
@@ -292,13 +267,7 @@ export const entries = [
     "harness": "opencode",
     "output": "opencode/agents/developer.md",
     "template": "templates/opencode/agents/developer.md.njk",
-    "context": {
-      "bounded": false
-    },
-    "legacy": "opencode/agents/architect/agents/developer.md",
-    "required": [
-      "bounded"
-    ]
+    "legacy": "opencode/agents/architect/agents/developer.md"
   },
   {
     "harness": "codex",
@@ -307,50 +276,11 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "developer",
-      "description": "Implement product code under uncertainty, exploring and adapting as evidence emerges. Submit task-only local commits when authorized.",
+      "description": "Implement product code, exploring and adapting as evidence emerges. Submit task-only local commits when authorized.",
       "model": "gpt-6-sol",
-      "model_reasoning_effort": "high",
-      "sandbox_mode": "workspace-write"
+      "model_reasoning_effort": "high"
     },
-    "context": {
-      "bounded": false
-    },
-    "required": [
-      "bounded"
-    ],
     "legacy": "codex/agents/developer.toml"
-  },
-  {
-    "harness": "opencode",
-    "output": "opencode/agents/developer-luna.md",
-    "template": "templates/opencode/agents/developer-luna.md.njk",
-    "context": {
-      "bounded": true
-    },
-    "legacy": "opencode/agents/architect/agents/developer-luna.md",
-    "required": [
-      "bounded"
-    ]
-  },
-  {
-    "harness": "codex",
-    "output": "codex/agents/developer_luna.toml",
-    "template": "templates/codex/agents/developer_luna.md.njk",
-    "format": "toml",
-    "metadata": {
-      "name": "developer_luna",
-      "model": "gpt-6-luna",
-      "model_reasoning_effort": "max",
-      "sandbox_mode": "workspace-write",
-      "description": "Implement bounded, predictable, directly verifiable work that follows an established pattern. Hand unresolved design or uncertain debugging back."
-    },
-    "context": {
-      "bounded": true
-    },
-    "required": [
-      "bounded"
-    ],
-    "legacy": null
   },
   {
     "harness": "opencode",
@@ -367,10 +297,9 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "contrarian",
-      "description": "Read-only adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted.",
+      "description": "Adversarial challenge to one uncertain, hard-to-reverse, or consequential decision when an independent stress test is warranted.",
       "model": "gpt-6.2-astra",
-      "model_reasoning_effort": "xhigh",
-      "sandbox_mode": "read-only"
+      "model_reasoning_effort": "xhigh"
     },
     "context": {},
     "required": [],
@@ -391,10 +320,9 @@ export const entries = [
     "format": "toml",
     "metadata": {
       "name": "oracle",
-      "description": "Read-only second opinion during planning or execution, or an explicit user request. Considers consequential defects and excess scope, complexity, or tests.",
+      "description": "Second opinion during planning or execution, or an explicit user request. Considers consequential defects and excess scope, complexity, or tests.",
       "model": "gpt-6-astra",
-      "model_reasoning_effort": "xhigh",
-      "sandbox_mode": "read-only"
+      "model_reasoning_effort": "xhigh"
     },
     "context": {},
     "required": [],
@@ -416,4 +344,7 @@ export const retired = [
   ...['architect', 'plan-feature', 'decompose', 'start-work'].map(name =>
     ({ harness: 'claude', destination: `commands/${name}.md`, legacy: `claude/commands/${name}.md` })),
   { harness: 'claude', destination: 'agents/repo-scout.md', legacy: 'claude/agents/repo-scout.md' },
+  { harness: 'claude', destination: 'agents/developer-luna.md', legacy: 'claude/agents/developer-luna.md' },
+  { harness: 'opencode', destination: 'agents/developer-luna.md', legacy: 'opencode/agents/architect/agents/developer-luna.md' },
+  { harness: 'codex', destination: 'agents/developer_luna.toml', legacy: 'codex/agents/developer_luna.toml' },
 ];

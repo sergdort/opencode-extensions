@@ -1,4 +1,4 @@
-Convene a council on the question this conversation is working on. `oracle` and `contrarian` give independent read-only views in parallel; you judge them and continue the discussion with the user.
+Convene a council on the question this conversation is working on. `oracle` and `contrarian` give independent views in parallel; you judge them and continue the discussion with the user.
 
 `{{ inputs.arguments }}`
 
@@ -11,7 +11,7 @@ Convene a council on the question this conversation is working on. `oracle` and 
 ## Consult
 
 - Dispatch `oracle` and `contrarian` in parallel with the same brief. Ask `oracle` for its own assessment and recommendation. Ask `contrarian` to attack the most load-bearing option or assumption.
-- Members stay read-only. When the question is a review of a change, ask each for a score out of 10 as a signal, not a gate.
+- Members do not change the work. When the question is a review of a change, ask each for a score out of 10 as a signal, not a gate.
 - If a member is missing or fails, say so and continue with the other. Do not substitute another role or model.
 
 ## Judge

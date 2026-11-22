@@ -8,11 +8,11 @@ description: Use only when the user explicitly invokes $review-work. Optional
 
 Run this skill only on explicit user invocation. Treat the text supplied with the skill as its arguments. Delegate, show-program-design, and council treat their arguments as notes on the work. Review accepts a plan path or directory and an optional Git range. Ask if the supplied input cannot be assigned unambiguously; reject unexpected extra inputs.
 
-Use the installed `developer`, `developer_luna`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
+Use the installed `developer`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
 
-Parent live permissions apply to spawned sessions. Agent sandbox defaults do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
+Spawned agents inherit the parent session's permissions; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
 
-Dispatch the installed read-only `oracle` with the complete review procedure below and the user's inputs. Return its findings. If Oracle is unavailable, stop and report the missing dependency. Do not substitute a main-session review.
+Dispatch the installed `oracle` with the complete review procedure below and the user's inputs. Return its findings. If Oracle is unavailable, stop and report the missing dependency. Do not substitute a main-session review.
 
 Review the current implementation against the agreed outcome.
 
@@ -28,7 +28,7 @@ Git range argument: `git-range`
 
 - If `plan-path` names a Markdown file, require its basename to be `plan.md` and use it. If it names a directory, use `<directory>/plan.md`. With no argument, use `plan.md` in the current repository or working directory. Reject a non-empty argument that does not resolve; never silently fall back to another plan.
 - Read the note's outcome, constraints, and decisions when one exists. If `git-range` is given, verify it is a valid Git range and use it. Otherwise review from the note's recorded base, or from recent history through `HEAD`; ask for a range instead of guessing when the boundary is unclear. Always include current tracked and untracked changes. Reject unexpected extra arguments.
-- Read the complete comparison and the relevant touched files. Stay read-only: do not edit, stage, commit, or push.
+- Read the complete comparison and the relevant touched files. Do not change the work under review: do not edit, stage, commit, or push.
 
 ## What To Weigh
 

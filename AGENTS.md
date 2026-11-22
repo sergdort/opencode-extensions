@@ -16,15 +16,15 @@ OpenCode packages live under `opencode/`:
 
 - `opencode/link-global.sh`: opt-in global symlink helper for the core OpenCode setup.
 - `opencode/commands/`: command documentation and the unchanged Librarian prompt. Core commands are generated into `generated/current/opencode/commands/`.
-- `opencode/agents/architect/`: documentation and example config for the complex and bounded Developer subagents, Contrarian, and the `/show-program-design` and `/delegate` commands used from the normal `build` agent; local discovery uses OpenCode's built-in Explore agent. The directory keeps its historical name; there is no Architect primary agent.
-- `opencode/agents/oracle/`: read-only second-opinion subagent preset.
+- `opencode/agents/architect/`: documentation and example config for the Developer subagent, Contrarian, and the `/show-program-design` and `/delegate` commands used from the normal `build` agent; local discovery uses OpenCode's built-in Explore agent. The directory keeps its historical name; there is no Architect primary agent.
+- `opencode/agents/oracle/`: second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
 - `opencode/plugins/second-opinions/`: optional V2 server plugin that appends an Oracle/Contrarian consultation policy to selected primary agents (default `build`) through the `context` hook. Outside generation; installed by a `plugins` config entry, not by the link helpers.
 
 The Claude Code package lives under `claude/`:
 
 - `claude/link-global.sh`: opt-in global symlink helper for the core Claude Code setup, with an explicit optional Librarian flag.
-- `generated/current/claude/agents/` + `generated/current/claude/commands/`: complex and bounded Developer, Oracle, Contrarian, and Sol Reviewer subagents, and the shared workflow and utility commands.
+- `generated/current/claude/agents/` + `generated/current/claude/commands/`: Developer, Oracle, Contrarian, and Sol Reviewer subagents, and the shared workflow and utility commands.
 - `claude/agents/github-librarian.md` + `claude/commands/github-librarian.md`: optional GitHub research agent and command.
 - `claude/README.md`: install, CLIProxyAPI launch, models, execution notes, and migration from the retired ticket workflow.
 
@@ -32,7 +32,7 @@ The Codex package lives under `codex/`:
 
 - `codex/link-global.sh`: opt-in global setup helper for the core Codex setup, with an explicit optional Librarian flag.
 - `generated/current/codex/skills/`: five manual-only workflow and utility skills.
-- `generated/current/codex/agents/`: complex and bounded Developer, Oracle, and Contrarian profiles.
+- `generated/current/codex/agents/`: Developer, Oracle, and Contrarian profiles.
 - `codex/optional/librarian/`: optional GitHub research skill and custom agent.
 - `codex/README.md`: install, workflow, execution, permission limits, model defaults, and non-goals.
 
@@ -74,7 +74,7 @@ Shared skills live under `skills/`:
 
 ## File Conventions — Claude Code (`claude/`)
 
-- Core subagents are generated into `generated/current/claude/agents/*.md` with `name`, `description`, `tools`, and `model` frontmatter, plus `effort` for Claude models. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Read-only agents must omit `Edit`/`Write` from `tools`; validation enforces this for Oracle, Contrarian, and Sol Reviewer.
+- Core subagents are generated into `generated/current/claude/agents/*.md` with `name`, `description`, and `model` frontmatter, plus `effort` for Claude models. Do not add `tools`: subagents inherit all tools, including skills and MCP tools. The `description` drives automatic delegation — keep it precise about when the agent should and should not be invoked. Oracle, Contrarian, and Sol Reviewer stay advisory through their prompts: they do not change the caller's work, but may use scratch worktrees for experiments.
 - GPT-backed agents need Claude Code to run through CLIProxyAPI. Put their effort in the model's `(level)` suffix, not in `effort`. Keep model IDs in `scripts/manifest.mjs`.
 - Core commands are generated into `generated/current/claude/commands/*.md` with `description`, optional `argument-hint`, and `disable-model-invocation: true`, so only the user can start them. They run in the main session (no `agent:` binding), so role instructions belong in the command body. Keep generated frontmatter values on single lines.
 - The shared workflow uses the conversation, Git, and the working tree, as for Codex. Do not reintroduce tickets, a required plan file, or hidden session state. A missing or unreachable subagent is reported, not substituted.
@@ -83,14 +83,14 @@ Shared skills live under `skills/`:
 
 ## File Conventions — Codex (`codex/`)
 
-- Core custom agents are generated into `generated/current/codex/agents/*.toml` with `name`, `description`, and `developer_instructions`. Model, reasoning effort, and sandbox defaults may be set with normal Codex config keys.
+- Core custom agents are generated into `generated/current/codex/agents/*.toml` with `name`, `description`, and `developer_instructions`. Model and reasoning effort are set with normal Codex config keys. Do not set `sandbox_mode`; agents inherit the parent session's permissions.
 - Core skills are generated into `generated/current/codex/skills/<skill>/SKILL.md` and use valid skill frontmatter. Each bundled workflow skill has `agents/openai.yaml` with `policy.allow_implicit_invocation: false`.
 - Keep skill descriptions explicit about manual invocation and scope. Do not add an implicit router in `AGENTS.md`.
 - Use Codex's built-in `explorer` for routine discovery instead of adding a duplicate Repo Scout.
 - Keep optional packages under `codex/optional/` and make absence non-blocking unless a core skill declares the dependency required. `show-program-design` uses `show-me` to align on the program design at the end of a conversation, design only. `grill-me-architecture` is standalone and runs only at the user's request; `skills/` holds both shared sources.
 - Keep `codex/link-global.sh` a scoped wrapper around the common generation/link implementation. It must not install dependencies, edit config, or change unrelated files.
 - The shared workflow uses the conversation, Git, and the working tree. `delegate` keeps the user's main session in charge: it dispatches a Developer, reviews the diff, and directs corrections. `show-program-design` presents the approach, architecture, and important interfaces for alignment and stops; it does not gate `delegate` or require a plan file. Respect native Plan mode restrictions. Do not add tickets, a decomposition stage, or an approval gate between design and implementation. The workflow never removes user artifacts; cleanup belongs to the user.
-- Codex custom-agent sandbox defaults are not a universal per-agent command policy because parent live permission choices propagate. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the Developer prompt contract and the delegate procedure's Git safety rules aligned.
+- Agents carry no tool lists, OpenCode `permission` blocks, or Codex sandbox modes in any harness. Prompts set their boundaries. Developers may submit authorized task-only local commits. Do not claim that their Git boundaries are mechanically enforced. Keep the Developer prompt contract and the delegate procedure's Git safety rules aligned.
 - Keep `codex/README.md` in sync when changing skills, custom agents, lifecycle rules, permissions, or model defaults.
 - Remind users to reload Codex after changing skills or custom agents.
 

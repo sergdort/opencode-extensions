@@ -8,13 +8,12 @@ There is no orchestrator primary agent, routing instruction, or approval gate be
 
 Generated agents in `generated/current/opencode/agents/`:
 
-- `developer.md`: complex Developer for work with unresolved design, unfamiliar integration, or uncertain debugging
-- `developer-luna.md`: bounded Developer for predictable, directly verifiable work that follows an established pattern
-- `oracle.md`: read-only second opinion on plans, designs, diagnoses, and code changes
-- `contrarian.md`: read-only adversarial challenge to one decision
-- `sol-reviewer.md`: read-only correctness reviewer for one code change, used by `/sol-review`
+- `developer.md`: Developer that implements product code and adapts as evidence emerges
+- `oracle.md`: second opinion on plans, designs, diagnoses, and code changes
+- `contrarian.md`: adversarial challenge to one decision
+- `sol-reviewer.md`: correctness reviewer for one code change, used by `/sol-review`
 
-Both Developers work from short self-contained briefs and use OpenCode's built-in Explore agent for read-only discovery. They can be called through `/delegate` or directly with `@developer` and `@developer-luna`.
+The Developer works from a short self-contained brief and may use OpenCode's built-in Explore agent for discovery. Call it through `/delegate` or directly with `@developer`.
 
 Generated commands in `generated/current/opencode/commands/`:
 
@@ -33,7 +32,6 @@ Generated commands in `generated/current/opencode/commands/`:
 conversation, prototypes, or a build in progress
   -> optional /show-program-design [notes]: approach, architecture, interfaces
   -> /delegate [notes], or build directly
-  -> pick developer or developer-luna from the work at hand
   -> Developer builds and verifies with the smallest credible checks
   -> build reviews the diff, resumes the same Developer for corrections
   -> honest summary and human acceptance
@@ -44,7 +42,7 @@ conversation, prototypes, or a build in progress
 - A strategy that fails twice changes instead of being repeated. Product conflicts and consequential trade-offs go back to you.
 - Developers may submit task-only local commits when you and the repository permit them. Nothing pushes, amends, squashes, or discards changes unless you ask.
 
-These are prompt rules, not a sandbox. Permission patterns do not prevent every alternate command form.
+These are prompt rules. The agents set no `permission` block, so your OpenCode config decides what they may run.
 
 ## Non-Goals
 
@@ -87,7 +85,7 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
 
 ## Task Permissions
 
-`/delegate` runs in your primary agent, so that agent must be allowed to call the Developers. If your config denies them, for example `agent.build.permission.task` with `"developer": "deny"`, `/delegate` cannot dispatch. Allow the subagents you want `build` to use:
+`/delegate` runs in your primary agent, so that agent must be allowed to call the Developer. If your config denies them, for example `agent.build.permission.task` with `"developer": "deny"`, `/delegate` cannot dispatch. Allow the subagents you want `build` to use:
 
 ```json
 {
@@ -97,7 +95,6 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
       "permission": {
         "task": {
           "developer": "allow",
-          "developer-luna": "allow",
           "oracle": "allow",
           "contrarian": "allow",
           "sol-reviewer": "allow"
@@ -108,7 +105,7 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
 }
 ```
 
-Put broad deny rules before these specific allows. The generated Developers may call only `explore`.
+Put broad deny rules before these specific allows. The generated agents carry no `permission` block, so your config decides what they may call.
 
 ## Models
 
@@ -116,8 +113,7 @@ Agent definitions omit `model` and `variant`. Configure routes in global `~/.con
 
 Recommended routes:
 
-- Complex Developer: `openai/gpt-6-sol`, `high`
-- Luna Developer: `openai/gpt-6-luna`, `max`
+- Developer: `openai/gpt-6-sol`, `high`
 - Explore: OpenCode built-in, with `openai/gpt-5.6-terra`, `low` as the recommended override
 - Oracle: `openai/gpt-6-astra`, `xhigh`
 - Contrarian: `openai/gpt-6.2-astra`, `xhigh`
