@@ -48,7 +48,7 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
 
 ## Workflow
 
-Work in the main Codex thread as usual: discuss, prototype, or build directly. Near the end of the conversation, invoke `$show-program-design` to have the main thread use `show-me` to present the approach, core architecture, and important interfaces for alignment; it designs only and stops. When you want implementation done in a separate context, leave native Plan mode if active and invoke `$delegate`. The main thread keeps your intent, hands the agreed work to `developer` or `developer_luna`, inspects the diff, and directs corrections. Arguments add notes; the outcome agreed in the conversation is the brief. No `plan.md` is required.
+Work in the main Codex thread as usual: discuss, prototype, or build directly. Near the end of the conversation, invoke `$show-program-design` to have the main thread use `show-me` to present the approach, core architecture, and important interfaces for alignment; it designs only and stops. When you want implementation done in a separate context, leave native Plan mode if active and invoke `$delegate`. The main thread keeps your intent, hands the agreed work to `developer`, inspects the diff, and directs corrections. Arguments add notes; the outcome agreed in the conversation is the brief. No `plan.md` is required.
 
 - For spikes and prototypes, the outcome can be a question to answer or behavior to demonstrate, with an agreed stopping point.
 - The main thread reviews the actual diff instead of trusting a delegated claim and resumes the same Developer for corrections when available. It makes trivial corrections itself when a round trip would cost more.
@@ -56,7 +56,7 @@ Work in the main Codex thread as usual: discuss, prototype, or build directly. N
 - When your judgment can prevent substantial rework, especially on appearance or interaction, it shows a concrete intermediate result early and asks a focused question.
 - Oracle and Contrarian run only when uncertainty or impact justifies an independent look.
 
-Developers explore and adapt internally and may revise implementation choices within user intent and safety constraints. The bounded Developer takes predictable, directly verifiable work that follows an established pattern and hands uncertain design or debugging back. Developers may submit task-owned local commits after focused proof when repository policy and the user permit them, preserving unrelated working-tree content and index entries.
+The Developer explores and adapts internally and may revise implementation choices within user intent and safety constraints. It may submit task-owned local commits after focused proof when repository policy and the user permit them, preserving unrelated working-tree content and index entries.
 
 There is no `$architect`, `$plan-feature`, `$start-work`, `$decompose`, ticket queue, or `Ticket:` trailer protocol. The helper removes only retired skill links owned by this checkout; inspect old copied skills manually.
 
@@ -77,8 +77,7 @@ Custom agents:
 
 | Name | Purpose | Default model / effort |
 |---|---|---|
-| `developer` | Complex or uncertain implementation | `gpt-6-sol` / high |
-| `developer_luna` | Bounded, directly verifiable implementation | `gpt-6-luna` / max |
+| `developer` | Implementation | `gpt-6-sol` / high |
 | `oracle` | Plan and implementation advice | `gpt-6-astra` / xhigh |
 | `contrarian` | Focused challenge to a design decision | `gpt-6.2-astra` / xhigh |
 

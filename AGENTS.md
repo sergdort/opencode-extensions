@@ -16,7 +16,7 @@ OpenCode packages live under `opencode/`:
 
 - `opencode/link-global.sh`: opt-in global symlink helper for the core OpenCode setup.
 - `opencode/commands/`: command documentation and the unchanged Librarian prompt. Core commands are generated into `generated/current/opencode/commands/`.
-- `opencode/agents/architect/`: documentation and example config for the complex and bounded Developer subagents, Contrarian, and the `/show-program-design` and `/delegate` commands used from the normal `build` agent; local discovery uses OpenCode's built-in Explore agent. The directory keeps its historical name; there is no Architect primary agent.
+- `opencode/agents/architect/`: documentation and example config for the Developer subagent, Contrarian, and the `/show-program-design` and `/delegate` commands used from the normal `build` agent; local discovery uses OpenCode's built-in Explore agent. The directory keeps its historical name; there is no Architect primary agent.
 - `opencode/agents/oracle/`: second-opinion subagent preset.
 - `opencode/agents/librarian/`: GitHub research subagent preset and command.
 - `opencode/plugins/second-opinions/`: optional V2 server plugin that appends an Oracle/Contrarian consultation policy to selected primary agents (default `build`) through the `context` hook. Outside generation; installed by a `plugins` config entry, not by the link helpers.
@@ -24,7 +24,7 @@ OpenCode packages live under `opencode/`:
 The Claude Code package lives under `claude/`:
 
 - `claude/link-global.sh`: opt-in global symlink helper for the core Claude Code setup, with an explicit optional Librarian flag.
-- `generated/current/claude/agents/` + `generated/current/claude/commands/`: complex and bounded Developer, Oracle, Contrarian, and Sol Reviewer subagents, and the shared workflow and utility commands.
+- `generated/current/claude/agents/` + `generated/current/claude/commands/`: Developer, Oracle, Contrarian, and Sol Reviewer subagents, and the shared workflow and utility commands.
 - `claude/agents/github-librarian.md` + `claude/commands/github-librarian.md`: optional GitHub research agent and command.
 - `claude/README.md`: install, CLIProxyAPI launch, models, execution notes, and migration from the retired ticket workflow.
 
@@ -32,7 +32,7 @@ The Codex package lives under `codex/`:
 
 - `codex/link-global.sh`: opt-in global setup helper for the core Codex setup, with an explicit optional Librarian flag.
 - `generated/current/codex/skills/`: five manual-only workflow and utility skills.
-- `generated/current/codex/agents/`: complex and bounded Developer, Oracle, and Contrarian profiles.
+- `generated/current/codex/agents/`: Developer, Oracle, and Contrarian profiles.
 - `codex/optional/librarian/`: optional GitHub research skill and custom agent.
 - `codex/README.md`: install, workflow, execution, permission limits, model defaults, and non-goals.
 

@@ -15,11 +15,11 @@ const skills = ['bro', 'council', 'delegate', 'handoff', 'review-work', 'show-pr
 const solReview = ['opencode/commands/sol-review.md', 'opencode/agents/sol-reviewer.md', 'claude/commands/sol-review.md', 'claude/agents/sol-reviewer.md'];
 const expectedNames = [
   ...skills.map(n => `opencode/commands/${n}.md`),
-  ...['developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
+  ...['developer', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
   ...skills.flatMap(n => [`codex/skills/${n}/SKILL.md`, `codex/skills/${n}/agents/openai.yaml`]),
-  ...['developer', 'developer_luna', 'oracle', 'contrarian'].map(n => `codex/agents/${n}.toml`),
+  ...['developer', 'oracle', 'contrarian'].map(n => `codex/agents/${n}.toml`),
   ...skills.map(n => `claude/commands/${n}.md`),
-  ...['developer', 'developer-luna', 'oracle', 'contrarian'].map(n => `claude/agents/${n}.md`),
+  ...['developer', 'oracle', 'contrarian'].map(n => `claude/agents/${n}.md`),
   ...solReview,
 ].sort();
 
@@ -36,9 +36,9 @@ test('complete native inventory, deterministic rendering and policy invariants',
       assert.throws(() => validatePayload(changed), /Manual-only policy/);
     }
   }
-  for (const name of ['developer', 'developer_luna']) {
-    const role = TOML.parse(files[`codex/agents/${name}.toml`]);
-    assert.equal(role.name, name);
+  {
+    const role = TOML.parse(files['codex/agents/developer.toml']);
+    assert.equal(role.name, 'developer');
     assert.match(role.developer_instructions, /task-owned local commits/);
     assert.match(role.developer_instructions, /protected worktree content and index entries/);
     assert.match(role.developer_instructions, /Work toward the agreed outcome through implementation and feedback/);
@@ -60,20 +60,20 @@ test('complete native inventory, deterministic rendering and policy invariants',
   }
   assert.equal(frontmatter(files['opencode/commands/show-program-design.md']).agent, undefined);
   assert.match(files['codex/skills/delegate/SKILL.md'], /leave Plan mode/);
-  assert.match(files['codex/skills/delegate/SKILL.md'], /`developer_luna`/);
+  assert.match(files['codex/skills/delegate/SKILL.md'], /Dispatch `developer`/);
   assert.match(files['codex/skills/review-work/SKILL.md'], /installed `oracle`/);
   for (const name of ['opencode/agents/oracle.md', 'opencode/agents/contrarian.md']) {
     assert.match(files[name], /No findings is a valid outcome/);
   }
   for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect|\/start-work/);
-  const claudeAgents = Object.fromEntries(['developer', 'developer-luna', 'oracle', 'contrarian', 'sol-reviewer']
+  const claudeAgents = Object.fromEntries(['developer', 'oracle', 'contrarian', 'sol-reviewer']
     .map(n => [n, frontmatter(files[`claude/agents/${n}.md`])]));
   for (const [name, meta] of Object.entries(claudeAgents)) {
     assert.equal(meta.name, name);
     assert.equal(meta.tools, undefined, name);
   }
   assert.deepEqual(Object.fromEntries(Object.entries(claudeAgents).map(([n, m]) => [n, [m.model, m.effort]])), {
-    'developer': ['claude-sonnet-5-5', 'high'], 'developer-luna': ['gpt-6.1-sol(medium)', undefined],
+    'developer': ['claude-sonnet-5-5', 'high'],
     'oracle': ['claude-fable-5-2', 'high'], 'contrarian': ['gpt-6.2-astra(xhigh)', undefined],
     'sol-reviewer': ['gpt-6.2-sol(high)', undefined],
   });
@@ -100,7 +100,8 @@ test('complete native inventory, deterministic rendering and policy invariants',
     assert.match(files[name], /One round by default/);
   }
   assert.match(files['claude/commands/delegate.md'], /leave plan mode/);
-  assert.match(files['claude/commands/delegate.md'], /`developer-luna`/);
+  assert.match(files['claude/commands/delegate.md'], /Dispatch `developer`/);
+  for (const text of Object.values(files)) assert.doesNotMatch(text, /developer[-_]luna|bounded Developer/);
   assert.match(files['claude/commands/review-work.md'], /installed `oracle`/);
   assert.match(files['claude/commands/review-work.md'], /Plan argument: `\$1`/);
   const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));
@@ -136,7 +137,7 @@ test('missing inputs, unknown values, missing mappings and unsafe outputs fail',
   put(source, body + '\n{{ unknown_required_value }}\n');
   assert.throws(() => render(root), /undefined|null/);
   put(source, body);
-  const config = structuredClone(mappings); delete config.codex.roles.bounded;
+  const config = structuredClone(mappings); delete config.codex.commands.delegate;
   assert.throws(() => render(root, entries, config), /Missing native mapping/);
   const bad = structuredClone(entries); bad[0].output = '../escape';
   assert.throws(() => render(root, bad), /Unsafe relative file/);

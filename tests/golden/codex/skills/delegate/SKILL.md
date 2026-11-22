@@ -8,7 +8,7 @@ description: Use only when the user explicitly invokes $delegate. Delegate
 
 Run this skill only on explicit user invocation. Treat the text supplied with the skill as its arguments. Delegate, show-program-design, and council treat their arguments as notes on the work. Review accepts a plan path or directory and an optional Git range. Ask if the supplied input cannot be assigned unambiguously; reject unexpected extra inputs.
 
-Use the installed `developer`, `developer_luna`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
+Use the installed `developer`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
 
 Spawned agents inherit the parent session's permissions; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
 
@@ -26,9 +26,8 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 
 ## Delegate
 
-- Use `developer` when design, integration, or debugging is unresolved, and `developer_luna` for predictable, directly verifiable work that follows an established pattern. Reassess when evidence changes the route.
-- Give the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; Developers explore and adapt internally. A small feature is one dispatch.
-- Developers may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
+- Dispatch `developer` with the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; the Developer explores and adapts internally. A small feature is one dispatch.
+- The Developer may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
 
 ## Review And Correct
 

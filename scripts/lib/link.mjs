@@ -112,8 +112,9 @@ export function installation(root, options = {}, environment = process.env, file
   }
   for (const item of retired) {
     if (!enabled(item.harness)) continue;
-    const base = item.harness === 'codex' ? bases.skills : bases[item.harness];
-    const relative = item.harness === 'codex' ? item.destination.replace(/^skills\//, '') : item.destination;
+    const base = item.harness !== 'codex' ? bases[item.harness]
+      : item.destination.startsWith('agents/') ? bases.agents : bases.skills;
+    const relative = item.harness === 'codex' ? item.destination.replace(/^(skills|agents)\//, '') : item.destination;
     add(base, relative, path.join(root, 'generated/current', item.harness, item.destination), [item.legacy], true);
   }
   for (const name of ['show-me', 'grill-me-architecture']) {
@@ -149,7 +150,9 @@ export function installation(root, options = {}, environment = process.env, file
     const info = stat(action.destination);
     const write = action.content === undefined ? 'link' : 'copy';
     if (action.remove) {
-      action.operation = !info ? 'skip' : owned(action) ? 'remove' : 'report';
+      // Retired Codex agents are managed copies; remove only unedited copies from this checkout.
+      action.operation = !info ? 'skip'
+        : owned(action) || (info.isFile() && unchangedCopy(action)) ? 'remove' : 'report';
     } else if (!info) action.operation = write;
     else if (owned(action)) {
       const target = path.resolve(path.dirname(action.destination), fs.readlinkSync(action.destination));

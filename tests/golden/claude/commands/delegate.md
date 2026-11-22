@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 Treat the text supplied with the command as its arguments. Delegate, show-program-design, and council treat their arguments as notes on the work. Review accepts a plan path or directory and an optional Git range. Sol-review accepts an optional Git base or range, followed by notes. Ask if the supplied input cannot be assigned unambiguously; reject unexpected extra inputs.
 
-Use the installed `developer`, `developer-luna`, `oracle`, and `contrarian` subagents when their stated purpose fits. Use `sol-reviewer` only for `/sol-review` or when the user asks for a Sol review. Independent review is optional and based on uncertainty and impact. Use the built-in `Explore` subagent for discovery. Dispatch subagents with the `Agent` tool. Resume the same agent for corrections when the session supports it, for example with a follow-up message to its agent ID; otherwise start a fresh Developer with the current diff and the open findings. Follow current tool schemas, not remembered parameter names. A missing or unreachable subagent blocks only the dispatch that needs it: report it and do not substitute another role. `contrarian`, `developer-luna`, and `sol-reviewer` use GPT models and need Claude Code to run through CLIProxyAPI.
+Use the installed `developer`, `oracle`, and `contrarian` subagents when their stated purpose fits. Use `sol-reviewer` only for `/sol-review` or when the user asks for a Sol review. Independent review is optional and based on uncertainty and impact. Use the built-in `Explore` subagent for discovery. Dispatch subagents with the `Agent` tool. Resume the same agent for corrections when the session supports it, for example with a follow-up message to its agent ID; otherwise start a fresh Developer with the current diff and the open findings. Follow current tool schemas, not remembered parameter names. A missing or unreachable subagent blocks only the dispatch that needs it: report it and do not substitute another role. `contrarian` and `sol-reviewer` use GPT models and need Claude Code to run through CLIProxyAPI.
 
 Subagents have full tool access; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
 
@@ -25,9 +25,8 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 
 ## Delegate
 
-- Use `developer` when design, integration, or debugging is unresolved, and `developer-luna` for predictable, directly verifiable work that follows an established pattern. Reassess when evidence changes the route.
-- Give the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; Developers explore and adapt internally. A small feature is one dispatch.
-- Developers may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
+- Dispatch `developer` with the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; the Developer explores and adapts internally. A small feature is one dispatch.
+- The Developer may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
 
 ## Review And Correct
 

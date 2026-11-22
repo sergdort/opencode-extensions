@@ -13,9 +13,8 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 
 ## Delegate
 
-- Use `developer` when design, integration, or debugging is unresolved, and `developer-luna` for predictable, directly verifiable work that follows an established pattern. Reassess when evidence changes the route.
-- Give the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; Developers explore and adapt internally. A small feature is one dispatch.
-- Developers may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
+- Dispatch `developer` with the outcome, constraints, relevant paths, and the proof expected. Keep the brief short; the Developer explores and adapts internally. A small feature is one dispatch.
+- The Developer may change implementation choices as they learn. Bring back to the user only changes to desired behavior or consequential trade-offs.
 
 ## Review And Correct
 
