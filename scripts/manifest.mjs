@@ -49,7 +49,7 @@ export const mappings = {
 
 
 const readOnlyTools = "Read, Grep, Glob, Bash, WebFetch";
-const developerTools = "Read, Write, Edit, Grep, Glob, Bash, Agent";
+const developerTools = "Read, Write, Edit, Grep, Glob, Bash, Skill, Agent";
 
 // Claude Code subagents send `model` verbatim. GPT models need CLIProxyAPI; the `(level)` suffix sets their effort.
 const claudeEntries = [
