@@ -10,9 +10,9 @@ Run this skill only on explicit user invocation. Treat the text supplied with th
 
 Use the installed `developer`, `developer_luna`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
 
-Parent live permissions apply to spawned sessions. Agent sandbox defaults do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
+Spawned agents inherit the parent session's permissions; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
 
-Convene a council on the question this conversation is working on. `oracle` and `contrarian` give independent read-only views in parallel; you judge them and continue the discussion with the user.
+Convene a council on the question this conversation is working on. `oracle` and `contrarian` give independent views in parallel; you judge them and continue the discussion with the user.
 
 `user-supplied skill arguments`
 
@@ -25,7 +25,7 @@ Convene a council on the question this conversation is working on. `oracle` and 
 ## Consult
 
 - Dispatch `oracle` and `contrarian` in parallel with the same brief. Ask `oracle` for its own assessment and recommendation. Ask `contrarian` to attack the most load-bearing option or assumption.
-- Members stay read-only. When the question is a review of a change, ask each for a score out of 10 as a signal, not a gate.
+- Members do not change the work. When the question is a review of a change, ask each for a score out of 10 as a signal, not a gate.
 - If a member is missing or fails, say so and continue with the other. Do not substitute another role or model.
 
 ## Judge

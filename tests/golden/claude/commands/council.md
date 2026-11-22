@@ -9,9 +9,9 @@ Treat the text supplied with the command as its arguments. Delegate, show-progra
 
 Use the installed `developer`, `developer-luna`, `oracle`, and `contrarian` subagents when their stated purpose fits. Use `sol-reviewer` only for `/sol-review` or when the user asks for a Sol review. Independent review is optional and based on uncertainty and impact. Use the built-in `Explore` subagent for discovery. Dispatch subagents with the `Agent` tool. Resume the same agent for corrections when the session supports it, for example with a follow-up message to its agent ID; otherwise start a fresh Developer with the current diff and the open findings. Follow current tool schemas, not remembered parameter names. A missing or unreachable subagent blocks only the dispatch that needs it: report it and do not substitute another role. `contrarian`, `developer-luna`, and `sol-reviewer` use GPT models and need Claude Code to run through CLIProxyAPI.
 
-Subagent tool lists and prompts do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
+Subagents have full tool access; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
 
-Convene a council on the question this conversation is working on. `oracle` and `contrarian` give independent read-only views in parallel; you judge them and continue the discussion with the user.
+Convene a council on the question this conversation is working on. `oracle` and `contrarian` give independent views in parallel; you judge them and continue the discussion with the user.
 
 `$ARGUMENTS`
 
@@ -24,7 +24,7 @@ Convene a council on the question this conversation is working on. `oracle` and 
 ## Consult
 
 - Dispatch `oracle` and `contrarian` in parallel with the same brief. Ask `oracle` for its own assessment and recommendation. Ask `contrarian` to attack the most load-bearing option or assumption.
-- Members stay read-only. When the question is a review of a change, ask each for a score out of 10 as a signal, not a gate.
+- Members do not change the work. When the question is a review of a change, ask each for a score out of 10 as a signal, not a gate.
 - If a member is missing or fails, say so and continue with the other. Do not substitute another role or model.
 
 ## Judge

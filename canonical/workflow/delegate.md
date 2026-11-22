@@ -20,7 +20,7 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 - Resume the same Developer for corrections when available. If a strategy fails twice, change it instead of repeating the prompt.
 - Make a trivial correction yourself when a round trip would cost more than the edit.
 - When appearance, interaction, or another uncertain part needs the user's judgment, show a concrete intermediate result early and ask a focused question.
-- Use `oracle` or `contrarian` only when uncertainty or impact justifies an independent read-only look. No findings is a valid outcome.
+- Use `oracle` or `contrarian` only when uncertainty or impact justifies an independent look. No findings is a valid outcome.
 - Stop once the outcome is adequately supported instead of accumulating speculative improvements.
 
 ## Git Safety And Reporting

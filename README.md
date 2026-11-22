@@ -63,13 +63,13 @@ Use the harness's normal agent (`build` in OpenCode, the main thread in Codex an
 | Handoff | `/handoff` | `$handoff` | `/handoff` |
 | Independent implementation review | Optional `/review-work` via `review` | `$review-work` via `oracle` | `/review-work` via `oracle` |
 
-Delegation picks the complex or bounded Developer by the work at hand, inspects the diff instead of trusting a delegated claim, and resumes the same Developer for corrections. Oracle and Contrarian are read-only reviewers used when uncertainty or impact justifies them, through delegation or directly. Program design uses `show-me` to present the approach, architecture, and important interfaces, then stops; implementation starts when you ask, directly or through delegation. `grill-me-architecture` runs at the user's request. There is no orchestrator agent, required plan file, template, tickets, or decomposition stage. Final human acceptance remains required, and repository and user restrictions remain authoritative.
+Delegation picks the complex or bounded Developer by the work at hand, inspects the diff instead of trusting a delegated claim, and resumes the same Developer for corrections. Oracle and Contrarian are independent reviewers used when uncertainty or impact justifies them, through delegation or directly. Program design uses `show-me` to present the approach, architecture, and important interfaces, then stops; implementation starts when you ask, directly or through delegation. `grill-me-architecture` runs at the user's request. There is no orchestrator agent, required plan file, template, tickets, or decomposition stage. Final human acceptance remains required, and repository and user restrictions remain authoritative.
 
 ## Rationale
 
 The shared workflow keeps design in the conversation and revises the route through building and integrating: [responding to change over following a plan](https://agilemanifesto.org/principles.html), [YAGNI](https://martinfowler.com/bliki/Yagni.html), and [getting one piece done](https://basecamp.com/shapeup/3.2-chapter-11) instead of prescribing the whole solution up front. Ceremony earns its place only when uncertainty or blast radius justifies it.
 
-Native mechanisms still differ. OpenCode and Claude Code use commands and subagents. Codex uses manual-only skills in the main thread and custom spawned agents. Prompt rules are not universal permission enforcement. Shared text cannot guarantee identical model behavior.
+Native mechanisms still differ. OpenCode and Claude Code use commands and subagents. Codex uses manual-only skills in the main thread and custom spawned agents. Agents carry no tool, permission, or sandbox restrictions; prompt rules set their boundaries. Shared text cannot guarantee identical model behavior.
 
 ## Migration And Recovery
 

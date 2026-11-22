@@ -54,7 +54,7 @@ Work in the main Codex thread as usual: discuss, prototype, or build directly. N
 - The main thread reviews the actual diff instead of trusting a delegated claim and resumes the same Developer for corrections when available. It makes trivial corrections itself when a round trip would cost more.
 - A strategy that fails twice changes instead of being repeated. Product conflicts and consequential trade-offs go back to you.
 - When your judgment can prevent substantial rework, especially on appearance or interaction, it shows a concrete intermediate result early and asks a focused question.
-- Oracle and Contrarian run only when uncertainty or impact justifies an independent read-only look.
+- Oracle and Contrarian run only when uncertainty or impact justifies an independent look.
 
 Developers explore and adapt internally and may revise implementation choices within user intent and safety constraints. The bounded Developer takes predictable, directly verifiable work that follows an established pattern and hands uncertain design or debugging back. Developers may submit task-owned local commits after focused proof when repository policy and the user permit them, preserving unrelated working-tree content and index entries.
 
@@ -79,8 +79,8 @@ Custom agents:
 |---|---|---|
 | `developer` | Complex or uncertain implementation | `gpt-6-sol` / high |
 | `developer_luna` | Bounded, directly verifiable implementation | `gpt-6-luna` / max |
-| `oracle` | Read-only plan and implementation advice | `gpt-6-astra` / xhigh |
-| `contrarian` | Focused read-only challenge to a design decision | `gpt-6.2-astra` / xhigh |
+| `oracle` | Plan and implementation advice | `gpt-6-astra` / xhigh |
+| `contrarian` | Focused challenge to a design decision | `gpt-6.2-astra` / xhigh |
 
 The main thread keeps its selected model; skills do not switch it. Use built-in `explorer` for discovery. Model availability depends on the client and account; change native metadata in `scripts/manifest.mjs` and regenerate when needed.
 
@@ -92,7 +92,7 @@ Invoke `$grill-me-architecture` separately when you want a deeper design intervi
 
 Use a Codex client that supports skill invocation policy and named custom agents. The templates follow current native tool schemas instead of requiring a fixed tool-call signature.
 
-Developer defaults use `workspace-write`; advisory defaults use `read-only`. Parent live permissions can override spawned-agent sandbox defaults. These settings do not mechanically enforce every Git or read-only prompt boundary.
+Custom agents set no `sandbox_mode`, so they inherit the parent session's permissions. Prompts set the boundaries: Developers never push or rewrite history; Oracle and Contrarian do not change your work and may use a scratch worktree for experiments.
 
 There is no implicit `AGENTS.md` router, primary-mode emulation, plugin, subprocess harness, automatic model selector, or hidden workflow state. Manual-only metadata controls skill triggering; it does not guarantee that different models behave identically.
 

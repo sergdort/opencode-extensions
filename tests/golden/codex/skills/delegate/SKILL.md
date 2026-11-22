@@ -10,7 +10,7 @@ Run this skill only on explicit user invocation. Treat the text supplied with th
 
 Use the installed `developer`, `developer_luna`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
 
-Parent live permissions apply to spawned sessions. Agent sandbox defaults do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
+Spawned agents inherit the parent session's permissions; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
 
 This skill does not switch native modes. If the active mode forbids implementation, ask the user to leave Plan mode and invoke this skill again. Do not bypass mode restrictions through tools or subagents.
 
@@ -36,7 +36,7 @@ Delegate the agreed work to a Developer subagent, then review what comes back un
 - Resume the same Developer for corrections when available. If a strategy fails twice, change it instead of repeating the prompt.
 - Make a trivial correction yourself when a round trip would cost more than the edit.
 - When appearance, interaction, or another uncertain part needs the user's judgment, show a concrete intermediate result early and ask a focused question.
-- Use `oracle` or `contrarian` only when uncertainty or impact justifies an independent read-only look. No findings is a valid outcome.
+- Use `oracle` or `contrarian` only when uncertainty or impact justifies an independent look. No findings is a valid outcome.
 - Stop once the outcome is adequately supported instead of accumulating speculative improvements.
 
 ## Git Safety And Reporting

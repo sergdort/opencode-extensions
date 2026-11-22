@@ -9,9 +9,9 @@ Treat the text supplied with the command as its arguments. Delegate, show-progra
 
 Use the installed `developer`, `developer-luna`, `oracle`, and `contrarian` subagents when their stated purpose fits. Use `sol-reviewer` only for `/sol-review` or when the user asks for a Sol review. Independent review is optional and based on uncertainty and impact. Use the built-in `Explore` subagent for discovery. Dispatch subagents with the `Agent` tool. Resume the same agent for corrections when the session supports it, for example with a follow-up message to its agent ID; otherwise start a fresh Developer with the current diff and the open findings. Follow current tool schemas, not remembered parameter names. A missing or unreachable subagent blocks only the dispatch that needs it: report it and do not substitute another role. `contrarian`, `developer-luna`, and `sol-reviewer` use GPT models and need Claude Code to run through CLIProxyAPI.
 
-Subagent tool lists and prompts do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
+Subagents have full tool access; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
 
-Dispatch the installed read-only `oracle` subagent with the complete review procedure below and the user's inputs. Return its findings. If Oracle is unavailable, stop and report the missing dependency. Do not substitute a main-session review.
+Dispatch the installed `oracle` subagent with the complete review procedure below and the user's inputs. Return its findings. If Oracle is unavailable, stop and report the missing dependency. Do not substitute a main-session review.
 
 Review the current implementation against the agreed outcome.
 
@@ -27,7 +27,7 @@ Git range argument: `$2`
 
 - If `$1` names a Markdown file, require its basename to be `plan.md` and use it. If it names a directory, use `<directory>/plan.md`. With no argument, use `plan.md` in the current repository or working directory. Reject a non-empty argument that does not resolve; never silently fall back to another plan.
 - Read the note's outcome, constraints, and decisions when one exists. If `$2` is given, verify it is a valid Git range and use it. Otherwise review from the note's recorded base, or from recent history through `HEAD`; ask for a range instead of guessing when the boundary is unclear. Always include current tracked and untracked changes. Reject unexpected extra arguments.
-- Read the complete comparison and the relevant touched files. Stay read-only: do not edit, stage, commit, or push.
+- Read the complete comparison and the relevant touched files. Do not change the work under review: do not edit, stage, commit, or push.
 
 ## What To Weigh
 

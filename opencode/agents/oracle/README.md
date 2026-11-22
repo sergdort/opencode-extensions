@@ -1,6 +1,6 @@
 # OpenCode Oracle
 
-Oracle is a simple OpenCode configuration preset for adding a read-only second-opinion subagent.
+Oracle is a simple OpenCode configuration preset for adding a second-opinion subagent.
 
 It is inspired by Pi Oracle, but the OpenCode version intentionally uses native OpenCode agents instead of a custom tool, plugin, subprocess, or installer.
 
@@ -52,9 +52,7 @@ Edit Oracle's shared charter in `canonical/roles/oracle.md` and its native front
 
 ## Permissions
 
-Oracle allows file reads, local search, web fetching, and Bash diagnostics without repeated prompts. Direct and RTK-wrapped Git commands are denied by default, with common read-only inspection such as `git status`, `git diff`, and `git log` allowed afterward. Edits and nested Task delegation are denied.
-
-This is a workflow guardrail, not a shell sandbox. Bash can mutate files through other commands, so the read-only prompt boundary remains necessary.
+Oracle sets no `permission` block, so your OpenCode config decides what it may run. Its prompt tells it not to change your work: it may run builds and tests, or use a scratch Git worktree or temporary directory, and it removes them when it finishes.
 
 ## Manual Use
 

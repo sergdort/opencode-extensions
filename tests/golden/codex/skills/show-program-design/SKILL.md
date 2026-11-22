@@ -10,7 +10,7 @@ Run this skill only on explicit user invocation. Treat the text supplied with th
 
 Use the installed `developer`, `developer_luna`, `oracle`, and `contrarian` roles when their stated purpose fits. Independent review is optional and based on uncertainty and impact. Use built-in `explorer` for discovery. Use the native subagent tools available in this session; select the named role on a supported isolated spawn and resume the same agent for corrections when available. Follow current tool schemas, not remembered parameter names. A missing role blocks only the dispatch that needs it.
 
-Parent live permissions apply to spawned sessions. Agent sandbox defaults do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
+Spawned agents inherit the parent session's permissions; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow skill; ask the user to invoke it.
 
 Native Plan mode is optional; this skill does not switch modes. Follow the active mode's restrictions and required response format. In any mode, do not implement product changes or delegate implementation during this skill.
 
@@ -32,7 +32,7 @@ Separate observed behavior from assumptions that still need implementation evide
 
 `grill-me-architecture` runs only when the user requests it. You may recommend it once for a specific decision that is expensive to reverse, then continue unless the user chooses it.
 
-Ask `oracle` or `contrarian` for an independent read-only look only when the uncertainty or blast radius justifies it. No findings is a valid outcome.
+Ask `oracle` or `contrarian` for an independent look only when the uncertainty or blast radius justifies it. No findings is a valid outcome.
 
 ## Handoff
 

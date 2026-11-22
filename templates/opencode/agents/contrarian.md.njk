@@ -1,26 +1,5 @@
 ---
-description: Read-only adversarial challenge to one uncertain, hard-to-undo, or consequential decision when an independent stress test is warranted.
+description: Adversarial challenge to one uncertain, hard-to-undo, or consequential decision when an independent stress test is warranted.
 mode: subagent
-permission:
-  edit: deny
-  bash:
-    "*": deny
-    "git status*": allow
-    "rtk git status*": allow
-    "git diff*": allow
-    "rtk git diff*": allow
-    "git log*": allow
-    "rtk git log*": allow
-    "git show*": allow
-    "rtk git show*": allow
-    "git blame*": allow
-    "rtk git blame*": allow
-    "git ls-files*": allow
-    "rtk git ls-files*": allow
-    "git rev-parse*": allow
-    "rtk git rev-parse*": allow
-    "git merge-base*": allow
-    "rtk git merge-base*": allow
-  task: deny
 ---
 {% include "canonical/roles/contrarian.md" %}

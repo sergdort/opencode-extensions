@@ -19,7 +19,7 @@ Separate observed behavior from assumptions that still need implementation evide
 
 `grill-me-architecture` runs only when the user requests it. You may recommend it once for a specific decision that is expensive to reverse, then continue unless the user chooses it.
 
-Ask `oracle` or `contrarian` for an independent read-only look only when the uncertainty or blast radius justifies it. No findings is a valid outcome.
+Ask `oracle` or `contrarian` for an independent look only when the uncertainty or blast radius justifies it. No findings is a valid outcome.
 
 ## Handoff
 

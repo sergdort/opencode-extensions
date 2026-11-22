@@ -9,7 +9,7 @@ Treat the text supplied with the command as its arguments. Delegate, show-progra
 
 Use the installed `developer`, `developer-luna`, `oracle`, and `contrarian` subagents when their stated purpose fits. Use `sol-reviewer` only for `/sol-review` or when the user asks for a Sol review. Independent review is optional and based on uncertainty and impact. Use the built-in `Explore` subagent for discovery. Dispatch subagents with the `Agent` tool. Resume the same agent for corrections when the session supports it, for example with a follow-up message to its agent ID; otherwise start a fresh Developer with the current diff and the open findings. Follow current tool schemas, not remembered parameter names. A missing or unreachable subagent blocks only the dispatch that needs it: report it and do not substitute another role. `contrarian`, `developer-luna`, and `sol-reviewer` use GPT models and need Claude Code to run through CLIProxyAPI.
 
-Subagent tool lists and prompts do not mechanically enforce Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
+Subagents have full tool access; their prompts, not permissions, set Git boundaries. Repository and explicit user restrictions remain authoritative. Do not automatically invoke the next workflow command; ask the user to invoke it.
 
 Plan mode is optional; this command does not switch modes. Follow the active mode's restrictions. In any mode, do not implement product changes or delegate implementation during this command.
 
@@ -31,7 +31,7 @@ Separate observed behavior from assumptions that still need implementation evide
 
 `grill-me-architecture` runs only when the user requests it. You may recommend it once for a specific decision that is expensive to reverse, then continue unless the user chooses it.
 
-Ask `oracle` or `contrarian` for an independent read-only look only when the uncertainty or blast radius justifies it. No findings is a valid outcome.
+Ask `oracle` or `contrarian` for an independent look only when the uncertainty or blast radius justifies it. No findings is a valid outcome.
 
 ## Handoff
 

@@ -61,7 +61,7 @@ test('complete native inventory, deterministic rendering and policy invariants',
   assert.equal(frontmatter(files['opencode/commands/show-program-design.md']).agent, undefined);
   assert.match(files['codex/skills/delegate/SKILL.md'], /leave Plan mode/);
   assert.match(files['codex/skills/delegate/SKILL.md'], /`developer_luna`/);
-  assert.match(files['codex/skills/review-work/SKILL.md'], /read-only `oracle`/);
+  assert.match(files['codex/skills/review-work/SKILL.md'], /installed `oracle`/);
   for (const name of ['opencode/agents/oracle.md', 'opencode/agents/contrarian.md']) {
     assert.match(files[name], /No findings is a valid outcome/);
   }
@@ -70,7 +70,7 @@ test('complete native inventory, deterministic rendering and policy invariants',
     .map(n => [n, frontmatter(files[`claude/agents/${n}.md`])]));
   for (const [name, meta] of Object.entries(claudeAgents)) {
     assert.equal(meta.name, name);
-    assert.equal(/\b(Edit|Write)\b/.test(meta.tools), name.startsWith('developer'), name);
+    assert.equal(meta.tools, undefined, name);
   }
   assert.deepEqual(Object.fromEntries(Object.entries(claudeAgents).map(([n, m]) => [n, [m.model, m.effort]])), {
     'developer': ['claude-sonnet-5-5', 'high'], 'developer-luna': ['gpt-6.1-sol(medium)', undefined],
@@ -87,9 +87,9 @@ test('complete native inventory, deterministic rendering and policy invariants',
   for (const name of ['opencode/agents/sol-reviewer.md', 'claude/agents/sol-reviewer.md']) {
     assert.match(files[name], /VERDICT: APPROVE or CHANGES/);
   }
-  assert.equal(frontmatter(files['opencode/agents/sol-reviewer.md']).permission.edit, 'deny');
-  const solEdit = files['claude/agents/sol-reviewer.md'].replace('tools: Read, Grep', 'tools: Read, Edit, Grep');
-  assert.throws(() => validatePayload({ ...files, 'claude/agents/sol-reviewer.md': solEdit }), /Read-only agent/);
+  for (const name of Object.keys(files).filter(n => n.startsWith('opencode/agents/'))) {
+    assert.equal(frontmatter(files[name]).permission, undefined, name);
+  }
   for (const name of Object.keys(files).filter(n => n.startsWith('claude/commands/'))) {
     assert.equal(frontmatter(files[name]).agent, undefined, name);
     assert.doesNotMatch(files[name].split('\n---\n')[0], /\n  /, `single-line frontmatter: ${name}`);
@@ -101,10 +101,8 @@ test('complete native inventory, deterministic rendering and policy invariants',
   }
   assert.match(files['claude/commands/delegate.md'], /leave plan mode/);
   assert.match(files['claude/commands/delegate.md'], /`developer-luna`/);
-  assert.match(files['claude/commands/review-work.md'], /read-only `oracle`/);
+  assert.match(files['claude/commands/review-work.md'], /installed `oracle`/);
   assert.match(files['claude/commands/review-work.md'], /Plan argument: `\$1`/);
-  const readOnly = files['claude/agents/oracle.md'].replace('tools: Read, Grep', 'tools: Read, Edit, Grep');
-  assert.throws(() => validatePayload({ ...files, 'claude/agents/oracle.md': readOnly }), /Read-only agent/);
   const example = JSON.parse(fs.readFileSync(path.join(repository, 'opencode/agents/architect/opencode.architect.example.json'), 'utf8'));
   assert.equal(example.agent.architect, undefined);
   assert.equal(example.instructions, undefined);

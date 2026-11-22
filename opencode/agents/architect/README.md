@@ -10,9 +10,9 @@ Generated agents in `generated/current/opencode/agents/`:
 
 - `developer.md`: complex Developer for work with unresolved design, unfamiliar integration, or uncertain debugging
 - `developer-luna.md`: bounded Developer for predictable, directly verifiable work that follows an established pattern
-- `oracle.md`: read-only second opinion on plans, designs, diagnoses, and code changes
-- `contrarian.md`: read-only adversarial challenge to one decision
-- `sol-reviewer.md`: read-only correctness reviewer for one code change, used by `/sol-review`
+- `oracle.md`: second opinion on plans, designs, diagnoses, and code changes
+- `contrarian.md`: adversarial challenge to one decision
+- `sol-reviewer.md`: correctness reviewer for one code change, used by `/sol-review`
 
 Both Developers work from short self-contained briefs and use OpenCode's built-in Explore agent for read-only discovery. They can be called through `/delegate` or directly with `@developer` and `@developer-luna`.
 
@@ -44,7 +44,7 @@ conversation, prototypes, or a build in progress
 - A strategy that fails twice changes instead of being repeated. Product conflicts and consequential trade-offs go back to you.
 - Developers may submit task-only local commits when you and the repository permit them. Nothing pushes, amends, squashes, or discards changes unless you ask.
 
-These are prompt rules, not a sandbox. Permission patterns do not prevent every alternate command form.
+These are prompt rules. The agents set no `permission` block, so your OpenCode config decides what they may run.
 
 ## Non-Goals
 

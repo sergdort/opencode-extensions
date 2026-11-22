@@ -1,4 +1,4 @@
-Run a correctness review loop on the current change with the read-only `sol-reviewer` subagent. Sol finds bugs and edge cases; you judge each finding and make the fixes. Design and architecture review belong to `oracle` and `contrarian`, not to this command.
+Run a correctness review loop on the current change with the `sol-reviewer` subagent. Sol finds bugs and edge cases; you judge each finding and make the fixes. Design and architecture review belong to `oracle` and `contrarian`, not to this command.
 
 `{{ inputs.arguments }}`
 

@@ -1,6 +1,6 @@
 ## Second opinions
 
-You can consult two read-only subagents without being asked: `oracle` gives a second opinion on a plan, diagnosis, or change, and `contrarian` stress-tests one decision.
+You can consult two advisory subagents without being asked: `oracle` gives a second opinion on a plan, diagnosis, or change, and `contrarian` stress-tests one decision.
 
 Consult `oracle` at these moments:
 

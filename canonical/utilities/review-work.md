@@ -12,7 +12,7 @@ Git range argument: `{{ inputs.range }}`
 
 - If `{{ inputs.plan }}` names a Markdown file, require its basename to be `plan.md` and use it. If it names a directory, use `<directory>/plan.md`. With no argument, use `plan.md` in the current repository or working directory. Reject a non-empty argument that does not resolve; never silently fall back to another plan.
 - Read the note's outcome, constraints, and decisions when one exists. If `{{ inputs.range }}` is given, verify it is a valid Git range and use it. Otherwise review from the note's recorded base, or from recent history through `HEAD`; ask for a range instead of guessing when the boundary is unclear. Always include current tracked and untracked changes. Reject unexpected extra arguments.
-- Read the complete comparison and the relevant touched files. Stay read-only: do not edit, stage, commit, or push.
+- Read the complete comparison and the relevant touched files. Do not change the work under review: do not edit, stage, commit, or push.
 
 ## What To Weigh
 
