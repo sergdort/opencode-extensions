@@ -1,4 +1,4 @@
-Run a correctness review loop on the current change with the `sol-reviewer` subagent. Sol finds bugs and edge cases; you judge each finding and make the fixes. Design and architecture review belong to `oracle` and `contrarian`, not to this command.
+Run a correctness review loop on the current change with two independent reviewers: `sol-reviewer` and `astra-reviewer`. They run the same review on different models in parallel and find bugs and edge cases; you merge and judge their findings and make the fixes. Design and architecture review belong to `oracle` and `contrarian`, not to this command.
 
 `{{ inputs.arguments }}`
 
@@ -12,19 +12,19 @@ Run a correctness review loop on the current change with the `sol-reviewer` suba
 
 ## Review
 
-Dispatch `sol-reviewer` with this brief. It gets no conversation history:
+Dispatch `sol-reviewer` and `astra-reviewer` in parallel with this brief. They get no conversation history:
 
 ```
 Repo: <absolute path>  Base: <sha>  Intent: <intent>  Out of scope: <scope>  Checks: <results>
 See: git diff <base> [-- <paths>]; git status --short (read untracked files).
 ```
 
-- Do not edit the scoped files while the review runs. Wait for the reply. A timeout, an error, or an empty reply is not approval.
-- If `sol-reviewer` is missing or fails, report it and stop. Do not substitute another agent, another model, or a main-session review.
+- Do not edit the scoped files while the reviews run. Wait for both replies. A timeout, an error, or an empty reply is not approval.
+- If one reviewer is missing or fails, report it and continue with the other. If both fail, report it and stop. Do not substitute another agent, another model, or a main-session review.
 
 ## Answer Findings
 
-Check each finding and its severity against the code yourself. Another path, a rare case, or a small cost is a nit, whatever its label.
+Merge findings that describe the same defect into one entry that keeps both IDs, such as `S2/A1`. Agreement between reviewers is not proof, and a finding from one reviewer is not weaker for that. Check each finding and its severity against the code yourself. Another path, a rare case, or a small cost is a nit, whatever its label.
 
 - Agree: make the smallest fix. Prefer to delete or narrow code over a new lock, cache, helper, or option. Add one focused test that fails without the fix only when the intent needs it.
 - Disagree: say why, with evidence such as `file:line`, a test, or command output.
@@ -35,11 +35,11 @@ Keep a short list in the conversation: ID, severity, and outcome (`fixed`, `disa
 ## Second Round
 
 - Two rounds in total: round 1 is the full review, round 2 is the check. Run more rounds only when the user asks.
-- Start round 2 only when you fixed or disputed a `blocker` or `should`, or changed behavior code after round 1. Skip it when round 1 approved or returned only nits, or when you changed only comments, docs, or formatting.
-- Resume the same `sol-reviewer` when the harness supports it; otherwise dispatch a fresh one with the round 1 brief. Send the finding list with outcomes and evidence, the same base diff, and the change since round 1. Ask it to check only the open IDs and the changed code.
+- Start round 2 only when you fixed or disputed a `blocker` or `should`, or changed behavior code after round 1. Skip it when every reviewer that replied approved or returned only nits, or when you changed only comments, docs, or formatting.
+- Run each reviewer that replied in round 1 again, in parallel. Resume each one when the harness supports it; otherwise dispatch a fresh one with the round 1 brief. Send each the merged finding list with outcomes and evidence, the same base diff, and the change since round 1. Ask each to check only the open IDs, including the other reviewer's, and the changed code.
 
 ## Finish
 
-- Agreed: `APPROVE` on the current diff, no `blocker` or `should` open, and no concern of your own.
+- Agreed: `APPROVE` on the current diff from every reviewer that replied, no `blocker` or `should` open, and no concern of your own. If only one reviewer replied, say that the review used one model.
 - Not agreed: a finding is still disputed after round 2. Show both sides in two or three lines each. The user decides. The end of the rounds is not approval.
-- Do not commit or push. Report the rounds, the reviewer model when known, what changed because of the review, the diff size before and after, and the fixed and declined findings with reasons.
+- Do not commit or push. Report the rounds, which reviewers replied and their models when known, what changed because of the review, the diff size before and after, and the fixed and declined findings with reasons.

@@ -11,7 +11,7 @@ Generated agents in `generated/current/opencode/agents/`:
 - `developer.md`: Developer that implements product code and adapts as evidence emerges
 - `oracle.md`: second opinion on plans, designs, diagnoses, and code changes
 - `contrarian.md`: adversarial challenge to one decision
-- `sol-reviewer.md`: correctness reviewer for one code change, used by `/sol-review`
+- `sol-reviewer.md` and `astra-reviewer.md`: correctness reviewers for one code change, run in parallel by `/sol-review`
 
 The Developer works from a short self-contained brief and may use OpenCode's built-in Explore agent for discovery. Call it through `/delegate` or directly with `@developer`.
 
@@ -20,7 +20,7 @@ Generated commands in `generated/current/opencode/commands/`:
 - `show-program-design.md`: present the program design with `show-me` for alignment; design only
 - `delegate.md`: delegate agreed work, including spikes and prototypes, to a Developer and review the result in the current session
 - `council.md`: ask Oracle and Contrarian for independent views on the current question in parallel, then judge them in the current session
-- `sol-review.md`: review the current change for bugs with `sol-reviewer`, fix agreed findings in the current session, and re-check once
+- `sol-review.md`: review the current change for bugs with `sol-reviewer` and `astra-reviewer` in parallel, fix agreed findings in the current session, and re-check once
 - `review-work.md`: optional independent review of the implementation
 - `bro.md`, `handoff.md`: utilities
 
@@ -97,7 +97,8 @@ For optional standalone grilling, also copy `skills/grill-me-architecture/SKILL.
           "developer": "allow",
           "oracle": "allow",
           "contrarian": "allow",
-          "sol-reviewer": "allow"
+          "sol-reviewer": "allow",
+          "astra-reviewer": "allow"
         }
       }
     }
@@ -118,6 +119,7 @@ Recommended routes:
 - Oracle: `openai/gpt-6-astra`, `xhigh`
 - Contrarian: `openai/gpt-6.2-astra`, `xhigh`
 - Sol Reviewer: `openai/gpt-6.2-sol`, `high`
+- Astra Reviewer: `openai/gpt-6.2-astra`, `high`
 
 Merge the `agent` block from [the example config](opencode.architect.example.json) into your config and edit routes to match available models and variants. The primary agent's own model is whatever you already use for `build`.
 

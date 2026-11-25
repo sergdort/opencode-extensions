@@ -12,7 +12,9 @@ import { readTree, writeTree, assertTree } from '../scripts/lib/files.mjs';
 import { repository, fixture, put } from './helpers.mjs';
 
 const skills = ['bro', 'council', 'delegate', 'handoff', 'review-work', 'show-program-design'];
-const solReview = ['opencode/commands/sol-review.md', 'opencode/agents/sol-reviewer.md', 'claude/commands/sol-review.md', 'claude/agents/sol-reviewer.md'];
+const reviewers = ['sol-reviewer', 'astra-reviewer'];
+const solReview = ['opencode/commands/sol-review.md', 'claude/commands/sol-review.md',
+  ...reviewers.flatMap(n => [`opencode/agents/${n}.md`, `claude/agents/${n}.md`])];
 const expectedNames = [
   ...skills.map(n => `opencode/commands/${n}.md`),
   ...['developer', 'oracle', 'contrarian'].map(n => `opencode/agents/${n}.md`),
@@ -66,7 +68,7 @@ test('complete native inventory, deterministic rendering and policy invariants',
     assert.match(files[name], /No findings is a valid outcome/);
   }
   for (const text of Object.values(files)) assert.doesNotMatch(text, /decision-brief\.md|\$architect|\/start-work/);
-  const claudeAgents = Object.fromEntries(['developer', 'oracle', 'contrarian', 'sol-reviewer']
+  const claudeAgents = Object.fromEntries(['developer', 'oracle', 'contrarian', ...reviewers]
     .map(n => [n, frontmatter(files[`claude/agents/${n}.md`])]));
   for (const [name, meta] of Object.entries(claudeAgents)) {
     assert.equal(meta.name, name);
@@ -75,17 +77,21 @@ test('complete native inventory, deterministic rendering and policy invariants',
   assert.deepEqual(Object.fromEntries(Object.entries(claudeAgents).map(([n, m]) => [n, [m.model, m.effort]])), {
     'developer': ['claude-sonnet-5-5', 'high'],
     'oracle': ['claude-fable-5-2', 'high'], 'contrarian': ['gpt-6.2-astra(xhigh)', undefined],
-    'sol-reviewer': ['gpt-6.2-sol(high)', undefined],
+    'sol-reviewer': ['gpt-6.2-sol(high)', undefined], 'astra-reviewer': ['gpt-6.2-astra(high)', undefined],
   });
   for (const name of ['opencode/commands/sol-review.md', 'claude/commands/sol-review.md']) {
-    assert.match(files[name], /Dispatch `sol-reviewer`/);
+    assert.match(files[name], /Dispatch `sol-reviewer` and `astra-reviewer` in parallel/);
     assert.match(files[name], /Two rounds in total/);
     assert.match(files[name], /Do not substitute another agent, another model/);
     assert.match(files[name], /Do not commit or push/);
   }
   assert.equal(frontmatter(files['opencode/commands/sol-review.md']).agent, undefined);
-  for (const name of ['opencode/agents/sol-reviewer.md', 'claude/agents/sol-reviewer.md']) {
-    assert.match(files[name], /VERDICT: APPROVE or CHANGES/);
+  for (const [name, prefix] of [['sol-reviewer', 'S'], ['astra-reviewer', 'A']]) {
+    for (const harness of ['opencode', 'claude']) {
+      const text = files[`${harness}/agents/${name}.md`];
+      assert.match(text, /VERDICT: APPROVE or CHANGES/);
+      assert.match(text, new RegExp(`\\n${prefix}1 \\[blocker\\|should\\|nit\\]`));
+    }
   }
   for (const name of Object.keys(files).filter(n => n.startsWith('opencode/agents/'))) {
     assert.equal(frontmatter(files[name]).permission, undefined, name);

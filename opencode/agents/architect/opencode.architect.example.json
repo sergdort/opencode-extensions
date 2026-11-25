@@ -17,6 +17,10 @@
       "model": "openai/gpt-6.2-sol",
       "variant": "high"
     },
+    "astra-reviewer": {
+      "model": "openai/gpt-6.2-astra",
+      "variant": "high"
+    },
     "explore": {
       "model": "openai/gpt-5.6-terra",
       "variant": "low"

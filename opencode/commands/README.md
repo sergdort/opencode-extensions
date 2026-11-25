@@ -10,7 +10,7 @@ Core commands are generated from canonical procedures. Librarian remains a nativ
 - `show-program-design.md`: present the program design with `show-me` for alignment before building; design only
 - `delegate.md`: delegate agreed work, including spikes and prototypes, to a Developer subagent and review the result in the current session
 - `council.md`: ask Oracle and Contrarian for independent views on the current question in parallel, then judge them
-- `sol-review.md`: review the current change for bugs with the `sol-reviewer` subagent, fix agreed findings, and re-check once
+- `sol-review.md`: review the current change for bugs with the `sol-reviewer` and `astra-reviewer` subagents in parallel, fix agreed findings, and re-check once
 - `review-work.md`: optionally review the implementation with an independent agent; this does not replace human QA or acceptance
 
 ## Install

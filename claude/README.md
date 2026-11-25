@@ -12,6 +12,7 @@ Subagents (`~/.claude/agents/`):
 | `oracle` | `claude-fable-5-2` | `high` | Second opinion |
 | `contrarian` | `gpt-6.2-astra(xhigh)` | suffix | Adversarial challenge to one decision |
 | `sol-reviewer` | `gpt-6.2-sol(high)` | suffix | Correctness review for `/sol-review` |
+| `astra-reviewer` | `gpt-6.2-astra(high)` | suffix | Same correctness review on Astra, in parallel with `sol-reviewer` |
 
 Commands (`~/.claude/commands/`). They run in the main session:
 
@@ -20,7 +21,7 @@ Commands (`~/.claude/commands/`). They run in the main session:
 | `/show-program-design [notes]` | Show the approach, architecture, and key interfaces with `show-me`; design only |
 | `/delegate [notes]` | Dispatch a Developer, review the diff in this session, direct corrections |
 | `/council [question or notes]` | Ask `oracle` and `contrarian` in parallel with one neutral brief, then judge their views |
-| `/sol-review [git-base-or-range] [notes]` | Ask `sol-reviewer` to find bugs in the current change, fix agreed findings, and re-check once |
+| `/sol-review [git-base-or-range] [notes]` | Ask `sol-reviewer` and `astra-reviewer` in parallel to find bugs in the current change, fix agreed findings, and re-check once |
 | `/review-work [plan-path-or-directory] [git-range]` | Optional independent review by `oracle` |
 | `/bro` | Restate the last reply in plain language |
 | `/handoff [focus]` | Write repo-local handoff documents |
@@ -43,7 +44,7 @@ In T3 Code, put this in Providers -> Claude -> Launch arguments. For the CLI, ad
 
 - No orchestrator agent, tickets, required plan file, decomposition stage, or approval gate. The workflow is the same as for OpenCode and Codex.
 - No plugins, hooks, settings edits, or hidden state. The helper only links named files.
-- No tool lists or permission rules. Every subagent gets all tools, including skills and MCP tools. Prompts set the boundaries: Developers make task-owned local commits when authorized and never push or rewrite history; Oracle, Contrarian, and Sol Reviewer do not change your work and may use a scratch worktree for experiments.
+- No tool lists or permission rules. Every subagent gets all tools, including skills and MCP tools. Prompts set the boundaries: Developers make task-owned local commits when authorized and never push or rewrite history; Oracle, Contrarian, Sol Reviewer, and Astra Reviewer do not change your work and may use a scratch worktree for experiments.
 
 ## Install
 
@@ -61,7 +62,7 @@ Restart Claude Code after installation and after each rerun. Rerun the helper af
 
 ## Run Through CLIProxyAPI
 
-`contrarian` and `sol-reviewer` use GPT models. Claude Code reaches them only through [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). `ANTHROPIC_BASE_URL` applies to the whole process, so the main session also goes through the proxy.
+`contrarian`, `sol-reviewer`, and `astra-reviewer` use GPT models. Claude Code reaches them only through [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). `ANTHROPIC_BASE_URL` applies to the whole process, so the main session also goes through the proxy.
 
 1. Log in to Claude and Codex in CLIProxyAPI. Check that `GET /v1/models` lists `claude-opus-5-5`, `claude-fable-5-2`, `claude-sonnet-5-5`, `gpt-6.1-sol`, `gpt-6.2-astra`, and `gpt-6.2-sol`.
 2. Start Claude Code with the proxy address and a proxy client key from `access.api-keys`. This is not an upstream provider key:
@@ -96,7 +97,7 @@ To change a model, edit the manifest entry, rerun the helper, and review the gol
 
 - Subagents do not see the parent conversation. The command passes a short brief with the outcome, constraints, paths, and expected proof.
 - `/delegate` resumes the same Developer for corrections when the session supports follow-up messages to an agent. Otherwise it starts a fresh Developer with the current diff and open findings.
-- Developers may use the built-in `Explore` subagent for discovery. Oracle, Contrarian, and Sol Reviewer do not start subagents.
+- Developers may use the built-in `Explore` subagent for discovery. Oracle, Contrarian, Sol Reviewer, and Astra Reviewer do not start subagents.
 - Plan mode stays authoritative. `/delegate` asks you to leave plan mode first.
 
 ## Migrating From The Ticket Workflow

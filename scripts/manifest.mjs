@@ -54,7 +54,7 @@ const claudeEntries = [
     ["delegate", "Delegate agreed work to a Developer subagent and review the result in this session, including spikes and prototypes", "[notes]"],
     ["show-program-design", "Show the program design for agreed work with show-me so the approach, architecture, and key interfaces are aligned before building; design only", "[notes]"],
     ["council", "Ask oracle and contrarian for independent views on the current question in parallel, then judge them and continue the discussion", "[question or notes]"],
-    ["sol-review", "Review the current change for bugs with sol-reviewer, fix agreed findings, and re-check once", "[git-base-or-range] [notes]"],
+    ["sol-review", "Review the current change for bugs with sol-reviewer and astra-reviewer in parallel, fix agreed findings, and re-check once", "[git-base-or-range] [notes]"],
   ].map(([name, description, hint]) => ({
     "harness": "claude",
     "output": `claude/commands/${name}.md`,
@@ -107,7 +107,21 @@ const claudeEntries = [
       "name": "sol-reviewer",
       "description": "Correctness review of one code change for bugs, edge cases, broken callers, and mismatch with intent. Use only through /sol-review or when the user asks for a Sol review; not for design review.",
       "model": "gpt-6.2-sol(high)"
-    }
+    },
+    "context": { "reviewer": { "name": "Sol Reviewer", "prefix": "S" } },
+    "required": ["reviewer"]
+  },
+  {
+    "harness": "claude",
+    "output": "claude/agents/astra-reviewer.md",
+    "template": "templates/claude/agents/astra-reviewer.md.njk",
+    "metadata": {
+      "name": "astra-reviewer",
+      "description": "Correctness review of one code change for bugs, edge cases, broken callers, and mismatch with intent. Runs on Astra beside sol-reviewer. Use only through /sol-review or when the user asks for an Astra review; not for design review.",
+      "model": "gpt-6.2-astra(high)"
+    },
+    "context": { "reviewer": { "name": "Astra Reviewer", "prefix": "A" } },
+    "required": ["reviewer"]
   },
 ];
 
@@ -261,7 +275,16 @@ export const entries = [
   {
     "harness": "opencode",
     "output": "opencode/agents/sol-reviewer.md",
-    "template": "templates/opencode/agents/sol-reviewer.md.njk"
+    "template": "templates/opencode/agents/sol-reviewer.md.njk",
+    "context": { "reviewer": { "name": "Sol Reviewer", "prefix": "S" } },
+    "required": ["reviewer"]
+  },
+  {
+    "harness": "opencode",
+    "output": "opencode/agents/astra-reviewer.md",
+    "template": "templates/opencode/agents/astra-reviewer.md.njk",
+    "context": { "reviewer": { "name": "Astra Reviewer", "prefix": "A" } },
+    "required": ["reviewer"]
   },
   {
     "harness": "opencode",
